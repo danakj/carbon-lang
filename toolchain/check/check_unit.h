@@ -31,6 +31,8 @@ struct PackageImports {
       : package_id(package_id), node_id(node_id) {}
 
   // The identifier of the imported package.
+  //
+  // The current package uses the `IdentifierId::Invalid` id.
   IdentifierId package_id;
   // The first `import` declaration in the file, which declared the package's
   // identifier (even if the import failed). Used for associating diagnostics
@@ -71,7 +73,8 @@ struct UnitAndImports {
   // name lookup.
   llvm::SmallVector<PackageImports> package_imports;
 
-  // A map of the package names to the outgoing imports above.
+  // A map of the package names to the outgoing imports above. The
+  // `IdentifierId::Invalid` id refers to the current package.
   Map<IdentifierId, int32_t> package_imports_map;
 
   // The remaining number of imports which must be checked before this unit can

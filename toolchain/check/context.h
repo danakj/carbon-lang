@@ -793,6 +793,8 @@ class Context {
   // Per-import constant values. These refer to the main IR and mainly serve as
   // a lookup table for quick access.
   //
+  // Indexed by the integer values of the `SemIR::ImportIRId`s in import_irs().
+  //
   // Inline 0 elements because it's expected to require heap allocation.
   llvm::SmallVector<SemIR::ConstantValueStore, 0> import_ir_constant_values_;
 
