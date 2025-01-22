@@ -13,6 +13,8 @@
 #include "toolchain/base/kind_switch.h"
 #include "toolchain/check/context.h"
 #include "toolchain/check/diagnostic_helpers.h"
+#include "toolchain/check/eval.h"
+#include "toolchain/check/impl_lookup.h"
 #include "toolchain/check/operator.h"
 #include "toolchain/check/pattern_match.h"
 #include "toolchain/diagnostics/format_providers.h"
@@ -985,6 +987,59 @@ static auto PerformBuiltinConversion(Context& context, SemIR::LocId loc_id,
     if (sem_ir.types().Is<SemIR::FacetType>(value_type_id)) {
       return context.AddInst<SemIR::FacetAccessType>(
           loc_id, {.type_id = target.type_id, .facet_value_inst_id = value_id});
+    }
+  }
+
+  // Implicit conversion from a class type T to a facet type F, when the
+  // class T implements the interface F.
+  if (sem_ir.types().Is<SemIR::FacetType>(target.type_id) &&
+      sem_ir.types().Is<SemIR::TypeType>(value_type_id)) {
+    auto facet_value_type_id = SemIR::TypeId::None;
+
+    // - NameRef occurs when a class type name is used explicitly, like
+    //   `f(ClassName)`.
+    // - ClassType occurs when a class value is used, like `f({} as ClassName)`.
+    // - FacetAccessType occurs inside a generic like
+    //   `fn F[I:! Interface](i: I) { G(i); }`.
+
+    // FIXME: Do we need to handle FacetType values here??? We get here with a
+    // FacetType value of the same type as the target type sometimes.
+    if (auto facet_access_type = value.TryAs<SemIR::FacetType>()) {
+      // facet_value_type_id = facet_access_type->facet_type_id;
+      context.TODO(loc_id, "???");
+    }
+
+    {
+      auto const_id = context.constant_values().Get(value_id);
+      auto type_id = context.GetTypeIdForTypeConstant(const_id);
+      facet_value_type_id = type_id;
+    }
+
+    if (auto t = context.insts().TryGetAs<SemIR::FacetAccessType>(value_id)) {
+      // FacetAccessType evals to a FacetValue of type FacetType. If that
+      // FacetType is already correct, then reuse that FacetValue instruction.
+      auto i = context.insts().Get(t->facet_value_inst_id).type_id();
+      if (i == target.type_id) {
+        return t->facet_value_inst_id;
+      }
+    }
+
+    if (facet_value_type_id.has_value()) {
+      auto interface_const_id = context.types().GetConstantId(target.type_id);
+      auto witness_inst_id = LookupImplWitness(
+          context, loc_id, context.types().GetConstantId(facet_value_type_id),
+          interface_const_id);
+      if (witness_inst_id != SemIR::InstId::None) {
+        // Construct a FacetValue instruction that binds the class with the
+        // facet type. It evaluates to a FacetValue constant value, that will
+        // have type FacetType, and that we can use as the conversion value.
+        return context.AddInst<SemIR::FacetValue>(
+            loc_id, {
+                        .type_id = target.type_id,
+                        .type_inst_id = value_id,
+                        .witness_inst_id = witness_inst_id,
+                    });
+      }
     }
   }
 
