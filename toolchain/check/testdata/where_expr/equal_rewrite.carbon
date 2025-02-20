@@ -172,6 +172,10 @@ interface A {}
 class D {}
 impl D as A {}
 // TODO: This should be a compile-time binding, once that is supported.
+// CHECK:STDERR: fail_todo_let.carbon:[[@LINE+11]]:35: error: semantics TODO: `impl lookup for a FacetType with no interface (using `where .Self impls ...` instead?)` [SemanticsTodo]
+// CHECK:STDERR: let B: type where .Self impls A = D;
+// CHECK:STDERR:                                   ^
+// CHECK:STDERR:
 // CHECK:STDERR: fail_todo_let.carbon:[[@LINE+7]]:35: error: cannot implicitly convert from `type` to `type where...` [ImplicitAsConversionFailure]
 // CHECK:STDERR: let B: type where .Self impls A = D;
 // CHECK:STDERR:                                   ^

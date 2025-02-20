@@ -237,6 +237,9 @@ auto LookupImplWitness(Context& context, SemIR::LocId loc_id,
                              .facet_type_id;
     const auto& facet_type_info = context.facet_types().Get(facet_type_id);
     if (facet_type_info.impls_constraints.empty()) {
+      context.TODO(loc_id,
+                   "impl lookup for a FacetType with no interface (using "
+                   "`where .Self impls ...` instead?)");
       return SemIR::InterfaceId::None;
     }
     if (facet_type_info.impls_constraints.size() > 1) {
