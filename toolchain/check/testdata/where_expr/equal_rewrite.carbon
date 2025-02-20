@@ -1426,15 +1426,15 @@ let K: (E where .F = .Self.G) = bool;
 // CHECK:STDOUT:   name_binding_decl {
 // CHECK:STDOUT:     %B.patt: %type_where = binding_pattern B
 // CHECK:STDOUT:   }
-// CHECK:STDOUT:   %.loc15_13.1: type = splice_block %.loc15_13.2 [concrete = constants.%type_where] {
+// CHECK:STDOUT:   %.loc19_13.1: type = splice_block %.loc19_13.2 [concrete = constants.%type_where] {
 // CHECK:STDOUT:     %.Self: type = bind_symbolic_name .Self [symbolic_self = constants.%.Self]
 // CHECK:STDOUT:     %.Self.ref: type = name_ref .Self, %.Self [symbolic_self = constants.%.Self]
 // CHECK:STDOUT:     %A.ref: type = name_ref A, %A.decl [concrete = constants.%A.type]
-// CHECK:STDOUT:     %.loc15_13.2: type = where_expr %.Self [concrete = constants.%type_where] {
+// CHECK:STDOUT:     %.loc19_13.2: type = where_expr %.Self [concrete = constants.%type_where] {
 // CHECK:STDOUT:       requirement_impls %.Self.ref, %A.ref
 // CHECK:STDOUT:     }
 // CHECK:STDOUT:   }
-// CHECK:STDOUT:   %.loc15_35: %type_where = converted @__global_init.%D.ref, <error> [concrete = <error>]
+// CHECK:STDOUT:   %.loc19_35: %type_where = converted @__global_init.%D.ref, <error> [concrete = <error>]
 // CHECK:STDOUT:   %B: %type_where = bind_name B, <error>
 // CHECK:STDOUT: }
 // CHECK:STDOUT:
