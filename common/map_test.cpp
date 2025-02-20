@@ -19,6 +19,7 @@ namespace {
 
 using RawHashtable::FixedHashKeyContext;
 using RawHashtable::IndexKeyContext;
+using RawHashtable::MoveOnlyTestData;
 using RawHashtable::TestData;
 using RawHashtable::TestKeyContext;
 using ::testing::Pair;
@@ -29,7 +30,7 @@ auto ExpectMapElementsAre(MapT&& m, MatcherRangeT element_matchers) -> void {
   // Now collect the elements into a container.
   using KeyT = typename std::remove_reference<MapT>::type::KeyT;
   using ValueT = typename std::remove_reference<MapT>::type::ValueT;
-  std::vector<std::pair<KeyT, ValueT>> map_entries;
+  std::vector<std::pair<KeyT&, ValueT&>> map_entries;
   m.ForEach([&map_entries](KeyT& k, ValueT& v) {
     map_entries.push_back({k, v});
   });
@@ -68,13 +69,27 @@ auto MakeKeyValues(ValueCB value_cb, RangeT&& range, RangeTs&&... ranges)
 template <typename MapT>
 class MapTest : public ::testing::Test {};
 
+template <typename MapT>
+class CopyableMapTest : public ::testing::Test {};
+
 using Types = ::testing::Types<
     Map<int, int>, Map<int, int, 16>, Map<int, int, 64>,
     Map<int, int, 0, TestKeyContext>, Map<int, int, 16, TestKeyContext>,
     Map<int, int, 64, TestKeyContext>, Map<TestData, TestData>,
     Map<TestData, TestData, 16>, Map<TestData, TestData, 0, TestKeyContext>,
-    Map<TestData, TestData, 16, TestKeyContext>>;
+    Map<TestData, TestData, 16, TestKeyContext>,
+    Map<MoveOnlyTestData, MoveOnlyTestData, 16>,
+    Map<MoveOnlyTestData, MoveOnlyTestData, 0, TestKeyContext>,
+    Map<MoveOnlyTestData, MoveOnlyTestData, 16, TestKeyContext>>;
 TYPED_TEST_SUITE(MapTest, Types);
+
+using CopyableTypes = ::testing::Types<
+    Map<int, int>, Map<int, int, 16>, Map<int, int, 64>,
+    Map<int, int, 0, TestKeyContext>, Map<int, int, 16, TestKeyContext>,
+    Map<int, int, 64, TestKeyContext>, Map<TestData, TestData>,
+    Map<TestData, TestData, 16>, Map<TestData, TestData, 0, TestKeyContext>,
+    Map<TestData, TestData, 16, TestKeyContext>>;
+TYPED_TEST_SUITE(CopyableMapTest, CopyableTypes);
 
 TYPED_TEST(MapTest, Basic) {
   TypeParam m;
@@ -140,7 +155,7 @@ TYPED_TEST(MapTest, FactoryAPI) {
   EXPECT_EQ(101, *m[1]);
 }
 
-TYPED_TEST(MapTest, Copy) {
+TYPED_TEST(CopyableMapTest, Copy) {
   using MapT = TypeParam;
 
   MapT m;
@@ -195,14 +210,19 @@ TYPED_TEST(MapTest, Copy) {
 TYPED_TEST(MapTest, Move) {
   using MapT = TypeParam;
 
-  MapT m;
-  // Make sure we exceed the small size for some of the map types, but not all
-  // of them, so we cover all the combinations of moving between small and
-  // large.
-  for (int i : llvm::seq(1, 24)) {
-    SCOPED_TRACE(llvm::formatv("Key: {0}", i).str());
-    ASSERT_TRUE(m.Insert(i, i * 100).is_inserted());
-  }
+  auto make_map = [] {
+    MapT m;
+    // Make sure we exceed the small size for some of the map types, but not all
+    // of them, so we cover all the combinations of moving between small and
+    // large.
+    for (int i : llvm::seq(1, 24)) {
+      SCOPED_TRACE(llvm::formatv("Key: {0}", i).str());
+      EXPECT_TRUE(m.Insert(i, i * 100).is_inserted());
+    }
+    return m;
+  };
+
+  MapT m = make_map();
 
   MapT other_m1 = std::move(m);
   ExpectMapElementsAre(
@@ -222,9 +242,13 @@ TYPED_TEST(MapTest, Move) {
       m, MakeKeyValues([](int k) { return k * 100; }, llvm::seq(1, 32)));
 
   // Copy over moved-from state also works.
-  other_m1 = m;
-  ExpectMapElementsAre(
-      other_m1, MakeKeyValues([](int k) { return k * 100; }, llvm::seq(1, 32)));
+  if constexpr (std::is_copy_assignable_v<MapT>) {
+    other_m1 = m;
+    ExpectMapElementsAre(other_m1, MakeKeyValues([](int k) { return k * 100; },
+                                                 llvm::seq(1, 32)));
+  } else {
+    other_m1 = std::move(m);
+  }
 
   // Now add still more elements.
   for (int i : llvm::seq(32, 48)) {
@@ -235,7 +259,15 @@ TYPED_TEST(MapTest, Move) {
       other_m1, MakeKeyValues([](int k) { return k * 100; }, llvm::seq(1, 48)));
 
   // And move-assign over the copy looks like the moved-from table not the copy.
-  other_m1 = std::move(m);
+  if constexpr (std::is_copy_assignable_v<MapT>) {
+    other_m1 = std::move(m);
+  } else {
+    other_m1 = make_map();
+    for (int i : llvm::seq(24, 32)) {
+      SCOPED_TRACE(llvm::formatv("Key: {0}", i).str());
+      ASSERT_TRUE(other_m1.Insert(i, i * 100).is_inserted());
+    }
+  }
   ExpectMapElementsAre(
       other_m1, MakeKeyValues([](int k) { return k * 100; }, llvm::seq(1, 32)));
 
@@ -244,15 +276,17 @@ TYPED_TEST(MapTest, Move) {
   ExpectMapElementsAre(
       other_m1, MakeKeyValues([](int k) { return k * 100; }, llvm::seq(1, 32)));
 
-  // Test copying of a moved-from table over a valid table and self-move-assign.
-  // The former is required to be valid, and the latter is in at least the case
-  // of self-move-assign-when-moved-from, but the result can be in any state so
-  // just do them and ensure we don't crash.
-  MapT other_m2 = other_m1;
-  // NOLINTNEXTLINE(bugprone-use-after-move): Testing required use-after-move.
-  other_m2 = m;
-  other_m1 = std::move(other_m1);
-  m = std::move(m);
+  if constexpr (std::is_copy_assignable_v<MapT>) {
+    // Test copying of a moved-from table over a valid table and
+    // self-move-assign. The former is required to be valid, and the latter is
+    // in at least the case of self-move-assign-when-moved-from, but the result
+    // can be in any state so just do them and ensure we don't crash.
+    MapT other_m2 = other_m1;
+    // NOLINTNEXTLINE(bugprone-use-after-move): Testing required use-after-move.
+    other_m2 = m;
+    other_m1 = std::move(other_m1);
+    m = std::move(m);
+  }
 }
 
 TYPED_TEST(MapTest, Conversions) {

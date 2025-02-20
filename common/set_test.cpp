@@ -17,6 +17,7 @@ namespace Carbon {
 namespace {
 
 using RawHashtable::IndexKeyContext;
+using RawHashtable::MoveOnlyTestData;
 using RawHashtable::TestData;
 using ::testing::UnorderedElementsAreArray;
 
@@ -24,8 +25,8 @@ template <typename SetT, typename MatcherRangeT>
 auto ExpectSetElementsAre(SetT&& s, MatcherRangeT element_matchers) -> void {
   // Collect the elements into a container.
   using KeyT = typename std::remove_reference<SetT>::type::KeyT;
-  std::vector<KeyT> entries;
-  s.ForEach([&entries](KeyT& k) { entries.push_back(k); });
+  std::vector<std::reference_wrapper<KeyT>> entries;
+  s.ForEach([&entries](KeyT& k) { entries.push_back(std::ref(k)); });
 
   // Use the GoogleMock unordered container matcher to validate and show errors
   // on wrong elements.
@@ -58,9 +59,18 @@ auto MakeElements(RangeT&& range, RangeTs&&... ranges) {
 template <typename SetT>
 class SetTest : public ::testing::Test {};
 
-using Types = ::testing::Types<Set<int>, Set<int, 16>, Set<int, 128>,
-                               Set<TestData>, Set<TestData, 16>>;
+template <typename SetT>
+class CopyableSetTest : public ::testing::Test {};
+
+using Types =
+    ::testing::Types<Set<int>, Set<int, 16>, Set<int, 128>, Set<TestData>,
+                     Set<TestData, 16>, Set<MoveOnlyTestData>,
+                     Set<MoveOnlyTestData, 16>>;
 TYPED_TEST_SUITE(SetTest, Types);
+
+using CopyableTypes = ::testing::Types<Set<int>, Set<int, 16>, Set<int, 128>,
+                                       Set<TestData>, Set<TestData, 16>>;
+TYPED_TEST_SUITE(CopyableSetTest, CopyableTypes);
 
 TYPED_TEST(SetTest, Basic) {
   using SetT = TypeParam;
@@ -108,7 +118,7 @@ TYPED_TEST(SetTest, FactoryAPI) {
                 }).is_inserted());
 }
 
-TYPED_TEST(SetTest, Copy) {
+TYPED_TEST(CopyableSetTest, Copy) {
   using SetT = TypeParam;
 
   SetT s;
@@ -156,14 +166,19 @@ TYPED_TEST(SetTest, Copy) {
 TYPED_TEST(SetTest, Move) {
   using SetT = TypeParam;
 
-  SetT s;
-  // Make sure we exceed the small size for some of the set types, but not all
-  // of them, so we cover all the combinations of copying between small and
-  // large.
-  for (int i : llvm::seq(1, 24)) {
-    SCOPED_TRACE(llvm::formatv("Key: {0}", i).str());
-    ASSERT_TRUE(s.Insert(i).is_inserted());
-  }
+  auto make_set = [] {
+    SetT s;
+    // Make sure we exceed the small size for some of the set types, but not all
+    // of them, so we cover all the combinations of copying between small and
+    // large.
+    for (int i : llvm::seq(1, 24)) {
+      SCOPED_TRACE(llvm::formatv("Key: {0}", i).str());
+      EXPECT_TRUE(s.Insert(i).is_inserted());
+    }
+    return s;
+  };
+
+  SetT s = make_set();
 
   SetT other_s1 = std::move(s);
   ExpectSetElementsAre(other_s1, MakeElements(llvm::seq(1, 24)));
@@ -180,8 +195,12 @@ TYPED_TEST(SetTest, Move) {
   ExpectSetElementsAre(s, MakeElements(llvm::seq(1, 32)));
 
   // Copy over moved-from state also works.
-  other_s1 = s;
-  ExpectSetElementsAre(other_s1, MakeElements(llvm::seq(1, 32)));
+  if constexpr (std::is_copy_assignable_v<SetT>) {
+    other_s1 = s;
+    ExpectSetElementsAre(other_s1, MakeElements(llvm::seq(1, 32)));
+  } else {
+    other_s1 = std::move(s);
+  }
 
   // Now add still more elements.
   for (int i : llvm::seq(32, 48)) {
@@ -191,22 +210,32 @@ TYPED_TEST(SetTest, Move) {
   ExpectSetElementsAre(other_s1, MakeElements(llvm::seq(1, 48)));
 
   // Move-assign over the copy looks like the moved-from table not the copy.
-  other_s1 = std::move(s);
+  if constexpr (std::is_copy_assignable_v<SetT>) {
+    other_s1 = std::move(s);
+  } else {
+    other_s1 = make_set();
+    for (int i : llvm::seq(24, 32)) {
+      SCOPED_TRACE(llvm::formatv("Key: {0}", i).str());
+      ASSERT_TRUE(other_s1.Insert(i).is_inserted());
+    }
+  }
   ExpectSetElementsAre(other_s1, MakeElements(llvm::seq(1, 32)));
 
   // Self-swap (which does a self-move) works and is a no-op.
   std::swap(other_s1, other_s1);
   ExpectSetElementsAre(other_s1, MakeElements(llvm::seq(1, 32)));
 
-  // Test copying of a moved-from table over a valid table and self-move-assign.
-  // The former is required to be valid, and the latter is in at least the case
-  // of self-move-assign-when-moved-from, but the result can be in any state so
-  // just do them and ensure we don't crash.
-  SetT other_s2 = other_s1;
-  // NOLINTNEXTLINE(bugprone-use-after-move): Testing required use-after-move.
-  other_s2 = s;
-  other_s1 = std::move(other_s1);
-  s = std::move(s);
+  if constexpr (std::is_copy_assignable_v<SetT>) {
+    // Test copying of a moved-from table over a valid table and
+    // self-move-assign. The former is required to be valid, and the latter is
+    // in at least the case of self-move-assign-when-moved-from, but the result
+    // can be in any state so just do them and ensure we don't crash.
+    SetT other_s2 = other_s1;
+    // NOLINTNEXTLINE(bugprone-use-after-move): Testing required use-after-move.
+    other_s2 = s;
+    other_s1 = std::move(other_s1);
+    s = std::move(s);
+  }
 }
 
 TYPED_TEST(SetTest, Conversions) {
