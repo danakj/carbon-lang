@@ -20,7 +20,8 @@ namespace std {
 template <class T, class U, class V, class W>
   requires(convertible_to<V, T> && convertible_to<W, U>)
 inline auto operator==(pair<T&, U&> lhs, pair<V, W> rhs) -> bool {
-  return lhs.first == T(rhs.first) && lhs.second == U(rhs.second);
+  return lhs.first == static_cast<T>(rhs.first) &&
+         lhs.second == static_cast<U>(rhs.second);
 }
 }  // namespace std
 #endif
