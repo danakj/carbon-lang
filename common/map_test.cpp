@@ -14,6 +14,17 @@
 
 #include "common/raw_hashtable_test_helpers.h"
 
+// Workaround for std::pair comparison deficiency in clang-16.
+#if defined(__clang_major__) && __clang_major__ <= 16
+namespace std {
+template <class T, class U, class V, class W>
+  requires(convertible_to<V, T> && convertible_to<W, U>)
+inline auto operator==(pair<T&, U&> lhs, pair<V, W> rhs) -> bool {
+  return lhs.first == T(rhs.first) && lhs.second == U(rhs.second);
+}
+}  // namespace std
+#endif
+
 namespace Carbon::Testing {
 namespace {
 
