@@ -43,26 +43,6 @@ fn Feed[Food:! Edible, T:! Eats(Food)](e: T, food: Food) {}
 fn HandleAnimal[T:! Animal, Food:! Edible](a: T, food: Food) { Feed(a, food); }
 
 fn F() {
-  // CHECK:STDERR: fail_todo_convert_facet_value_value_to_generic_facet_value_value.carbon:[[@LINE+20]]:3: error: cycle found in lookup of interface <TODO: interface name> for type `Goat` [ImplLookupCycle]
-  // CHECK:STDERR:   HandleAnimal({} as Goat, {} as Grass);
-  // CHECK:STDERR:   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  // CHECK:STDERR: fail_todo_convert_facet_value_value_to_generic_facet_value_value.carbon:[[@LINE-12]]:1: note: while deducing parameters of generic declared here [DeductionGenericHere]
-  // CHECK:STDERR: impl forall [T:! Animal, U:! Edible] T as Eats(U) {}
-  // CHECK:STDERR: ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  // CHECK:STDERR: fail_todo_convert_facet_value_value_to_generic_facet_value_value.carbon:[[@LINE-9]]:1: note: while deducing parameters of generic declared here [DeductionGenericHere]
-  // CHECK:STDERR: fn HandleAnimal[T:! Animal, Food:! Edible](a: T, food: Food) { Feed(a, food); }
-  // CHECK:STDERR: ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  // CHECK:STDERR:
-  // CHECK:STDERR: fail_todo_convert_facet_value_value_to_generic_facet_value_value.carbon:[[@LINE+10]]:3: error: cycle found in lookup of interface <TODO: interface name> for type `Goat` [ImplLookupCycle]
-  // CHECK:STDERR:   HandleAnimal({} as Goat, {} as Grass);
-  // CHECK:STDERR:   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  // CHECK:STDERR: fail_todo_convert_facet_value_value_to_generic_facet_value_value.carbon:[[@LINE-22]]:1: note: while deducing parameters of generic declared here [DeductionGenericHere]
-  // CHECK:STDERR: impl forall [T:! Animal, U:! Edible] T as Eats(U) {}
-  // CHECK:STDERR: ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  // CHECK:STDERR: fail_todo_convert_facet_value_value_to_generic_facet_value_value.carbon:[[@LINE-19]]:1: note: while deducing parameters of generic declared here [DeductionGenericHere]
-  // CHECK:STDERR: fn HandleAnimal[T:! Animal, Food:! Edible](a: T, food: Food) { Feed(a, food); }
-  // CHECK:STDERR: ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  // CHECK:STDERR:
   HandleAnimal({} as Goat, {} as Grass);
 }
 
@@ -498,34 +478,30 @@ fn F() {
 // CHECK:STDOUT: fn @F() {
 // CHECK:STDOUT: !entry:
 // CHECK:STDOUT:   %HandleAnimal.ref: %HandleAnimal.type = name_ref HandleAnimal, file.%HandleAnimal.decl [concrete = constants.%HandleAnimal]
-// CHECK:STDOUT:   %.loc47_17.1: %empty_struct_type = struct_literal ()
+// CHECK:STDOUT:   %.loc27_17.1: %empty_struct_type = struct_literal ()
 // CHECK:STDOUT:   %Goat.ref: type = name_ref Goat, file.%Goat.decl [concrete = constants.%Goat]
-// CHECK:STDOUT:   %.loc47_17.2: ref %Goat = temporary_storage
-// CHECK:STDOUT:   %.loc47_17.3: init %Goat = class_init (), %.loc47_17.2 [concrete = constants.%Goat.val]
-// CHECK:STDOUT:   %.loc47_17.4: ref %Goat = temporary %.loc47_17.2, %.loc47_17.3
-// CHECK:STDOUT:   %.loc47_19.1: ref %Goat = converted %.loc47_17.1, %.loc47_17.4
-// CHECK:STDOUT:   %.loc47_29.1: %empty_struct_type = struct_literal ()
+// CHECK:STDOUT:   %.loc27_17.2: ref %Goat = temporary_storage
+// CHECK:STDOUT:   %.loc27_17.3: init %Goat = class_init (), %.loc27_17.2 [concrete = constants.%Goat.val]
+// CHECK:STDOUT:   %.loc27_17.4: ref %Goat = temporary %.loc27_17.2, %.loc27_17.3
+// CHECK:STDOUT:   %.loc27_19.1: ref %Goat = converted %.loc27_17.1, %.loc27_17.4
+// CHECK:STDOUT:   %.loc27_29.1: %empty_struct_type = struct_literal ()
 // CHECK:STDOUT:   %Grass.ref: type = name_ref Grass, file.%Grass.decl [concrete = constants.%Grass]
-// CHECK:STDOUT:   %.loc47_29.2: ref %Grass = temporary_storage
-// CHECK:STDOUT:   %.loc47_29.3: init %Grass = class_init (), %.loc47_29.2 [concrete = constants.%Grass.val]
-// CHECK:STDOUT:   %.loc47_29.4: ref %Grass = temporary %.loc47_29.2, %.loc47_29.3
-// CHECK:STDOUT:   %.loc47_31.1: ref %Grass = converted %.loc47_29.1, %.loc47_29.4
-// CHECK:STDOUT:   %Animal.facet.loc47_39.1: %Animal.type = facet_value constants.%Goat, <error> [concrete = <error>]
-// CHECK:STDOUT:   %.loc47_39.1: %Animal.type = converted constants.%Goat, %Animal.facet.loc47_39.1 [concrete = <error>]
-// CHECK:STDOUT:   %Animal.facet.loc47_39.2: %Animal.type = facet_value constants.%Goat, constants.%impl_witness.1bc [concrete = constants.%Animal.facet]
-// CHECK:STDOUT:   %.loc47_39.2: %Animal.type = converted constants.%Goat, %Animal.facet.loc47_39.2 [concrete = constants.%Animal.facet]
-// CHECK:STDOUT:   %Animal.facet.loc47_39.3: %Animal.type = facet_value constants.%Goat, <error> [concrete = <error>]
-// CHECK:STDOUT:   %.loc47_39.3: %Animal.type = converted constants.%Goat, %Animal.facet.loc47_39.3 [concrete = <error>]
-// CHECK:STDOUT:   %Animal.facet.loc47_39.4: %Animal.type = facet_value constants.%Goat, constants.%impl_witness.1bc [concrete = constants.%Animal.facet]
-// CHECK:STDOUT:   %.loc47_39.4: %Animal.type = converted constants.%Goat, %Animal.facet.loc47_39.4 [concrete = constants.%Animal.facet]
-// CHECK:STDOUT:   %Edible.facet.loc47_39.1: %Edible.type = facet_value constants.%Grass, constants.%impl_witness.1bc [concrete = constants.%Edible.facet]
-// CHECK:STDOUT:   %.loc47_39.5: %Edible.type = converted constants.%Grass, %Edible.facet.loc47_39.1 [concrete = constants.%Edible.facet]
-// CHECK:STDOUT:   %Edible.facet.loc47_39.2: %Edible.type = facet_value constants.%Grass, constants.%impl_witness.1bc [concrete = constants.%Edible.facet]
-// CHECK:STDOUT:   %.loc47_39.6: %Edible.type = converted constants.%Grass, %Edible.facet.loc47_39.2 [concrete = constants.%Edible.facet]
+// CHECK:STDOUT:   %.loc27_29.2: ref %Grass = temporary_storage
+// CHECK:STDOUT:   %.loc27_29.3: init %Grass = class_init (), %.loc27_29.2 [concrete = constants.%Grass.val]
+// CHECK:STDOUT:   %.loc27_29.4: ref %Grass = temporary %.loc27_29.2, %.loc27_29.3
+// CHECK:STDOUT:   %.loc27_31.1: ref %Grass = converted %.loc27_29.1, %.loc27_29.4
+// CHECK:STDOUT:   %Animal.facet.loc27_39.1: %Animal.type = facet_value constants.%Goat, constants.%impl_witness.1bc [concrete = constants.%Animal.facet]
+// CHECK:STDOUT:   %.loc27_39.1: %Animal.type = converted constants.%Goat, %Animal.facet.loc27_39.1 [concrete = constants.%Animal.facet]
+// CHECK:STDOUT:   %Animal.facet.loc27_39.2: %Animal.type = facet_value constants.%Goat, constants.%impl_witness.1bc [concrete = constants.%Animal.facet]
+// CHECK:STDOUT:   %.loc27_39.2: %Animal.type = converted constants.%Goat, %Animal.facet.loc27_39.2 [concrete = constants.%Animal.facet]
+// CHECK:STDOUT:   %Edible.facet.loc27_39.1: %Edible.type = facet_value constants.%Grass, constants.%impl_witness.1bc [concrete = constants.%Edible.facet]
+// CHECK:STDOUT:   %.loc27_39.3: %Edible.type = converted constants.%Grass, %Edible.facet.loc27_39.1 [concrete = constants.%Edible.facet]
+// CHECK:STDOUT:   %Edible.facet.loc27_39.2: %Edible.type = facet_value constants.%Grass, constants.%impl_witness.1bc [concrete = constants.%Edible.facet]
+// CHECK:STDOUT:   %.loc27_39.4: %Edible.type = converted constants.%Grass, %Edible.facet.loc27_39.2 [concrete = constants.%Edible.facet]
 // CHECK:STDOUT:   %HandleAnimal.specific_fn: <specific function> = specific_function %HandleAnimal.ref, @HandleAnimal(constants.%Animal.facet, constants.%Edible.facet) [concrete = constants.%HandleAnimal.specific_fn]
-// CHECK:STDOUT:   %.loc47_19.2: %Goat = bind_value %.loc47_19.1
-// CHECK:STDOUT:   %.loc47_31.2: %Grass = bind_value %.loc47_31.1
-// CHECK:STDOUT:   %HandleAnimal.call: init %empty_tuple.type = call %HandleAnimal.specific_fn(%.loc47_19.2, %.loc47_31.2)
+// CHECK:STDOUT:   %.loc27_19.2: %Goat = bind_value %.loc27_19.1
+// CHECK:STDOUT:   %.loc27_31.2: %Grass = bind_value %.loc27_31.1
+// CHECK:STDOUT:   %HandleAnimal.call: init %empty_tuple.type = call %HandleAnimal.specific_fn(%.loc27_19.2, %.loc27_31.2)
 // CHECK:STDOUT:   return
 // CHECK:STDOUT: }
 // CHECK:STDOUT:

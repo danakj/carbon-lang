@@ -7,6 +7,7 @@
 #include "toolchain/check/deduce.h"
 #include "toolchain/check/generic.h"
 #include "toolchain/check/import_ref.h"
+#include "toolchain/check/type_completion.h"
 #include "toolchain/sem_ir/ids.h"
 #include "toolchain/sem_ir/impl.h"
 #include "toolchain/sem_ir/inst.h"
@@ -125,9 +126,24 @@ static auto GetWitnessIdForImpl(Context& context, SemIR::LocId loc_id,
     return SemIR::InstId::None;
   }
 
-  // TODO: If the interface id of the `impl` and the query are not the same,
-  // then we can skip this `impl`. (The interface id is the root of the
-  // constraint, the unique `interface` declaration.)
+  auto facet_type = context.types().GetAs<SemIR::FacetType>(
+      context.types().GetTypeIdForTypeConstantId(interface_const_id));
+  auto facet_type_info = context.facet_types().Get(facet_type.facet_type_id);
+  if (facet_type_info.impls_constraints.size() != 1) {
+    context.TODO(loc_id,
+                 "impl lookup for a FacetType with more than one interface");
+    return SemIR::InstId::None;
+  }
+  // This is the (single) interface named in the query `interface_const_id`.
+  // If the impl's interface_id differs from the query, then this impl can not
+  // possibly provide the queried interface, and we don't need to proceed.
+  // Unlike the early-out above comparing the `impl.constraint_id`, this also
+  // elides looking at impls of generic interfaces where the interface itself
+  // does not match the query.
+  if (impl.interface.interface_id !=
+      facet_type_info.impls_constraints[0].interface_id) {
+    return SemIR::InstId::None;
+  }
 
   auto specific_id = SemIR::SpecificId::None;
   // This check comes first to avoid deduction with an invalid impl. We use an
