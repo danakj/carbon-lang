@@ -25,12 +25,13 @@ static auto Main(int argc, char** argv) -> ErrorOr<int> {
   InitLLVM init_llvm(argc, argv);
 
   // Start by resolving any symlinks.
-  CARBON_ASSIGN_OR_RETURN(auto busybox_info, GetBusyboxInfo(argv[0]));
+  CARBON_ASSIGN_OR_RETURN(auto busybox_info,
+                          GetBusyboxInfo(FindExecutablePath(argv[0])));
 
   auto fs = llvm::vfs::getRealFileSystem();
 
   // Resolve paths before calling SetWorkingDirForBazel.
-  std::string exe_path = FindExecutablePath(busybox_info.bin_path.string());
+  std::string exe_path = busybox_info.bin_path.string();
   const auto install_paths = InstallPaths::MakeExeRelative(exe_path);
   if (install_paths.error()) {
     return Error(*install_paths.error());
@@ -45,7 +46,8 @@ static auto Main(int argc, char** argv) -> ErrorOr<int> {
   }
   args.append(argv + 1, argv + argc);
 
-  Driver driver(fs, &install_paths, stdin, &llvm::outs(), &llvm::errs());
+  Driver driver(fs, &install_paths, stdin, &llvm::outs(), &llvm::errs(),
+                /*fuzzing=*/false, /*enable_leaking=*/true);
   bool success = driver.RunCommand(args).success;
   return success ? EXIT_SUCCESS : EXIT_FAILURE;
 }
