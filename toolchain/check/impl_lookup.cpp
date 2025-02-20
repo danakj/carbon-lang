@@ -116,6 +116,7 @@ static auto FindAssociatedImportIRs(Context& context,
 static auto GetWitnessIdForImpl(Context& context, SemIR::LocId loc_id,
                                 SemIR::ConstantId type_const_id,
                                 SemIR::ConstantId interface_const_id,
+                                SemIR::InterfaceId interface_id,
                                 const SemIR::Impl& impl) -> SemIR::InstId {
   // If impl.constraint_id is not symbolic, and doesn't match the query, then
   // we don't need to proceed.
@@ -126,22 +127,13 @@ static auto GetWitnessIdForImpl(Context& context, SemIR::LocId loc_id,
     return SemIR::InstId::None;
   }
 
-  auto facet_type = context.types().GetAs<SemIR::FacetType>(
-      context.types().GetTypeIdForTypeConstantId(interface_const_id));
-  auto facet_type_info = context.facet_types().Get(facet_type.facet_type_id);
-  if (facet_type_info.impls_constraints.size() != 1) {
-    context.TODO(loc_id,
-                 "impl lookup for a FacetType with more than one interface");
-    return SemIR::InstId::None;
-  }
   // This is the (single) interface named in the query `interface_const_id`.
   // If the impl's interface_id differs from the query, then this impl can not
   // possibly provide the queried interface, and we don't need to proceed.
   // Unlike the early-out above comparing the `impl.constraint_id`, this also
   // elides looking at impls of generic interfaces where the interface itself
   // does not match the query.
-  if (impl.interface.interface_id !=
-      facet_type_info.impls_constraints[0].interface_id) {
+  if (impl.interface.interface_id != interface_id) {
     return SemIR::InstId::None;
   }
 
@@ -234,6 +226,27 @@ auto LookupImplWitness(Context& context, SemIR::LocId loc_id,
     }
   }
 
+  // The `interface_id` is the single interface in the `interface_const_id`
+  // facet type. In the future, a facet type may include more than a single
+  // interface, but for now that is unhandled with a TODO.
+  auto interface_id = [&] {
+    auto facet_type_inst_id =
+        context.constant_values().GetInstId(interface_const_id);
+    auto facet_type_id = context.insts()
+                             .GetAs<SemIR::FacetType>(facet_type_inst_id)
+                             .facet_type_id;
+    const auto& facet_type_info = context.facet_types().Get(facet_type_id);
+    if (facet_type_info.impls_constraints.empty()) {
+      return SemIR::InterfaceId::None;
+    }
+    if (facet_type_info.impls_constraints.size() > 1) {
+      context.TODO(loc_id,
+                   "impl lookup for a FacetType with more than one interface");
+      return SemIR::InterfaceId::None;
+    }
+    return facet_type_info.impls_constraints[0].interface_id;
+  }();
+
   auto witness_id = SemIR::InstId::None;
 
   stack.push_back({
@@ -242,7 +255,7 @@ auto LookupImplWitness(Context& context, SemIR::LocId loc_id,
   });
   for (const auto& impl : context.impls().array_ref()) {
     witness_id = GetWitnessIdForImpl(context, loc_id, type_const_id,
-                                     interface_const_id, impl);
+                                     interface_const_id, interface_id, impl);
     if (witness_id.has_value()) {
       // We found a matching impl, don't keep looking.
       break;
