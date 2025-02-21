@@ -14,8 +14,8 @@
 
 #include "common/raw_hashtable_test_helpers.h"
 
-// Workaround for std::pair comparison deficiency in clang-16.
-#if defined(__clang_major__) && __clang_major__ <= 16
+// Workaround for std::pair comparison deficiency in libc++ 16.
+#if defined(_LIBCPP_VERSION) && _LIBCPP_VERSION < 170000
 namespace std {
 template <class T, class U, class V, class W>
   requires(convertible_to<V, T> && convertible_to<W, U>)
