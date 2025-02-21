@@ -212,16 +212,25 @@ auto LookupImplWitness(Context& context, SemIR::LocId loc_id,
   // TODO: Implement the termination rule, which requires looking at the
   // complexity of the types on the top of (or throughout?) the stack:
   // https://docs.carbon-lang.dev/docs/design/generics/details.html#termination-rule
-  for (auto entry : stack) {
+  for (auto [i, entry] : llvm::enumerate(stack)) {
     if (entry.type_const_id == type_const_id &&
         entry.interface_const_id == interface_const_id) {
+      auto facet_type_type_id =
+          context.types().GetTypeIdForTypeConstantId(interface_const_id);
       CARBON_DIAGNOSTIC(ImplLookupCycle, Error,
-                        "cycle found in lookup of interface {0} for type {1}",
-                        std::string, SemIR::TypeId);
-      context.emitter()
-          .Build(loc_id, ImplLookupCycle, "<TODO: interface name>",
-                 context.types().GetTypeIdForTypeConstantId(type_const_id))
-          .Emit();
+                        "cycle found in search for impl of {0} for type {1}",
+                        SemIR::TypeId, SemIR::TypeId);
+      auto builder = context.emitter().Build(
+          loc_id, ImplLookupCycle, facet_type_type_id,
+          context.types().GetTypeIdForTypeConstantId(type_const_id));
+      for (auto& active_entry : llvm::drop_begin(stack, i)) {
+        if (active_entry.impl_loc.has_value()) {
+          CARBON_DIAGNOSTIC(ImplLookupCycleNote, Note,
+                            "determining if this impl clause matches", );
+          builder.Note(active_entry.impl_loc, ImplLookupCycleNote);
+        }
+      }
+      builder.Emit();
       return SemIR::ErrorInst::SingletonInstId;
     }
   }
@@ -257,6 +266,7 @@ auto LookupImplWitness(Context& context, SemIR::LocId loc_id,
       .interface_const_id = interface_const_id,
   });
   for (const auto& impl : context.impls().array_ref()) {
+    stack.back().impl_loc = impl.definition_id;
     witness_id = GetWitnessIdForImpl(context, loc_id, type_const_id,
                                      interface_const_id, interface_id, impl);
     if (witness_id.has_value()) {
