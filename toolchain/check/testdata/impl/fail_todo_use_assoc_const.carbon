@@ -511,7 +511,7 @@ impl () as I where .N = 2 {
 // CHECK:STDOUT:   }
 // CHECK:STDOUT:   %Core.import = import Core
 // CHECK:STDOUT:   %I.decl: type = interface_decl @I [concrete = constants.%I.type] {} {}
-// CHECK:STDOUT:   impl_decl @impl.44 [concrete] {} {
+// CHECK:STDOUT:   impl_decl @impl.45 [concrete] {} {
 // CHECK:STDOUT:     %.loc15_7.1: %empty_tuple.type = tuple_literal ()
 // CHECK:STDOUT:     %.loc15_7.2: type = converted %.loc15_7.1, constants.%empty_tuple.type [concrete = constants.%empty_tuple.type]
 // CHECK:STDOUT:     %I.ref: type = name_ref I, file.%I.decl [concrete = constants.%I.type]
@@ -576,7 +576,7 @@ impl () as I where .N = 2 {
 // CHECK:STDOUT:   assoc_const N:! %i32;
 // CHECK:STDOUT: }
 // CHECK:STDOUT:
-// CHECK:STDOUT: impl @impl.44: %.loc15_7.2 as %.loc15_14 {
+// CHECK:STDOUT: impl @impl.45: %.loc15_7.2 as %.loc15_14 {
 // CHECK:STDOUT:   %F.decl: %F.type.9f6 = fn_decl @F.2 [concrete = constants.%F.572] {
 // CHECK:STDOUT:     %self.patt: %empty_tuple.type = binding_pattern self
 // CHECK:STDOUT:     %self.param_patt: %empty_tuple.type = value_param_pattern %self.patt, runtime_param0
@@ -589,7 +589,7 @@ impl () as I where .N = 2 {
 // CHECK:STDOUT:     %.loc16_31.2: type = converted %bool.make_type, %.loc16_31.1 [concrete = bool]
 // CHECK:STDOUT:     %array_type: type = array_type %int_2, bool [concrete = constants.%array_type]
 // CHECK:STDOUT:     %self.param: %empty_tuple.type = value_param runtime_param0
-// CHECK:STDOUT:     %Self.ref: type = name_ref Self, @impl.44.%.loc15_7.2 [concrete = constants.%empty_tuple.type]
+// CHECK:STDOUT:     %Self.ref: type = name_ref Self, @impl.45.%.loc15_7.2 [concrete = constants.%empty_tuple.type]
 // CHECK:STDOUT:     %self: %empty_tuple.type = bind_name self, %self.param
 // CHECK:STDOUT:     %return.param: ref %array_type = out_param runtime_param1
 // CHECK:STDOUT:     %return: ref %array_type = return_slot %return.param

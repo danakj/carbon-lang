@@ -175,7 +175,7 @@ fn CallF() {
 // CHECK:STDOUT:     }
 // CHECK:STDOUT:   }
 // CHECK:STDOUT:   %impl_witness.loc8: <witness> = impl_witness (constants.%empty_struct) [concrete = constants.%impl_witness.a4f]
-// CHECK:STDOUT:   impl_decl @impl.45 [concrete] {} {
+// CHECK:STDOUT:   impl_decl @impl.46 [concrete] {} {
 // CHECK:STDOUT:     %int_32: Core.IntLiteral = int_value 32 [concrete = constants.%int_32]
 // CHECK:STDOUT:     %i32: type = class_type @Int, @Int(constants.%int_32) [concrete = constants.%i32]
 // CHECK:STDOUT:     %I.ref: type = name_ref I, file.%I.decl [concrete = constants.%I.type]
@@ -225,7 +225,7 @@ fn CallF() {
 // CHECK:STDOUT:   witness = file.%impl_witness.loc8
 // CHECK:STDOUT: }
 // CHECK:STDOUT:
-// CHECK:STDOUT: impl @impl.45: %i32 as %.loc10_15 {
+// CHECK:STDOUT: impl @impl.46: %i32 as %.loc10_15 {
 // CHECK:STDOUT: !members:
 // CHECK:STDOUT:   witness = file.%impl_witness.loc10
 // CHECK:STDOUT: }
