@@ -133,9 +133,9 @@ struct FileTestFactory {
 // to implement this function.
 extern auto GetFileTestFactory() -> FileTestFactory;
 
-// Returns the manifest path, which is provided by rules.bzl and
-// file_test_manifest.cpp. This is exposed so that the explorer sharding
-// approach can use a different implementation.
+// Returns the manifest path relative to the file_test binary, which is provided
+// by rules.bzl and file_test_manifest.cpp. This is exposed so that the explorer
+// sharding approach can use a different implementation.
 auto GetFileTestManifestPath() -> std::filesystem::path;
 
 // Provides a standard GetFileTestFactory implementation.

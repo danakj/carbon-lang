@@ -298,9 +298,10 @@ static auto RegisterTests(FileTestFactory* test_factory,
                           llvm::StringRef exe_path,
                           llvm::SmallVectorImpl<FileTestInfo>& tests)
     -> ErrorOr<Success> {
-  GetFileTestManifestPath();
-  CARBON_ASSIGN_OR_RETURN(auto test_manifest,
-                          ReadFile(GetFileTestManifestPath()));
+  auto manifest_path =
+      std::filesystem::path(std::string_view{exe_path}).parent_path() /
+      GetFileTestManifestPath();
+  CARBON_ASSIGN_OR_RETURN(auto test_manifest, ReadFile(manifest_path));
 
   // Prepare the vector first, so that the location of entries won't change.
   for (const auto& test_name :
