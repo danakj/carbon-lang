@@ -50,7 +50,7 @@ def file_test(
         # TODO: The prebuilt_binary support is only used by explorer. We should
         # remove this once explorer is removed, and think about better factoring
         # approaches if we need it later for toolchain.
-        args = ["--explorer_test_targets_file=$(rootpath :{0})".format(tests_file)] + args
+        args = ["--explorer_test_targets_file=$(execpath :{0})".format(tests_file)] + args
         native.sh_test(
             name = name,
             srcs = srcs + [prebuilt_binary],
@@ -66,6 +66,6 @@ def file_test(
             data = data,
             args = args,
             env = cc_env(),
-            local_defines = ["CARBON_FILE_TEST_MANIFEST='\"$(rootpath :{0})\"'".format(tests_file)],
+            local_defines = ["CARBON_FILE_TEST_MANIFEST='\"$(execpath :{0})\"'".format(tests_file)],
             **kwargs
         )
