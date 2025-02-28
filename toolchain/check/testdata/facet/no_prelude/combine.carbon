@@ -225,7 +225,7 @@ fn F() {
   (({} as C) as (C as (A(P2) & B))).(B.G)();
 }
 
-// --- todo_generic_interface_parameter.carbon
+// --- fail_todo_generic_interface_parameter.carbon
 library "[[@TEST_NAME]]";
 
 import Core;
@@ -249,12 +249,12 @@ fn G[T:! A & B](t: T) {
   // TODO: Lookup of `AA` and `BB` should be possible here, using the witnesses
   // found in type deduction.
 
-  // CHECK:STDERR: todo_generic_interface_parameter.carbon:[[@LINE+4]]:3: error: type `T` does not support qualified expressions [QualifiedExprUnsupported]
+  // CHECK:STDERR: fail_todo_generic_interface_parameter.carbon:[[@LINE+4]]:3: error: type `T` does not support qualified expressions [QualifiedExprUnsupported]
   // CHECK:STDERR:   t.AA();
   // CHECK:STDERR:   ^~~~
   // CHECK:STDERR:
   t.AA();
-  // CHECK:STDERR: todo_generic_interface_parameter.carbon:[[@LINE+4]]:3: error: type `T` does not support qualified expressions [QualifiedExprUnsupported]
+  // CHECK:STDERR: fail_todo_generic_interface_parameter.carbon:[[@LINE+4]]:3: error: type `T` does not support qualified expressions [QualifiedExprUnsupported]
   // CHECK:STDERR:   t.BB();
   // CHECK:STDERR:   ^~~~
   // CHECK:STDERR:
@@ -263,12 +263,12 @@ fn G[T:! A & B](t: T) {
   // TODO: Qualified lookup of `AA` and `BB` should also be possible here, using
   // the witnesses found in type deduction.
 
-  // CHECK:STDERR: todo_generic_interface_parameter.carbon:[[@LINE+4]]:3: error: cannot access member of interface `A` in type `T` that does not implement that interface [MissingImplInMemberAccess]
+  // CHECK:STDERR: fail_todo_generic_interface_parameter.carbon:[[@LINE+4]]:3: error: cannot access member of interface `A` in type `T` that does not implement that interface [MissingImplInMemberAccess]
   // CHECK:STDERR:   t.(A.AA)();
   // CHECK:STDERR:   ^~~~~~~~
   // CHECK:STDERR:
   t.(A.AA)();
-  // CHECK:STDERR: todo_generic_interface_parameter.carbon:[[@LINE+4]]:3: error: cannot access member of interface `B` in type `T` that does not implement that interface [MissingImplInMemberAccess]
+  // CHECK:STDERR: fail_todo_generic_interface_parameter.carbon:[[@LINE+4]]:3: error: cannot access member of interface `B` in type `T` that does not implement that interface [MissingImplInMemberAccess]
   // CHECK:STDERR:   t.(B.BB)();
   // CHECK:STDERR:   ^~~~~~~~
   // CHECK:STDERR:
