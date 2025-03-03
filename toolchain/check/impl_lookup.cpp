@@ -157,7 +157,7 @@ static auto FindAndDiagnoseImplLookupCycle(
   return false;
 }
 
-// Gets the set of `SemIR::InterfaceId`s that are available given a facet type
+// Gets the set of `SpecificInterface`s that are required by a facet type
 // (as a constant value).
 static auto GetInterfacesFromConstantId(Context& context, SemIR::LocId loc_id,
                                         SemIR::ConstantId interface_const_id)
