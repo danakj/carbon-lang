@@ -363,7 +363,7 @@ auto LookupImplWitness(Context& context, SemIR::LocId loc_id,
           interface_has_other_requirements, impl);
       if (result_witness_id.has_value()) {
         result_witness_ids.push_back(result_witness_id);
-        // We found a matching impl; don't keep looking for this `interface_id`,
+        // We found a matching impl; don't keep looking for this `interface`,
         // move onto the next.
         found_witness = true;
         break;
