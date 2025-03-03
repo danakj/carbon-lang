@@ -238,7 +238,7 @@ static auto GetWitnessIdForImpl(
   CARBON_CHECK(impl.witness_id.has_value());
 
   // The impl may have generic arguments, in which case we need to deduce them
-  // to find what they are given the specific interface query. We use that
+  // to find what they are given the specific type and interface query. We use that
   // specific to map values in the impl to the deduced values.
   auto specific_id = SemIR::SpecificId::None;
   if (impl.generic_id.has_value()) {
