@@ -214,12 +214,6 @@ static auto GetWitnessIdForImpl(
     return SemIR::InstId::None;
   }
 
-  // impl C as A where .Self impls I {}
-
-  // ({} as C) as (C as (A & B))
-  //     ^      FacetValue witnesses for A and B
-  //                       ^ CompleteFacetType has 2 required_interfaces
-
   // When the impl's interface_id matches, but the interface is generic, the
   // impl may or may not match based on restrictions in the generic parameters
   // of the impl.
