@@ -343,7 +343,7 @@ auto LookupImplWitness(Context& context, SemIR::LocId loc_id,
       GetInterfacesFromConstantId(context, loc_id, interface_const_id);
   if (interfaces.empty()) {
     // TODO: Remove this when the context.TODO() is removed in
-    // GetInterfaceIdsFromConstantId.
+    // GetInterfacesFromConstantId.
     return SemIR::InstId::None;
   }
 
