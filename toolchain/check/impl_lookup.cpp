@@ -235,10 +235,7 @@ static auto GetWitnessIdForImpl(
   if (impl.witness_id == SemIR::ErrorInst::SingletonInstId) {
     return SemIR::InstId::None;
   }
-  if (!impl.witness_id.has_value()) {
-    // TODO: Diagnose if the impl isn't defined yet?
-    return SemIR::InstId::None;
-  }
+  CARBON_CHECK(impl.witness_id.has_value());
 
   // The impl may have generic arguments, in which case we need to deduce them
   // to find what they are given the specific interface query. We use that
