@@ -41,10 +41,6 @@ interface I {
 }
 
 fn Use[T:! I](x: T) -> T {
-  // CHECK:STDERR: fail_todo_access_assoc_method.carbon:[[@LINE+4]]:10: error: type `T` does not support qualified expressions [QualifiedExprUnsupported]
-  // CHECK:STDERR:   return x.Copy();
-  // CHECK:STDERR:          ^~~~~~
-  // CHECK:STDERR:
   return x.Copy();
 }
 
@@ -286,6 +282,10 @@ fn UseIndirect[T:! I](x: T) -> T {
 // CHECK:STDOUT:   %Use.type: type = fn_type @Use [concrete]
 // CHECK:STDOUT:   %Use: %Use.type = struct_value () [concrete]
 // CHECK:STDOUT:   %require_complete: <witness> = require_complete_type %T.as_type [symbolic]
+// CHECK:STDOUT:   %T.as_wit: <witness> = facet_access_witness %T [symbolic]
+// CHECK:STDOUT:   %I.facet: %I.type = facet_value %T.as_type, %T.as_wit [symbolic]
+// CHECK:STDOUT:   %.4ef: type = fn_type_with_self_type %Copy.type, %I.facet [symbolic]
+// CHECK:STDOUT:   %impl.elem0: %.4ef = impl_witness_access %T.as_wit, element0 [symbolic]
 // CHECK:STDOUT: }
 // CHECK:STDOUT:
 // CHECK:STDOUT: file {
@@ -363,11 +363,25 @@ fn UseIndirect[T:! I](x: T) -> T {
 // CHECK:STDOUT:
 // CHECK:STDOUT: !definition:
 // CHECK:STDOUT:   %require_complete: <witness> = require_complete_type @Use.%T.as_type.loc8_18.2 (%T.as_type) [symbolic = %require_complete (constants.%require_complete)]
+// CHECK:STDOUT:   %T.as_wit.loc13_11.2: <witness> = facet_access_witness %T.loc8_8.2 [symbolic = %T.as_wit.loc13_11.2 (constants.%T.as_wit)]
+// CHECK:STDOUT:   %I.facet: %I.type = facet_value %T.as_type.loc8_18.2, %T.as_wit.loc13_11.2 [symbolic = %I.facet (constants.%I.facet)]
+// CHECK:STDOUT:   %.loc13_11.2: type = fn_type_with_self_type constants.%Copy.type, %I.facet [symbolic = %.loc13_11.2 (constants.%.4ef)]
+// CHECK:STDOUT:   %impl.elem0.loc13_11.2: @Use.%.loc13_11.2 (%.4ef) = impl_witness_access %T.as_wit.loc13_11.2, element0 [symbolic = %impl.elem0.loc13_11.2 (constants.%impl.elem0)]
 // CHECK:STDOUT:
 // CHECK:STDOUT:   fn[%T.param_patt: %I.type](%x.param_patt: @Use.%T.as_type.loc8_18.2 (%T.as_type)) -> @Use.%T.as_type.loc8_18.2 (%T.as_type) {
 // CHECK:STDOUT:   !entry:
 // CHECK:STDOUT:     %x.ref: @Use.%T.as_type.loc8_18.2 (%T.as_type) = name_ref x, %x
-// CHECK:STDOUT:     return <error>
+// CHECK:STDOUT:     %Copy.ref: %I.assoc_type = name_ref Copy, @I.%assoc0 [concrete = constants.%assoc0]
+// CHECK:STDOUT:     %T.as_type.loc13: type = facet_access_type constants.%T [symbolic = %T.as_type.loc8_18.2 (constants.%T.as_type)]
+// CHECK:STDOUT:     %.loc13_11.1: type = converted constants.%T, %T.as_type.loc13 [symbolic = %T.as_type.loc8_18.2 (constants.%T.as_type)]
+// CHECK:STDOUT:     %T.as_wit.loc13_11.1: <witness> = facet_access_witness constants.%T [symbolic = %T.as_wit.loc13_11.2 (constants.%T.as_wit)]
+// CHECK:STDOUT:     %impl.elem0.loc13_11.1: @Use.%.loc13_11.2 (%.4ef) = impl_witness_access %T.as_wit.loc13_11.1, element0 [symbolic = %impl.elem0.loc13_11.2 (constants.%impl.elem0)]
+// CHECK:STDOUT:     %bound_method: <bound method> = bound_method %x.ref, %impl.elem0.loc13_11.1
+// CHECK:STDOUT:     %specific_fn: <specific function> = specific_function %bound_method, @Copy(constants.%I.facet)
+// CHECK:STDOUT:     %Copy.call: init @Use.%T.as_type.loc8_18.2 (%T.as_type) = call %specific_fn(%x.ref)
+// CHECK:STDOUT:     %.loc13_18.1: @Use.%T.as_type.loc8_18.2 (%T.as_type) = value_of_initializer %Copy.call
+// CHECK:STDOUT:     %.loc13_18.2: @Use.%T.as_type.loc8_18.2 (%T.as_type) = converted %Copy.call, %.loc13_18.1
+// CHECK:STDOUT:     return %.loc13_18.2
 // CHECK:STDOUT:   }
 // CHECK:STDOUT: }
 // CHECK:STDOUT:
@@ -380,6 +394,11 @@ fn UseIndirect[T:! I](x: T) -> T {
 // CHECK:STDOUT:   %T.loc8_8.2 => constants.%T
 // CHECK:STDOUT:   %T.patt.loc8_8.2 => constants.%T
 // CHECK:STDOUT:   %T.as_type.loc8_18.2 => constants.%T.as_type
+// CHECK:STDOUT: }
+// CHECK:STDOUT:
+// CHECK:STDOUT: specific @Copy(constants.%I.facet) {
+// CHECK:STDOUT:   %Self => constants.%I.facet
+// CHECK:STDOUT:   %Self.as_type.loc5_17.1 => constants.%T.as_type
 // CHECK:STDOUT: }
 // CHECK:STDOUT:
 // CHECK:STDOUT: --- access_assoc_method_indirect.carbon
