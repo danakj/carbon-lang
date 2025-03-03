@@ -354,7 +354,7 @@ auto LookupImplWitness(Context& context, SemIR::LocId loc_id,
       .type_const_id = type_const_id,
       .interface_const_id = interface_const_id,
   });
-  // We need to find a witness for each interface in `interface_ids`. We return
+  // We need to find a witness for each interface in `interfaces`. We return
   // them in the same order as they are found in the `CompleteFacetType`, which
   // is the same order as in `interface_ids` here.
   for (const auto& [interface, interface_has_other_requirements] : interfaces) {
