@@ -219,7 +219,7 @@ static auto GetWitnessIdForImpl(
   // of the impl.
   //
   // As a shortcut, if the impl's constraint is not symbolic (does not depend on
-  // any generic parameters), then we can determine if we match if the specific
+  // any generic parameters), then we can determine that we match if the specific
   // ids match exactly.
   auto impl_interface_const_id =
       context.constant_values().Get(impl.constraint_id);
