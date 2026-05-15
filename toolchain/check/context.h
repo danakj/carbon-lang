@@ -275,6 +275,14 @@ class Context {
     return where_stack_;
   }
 
+  auto CurrentPeriodSelfDepth(int offset = 0) -> SemIR::ElementIndex {
+    // `.Self` values of depth 0 and 1 both refer to the top level self, so we
+    // collapse them both down to depth 0. This simplifies semir, and gives them
+    // a depth that matches callers from outside of a `where` expression.
+    int size = where_stack_.empty() ? 0 : where_stack_.size() - 1;
+    return SemIR::ElementIndex(size + offset);
+  }
+
   // Data about a form expression.
   //
   // TODO: consider moving this out of Context.

@@ -13,17 +13,21 @@
 #include "toolchain/check/subst.h"
 #include "toolchain/check/type.h"
 #include "toolchain/check/type_completion.h"
+#include "toolchain/sem_ir/ids.h"
 #include "toolchain/sem_ir/typed_insts.h"
 
 namespace Carbon::Check {
 
 auto MakePeriodSelfFacetValue(Context& context, SemIR::LocId loc_id,
-                              SemIR::TypeId self_type_id) -> SemIR::InstId {
+                              SemIR::TypeId self_type_id,
+                              SemIR::ElementIndex depth, bool insert_name)
+    -> SemIR::InstId {
   CARBON_CHECK(self_type_id == SemIR::ErrorInst::TypeId ||
                context.types().Is<SemIR::FacetType>(self_type_id));
   auto entity_name_id = context.entity_names().AddCanonical({
       .name_id = SemIR::NameId::PeriodSelf,
       .parent_scope_id = context.scope_stack().PeekNameScopeId(),
+      .period_self_depth = depth,
   });
   auto inst_id = AddInst<SemIR::SymbolicBinding>(
       context, loc_id,
@@ -33,24 +37,39 @@ auto MakePeriodSelfFacetValue(Context& context, SemIR::LocId loc_id,
           // `None` because there is no equivalent non-symbolic value.
           .value_id = SemIR::InstId::None,
       });
-  auto existing = context.scope_stack().LookupOrAddName(
-      SemIR::NameId::PeriodSelf, inst_id, ScopeIndex::None,
-      IsCurrentPositionReachable(context));
-  // Shouldn't have any names in newly created scope.
-  CARBON_CHECK(!existing.has_value());
+  if (insert_name) {
+    auto existing = context.scope_stack().LookupOrAddName(
+        SemIR::NameId::PeriodSelf, inst_id, ScopeIndex::None,
+        IsCurrentPositionReachable(context));
+    // Shouldn't have any names in newly created scope.
+    CARBON_CHECK(!existing.has_value());
+  }
   return inst_id;
+}
+
+// Get the depth of a `.Self` facet, which represents the number of `where`
+// clauses it is nested within.
+static auto GetPeriodSelfDepth(Context& context, SemIR::SymbolicBinding bind)
+    -> SemIR::ElementIndex {
+  const auto& entity_name = context.entity_names().Get(bind.entity_name_id);
+  CARBON_CHECK(entity_name.name_id == SemIR::NameId::PeriodSelf);
+  return entity_name.period_self_depth;
 }
 
 class SubstPeriodSelfCallbacks : public SubstInstCallbacks {
  public:
   explicit SubstPeriodSelfCallbacks(
       Context* context, SemIR::LocId loc_id,
-      SemIR::ConstantId period_self_replacement_id,
-      SubstPeriodSelfBehaviour behaviour, SubstPeriodSelfRebuildInst rebuild)
+      SemIR::InstId period_self_replacement_id,
+      SemIR::ElementIndex period_self_replacement_depth,
+      SubstPeriodSelfBehaviour behaviour, SemIR::ElementIndex depth,
+      SubstPeriodSelfRebuildInst rebuild)
       : SubstInstCallbacks(context),
         loc_id_(loc_id),
         period_self_replacement_id_(period_self_replacement_id),
+        period_self_replacement_depth_(period_self_replacement_depth),
         behaviour_(behaviour),
+        depth_(depth),
         rebuild_callback_(rebuild) {}
 
   virtual ~SubstPeriodSelfCallbacks() {
@@ -76,9 +95,8 @@ class SubstPeriodSelfCallbacks : public SubstInstCallbacks {
             context().insts().TryGetAs<SemIR::ImplWitnessAccess>(inst_id)) {
       if (auto witness = context().insts().TryGetAs<SemIR::LookupImplWitness>(
               access->witness_id)) {
-        // Canonicalization not necessary; we are working with the constant
-        // value already, and the query self in a witness is already
-        // canonicalized.
+        // Canonicalization not necessary; the query self in a witness is
+        // already canonicalized.
         if (IsPeriodSelf(context(), witness->query_self_inst_id,
                          /*canonicalize=*/false)) {
           // We are entering a designator. We watch for the witness next.
@@ -99,29 +117,45 @@ class SubstPeriodSelfCallbacks : public SubstInstCallbacks {
       }
     }
 
-    // Canonicalization not necessary; we are working with the constant
-    // value already, and the query self in a witness is already
-    // canonicalized.
-    if (IsPeriodSelf(context(), inst_id,
-                     /*canonicalize=*/false)) {
+    // Canonicalization not necessary; Subst will recurse anyway, so avoid
+    // extra work for non-matches.
+    if (auto period_self = TryGetAsPeriodSelf(context(), inst_id,
+                                              /*canonicalize=*/false)) {
       bool is_implicit_self_in_desigator = false;
       if (GetDesignatorState() == WitnessSelfNext) {
         is_implicit_self_in_desigator = true;
         designator_states_.back() = RebuildNext;
       }
 
+      // When we identify `.Self(2)` as its facet type, the facet type can
+      // contain `M(.Self(1))`. We never replace a lower depth with a higher
+      // one, that would be escaping the higher depth `.Self` to a context where
+      // it doesn't exist.
+      if (GetPeriodSelfDepth(context(), *period_self) <=
+          period_self_replacement_depth_) {
+        return FullySubstituted;
+      }
+
       switch (behaviour_) {
         case SubstPeriodSelfBehaviour::All:
-          inst_id = GetReplacement(inst_id);
+          inst_id = GetReplacement(*period_self);
           break;
+        case SubstPeriodSelfBehaviour::MatchingDepth: {
+          auto p = context().insts().GetAs<SemIR::SymbolicBinding>(
+              context().constant_values().GetConstantInstId(inst_id));
+          if (GetPeriodSelfDepth(context(), p) == depth_) {
+            inst_id = GetReplacement(*period_self);
+          }
+          break;
+        }
         case SubstPeriodSelfBehaviour::ImplicitOnly:
           if (is_implicit_self_in_desigator) {
-            inst_id = GetReplacement(inst_id);
+            inst_id = GetReplacement(*period_self);
           }
           break;
         case SubstPeriodSelfBehaviour::ExplicitOnly:
           if (!is_implicit_self_in_desigator) {
-            inst_id = GetReplacement(inst_id);
+            inst_id = GetReplacement(*period_self);
           }
           break;
       }
@@ -163,19 +197,17 @@ class SubstPeriodSelfCallbacks : public SubstInstCallbacks {
     RebuildNext,
   };
 
-  auto GetReplacement(SemIR::InstId period_self) -> SemIR::InstId {
-    auto period_self_type_id = context().insts().Get(period_self).type_id();
+  auto GetReplacement(SemIR::SymbolicBinding period_self) -> SemIR::InstId {
+    auto period_self_type_id = period_self.type_id;
     CARBON_CHECK(context().types().Is<SemIR::FacetType>(period_self_type_id));
 
-    auto replacement_self_inst_id =
-        context().constant_values().GetInstId(period_self_replacement_id_);
     auto replacement_type_id =
-        context().insts().Get(replacement_self_inst_id).type_id();
+        context().insts().Get(period_self_replacement_id_).type_id();
     CARBON_CHECK(context().types().IsFacetType(replacement_type_id));
 
     // If the replacement has the same type as `.Self`, use it directly.
     if (replacement_type_id == period_self_type_id) {
-      return replacement_self_inst_id;
+      return period_self_replacement_id_;
     }
 
     // If we have already converted the replacement to the type of `.Self`, use
@@ -186,7 +218,7 @@ class SubstPeriodSelfCallbacks : public SubstInstCallbacks {
 
     // Convert the replacement facet to the type of `.Self`.
     cached_replacement_id_ = ConvertReplacement(
-        replacement_self_inst_id, replacement_type_id, period_self_type_id);
+        period_self_replacement_id_, replacement_type_id, period_self.type_id);
     cached_replacement_type_id_ = period_self_type_id;
     return cached_replacement_id_;
   }
@@ -194,6 +226,19 @@ class SubstPeriodSelfCallbacks : public SubstInstCallbacks {
   auto ConvertReplacement(SemIR::InstId replacement_self_inst_id,
                           SemIR::TypeId replacement_type_id,
                           SemIR::TypeId period_self_type_id) -> SemIR::InstId {
+    // If the replacement is .Self, just steal its depth and replace the depth
+    // in `period_self` with it. This avoids constructing a FacetValue to
+    // convert from one `.Self` to another, so that ...
+    // FIXME: Do this in the eval of FacetValue?
+    if (auto replacement_period_self =
+            TryGetAsPeriodSelf(context(), replacement_self_inst_id)) {
+      auto replacement_depth =
+          GetPeriodSelfDepth(context(), *replacement_period_self);
+      return MakePeriodSelfFacetValue(context(), loc_id_, period_self_type_id,
+                                      replacement_depth,
+                                      /*insert_name=*/false);
+    }
+
     // TODO: Replace all empty facet types with TypeType.
     if (period_self_type_id == GetEmptyFacetType(context())) {
       // Convert to an empty facet type (representing TypeType); we don't need
@@ -202,8 +247,9 @@ class SubstPeriodSelfCallbacks : public SubstInstCallbacks {
                                   period_self_type_id);
     }
 
-    // We have a facet or a type, but we need more interfaces in the facet type.
-    // We will have to synthesize a symbolic witness for each interface.
+    // We have a facet or a type, but we need a different set of interfaces in
+    // the facet type. We will have to synthesize a symbolic witness for each
+    // interface.
     //
     // Why is this okay? The type of `.Self` comes from interfaces that are
     // before it (to the left of it) in the facet type. The replacement for
@@ -283,8 +329,10 @@ class SubstPeriodSelfCallbacks : public SubstInstCallbacks {
   }
 
   SemIR::LocId loc_id_;
-  SemIR::ConstantId period_self_replacement_id_;
+  SemIR::InstId period_self_replacement_id_;
+  SemIR::ElementIndex period_self_replacement_depth_;
   SubstPeriodSelfBehaviour behaviour_;
+  SemIR::ElementIndex depth_;
   SubstPeriodSelfRebuildInst rebuild_callback_;
 
   // The last output of GetReplacement().
@@ -300,30 +348,46 @@ auto SubstPeriodSelf(Context& context, SemIR::LocId loc_id,
                      SemIR::ConstantId const_id,
                      SemIR::ConstantId period_self_replacement_id,
                      SubstPeriodSelfBehaviour behaviour,
+                     SemIR::ElementIndex depth,
                      SubstPeriodSelfRebuildInst rebuild) -> SemIR::ConstantId {
+  auto inst_id = SubstPeriodSelf(
+      context, loc_id, context.constant_values().GetInstId(const_id),
+      context.constant_values().GetInstId(period_self_replacement_id),
+      behaviour, depth, rebuild);
+  return context.constant_values().Get(inst_id);
+}
+
+auto SubstPeriodSelf(Context& context, SemIR::LocId loc_id,
+                     SemIR::InstId inst_id,
+                     SemIR::InstId period_self_replacement_id,
+                     SubstPeriodSelfBehaviour behaviour,
+                     SemIR::ElementIndex depth,
+                     SubstPeriodSelfRebuildInst rebuild) -> SemIR::InstId {
   // Don't replace `.Self` with itself; that is cyclical.
   //
   // If the types differ, we would try to convert the replacement to a `.Self`
   // of the desired type in `const_id`, which is what we already have, so
   // there's nothing we need to do. But trying to do that conversion recurses
   // when the type of the `.Self` contains a `.Self`.
-  if (IsPeriodSelf(context, context.constant_values().GetInstId(
-                                period_self_replacement_id))) {
-    return const_id;
+  //
+  // FIXME: Fix comment.
+  auto replacement_depth = SemIR::ElementIndex::None;
+  if (auto period_self =
+          TryGetAsPeriodSelf(context, period_self_replacement_id)) {
+    replacement_depth = GetPeriodSelfDepth(context, *period_self);
   }
 
   SubstPeriodSelfCallbacks callbacks(
-      &context, loc_id, period_self_replacement_id, behaviour, rebuild);
-  auto subst_id = SubstInst(
-      context, context.constant_values().GetInstId(const_id), callbacks);
-  return context.constant_values().Get(subst_id);
+      &context, loc_id, period_self_replacement_id, replacement_depth,
+      behaviour, depth, rebuild);
+  return SubstInst(context, inst_id, callbacks);
 }
 
 static auto SubstPeriodSelfInSpecific(
     Context& context, SemIR::LocId loc_id, SemIR::SpecificId specific_id,
     SemIR::ConstantId period_self_replacement_id,
-    SubstPeriodSelfBehaviour behaviour, SubstPeriodSelfRebuildInst rebuild)
-    -> SemIR::SpecificId {
+    SubstPeriodSelfBehaviour behaviour, SemIR::ElementIndex depth,
+    SubstPeriodSelfRebuildInst rebuild) -> SemIR::SpecificId {
   if (!specific_id.has_value()) {
     return specific_id;
   }
@@ -336,8 +400,9 @@ static auto SubstPeriodSelfInSpecific(
       context.inst_blocks().Get(specific.args_id));
   for (auto& arg_id : args) {
     auto const_id = context.constant_values().Get(arg_id);
-    const_id = SubstPeriodSelf(context, loc_id, const_id,
-                               period_self_replacement_id, behaviour, rebuild);
+    const_id =
+        SubstPeriodSelf(context, loc_id, const_id, period_self_replacement_id,
+                        behaviour, depth, rebuild);
     arg_id = context.constant_values().GetInstId(const_id);
   }
   return MakeSpecific(context, loc_id, specific.generic_id, args);
@@ -347,22 +412,24 @@ auto SubstPeriodSelf(Context& context, SemIR::LocId loc_id,
                      SemIR::SpecificInterface interface,
                      SemIR::ConstantId period_self_replacement_id,
                      SubstPeriodSelfBehaviour behaviour,
+                     SemIR::ElementIndex depth,
                      SubstPeriodSelfRebuildInst rebuild)
     -> SemIR::SpecificInterface {
-  interface.specific_id =
-      SubstPeriodSelfInSpecific(context, loc_id, interface.specific_id,
-                                period_self_replacement_id, behaviour, rebuild);
+  interface.specific_id = SubstPeriodSelfInSpecific(
+      context, loc_id, interface.specific_id, period_self_replacement_id,
+      behaviour, depth, rebuild);
   return interface;
 }
 auto SubstPeriodSelf(Context& context, SemIR::LocId loc_id,
                      SemIR::SpecificNamedConstraint constraint,
                      SemIR::ConstantId period_self_replacement_id,
                      SubstPeriodSelfBehaviour behaviour,
+                     SemIR::ElementIndex depth,
                      SubstPeriodSelfRebuildInst rebuild)
     -> SemIR::SpecificNamedConstraint {
-  constraint.specific_id =
-      SubstPeriodSelfInSpecific(context, loc_id, constraint.specific_id,
-                                period_self_replacement_id, behaviour, rebuild);
+  constraint.specific_id = SubstPeriodSelfInSpecific(
+      context, loc_id, constraint.specific_id, period_self_replacement_id,
+      behaviour, depth, rebuild);
   return constraint;
 }
 
@@ -470,19 +537,28 @@ auto SubstPeriodSelfInFacetType(Context& context, SemIR::LocId loc_id,
 
 auto IsPeriodSelf(Context& context, SemIR::InstId inst_id, bool canonicalize)
     -> bool {
-  auto const_inst_id = context.constant_values().GetConstantInstId(inst_id);
-  if (!const_inst_id.has_value()) {
-    return false;
+  return TryGetAsPeriodSelf(context, inst_id, canonicalize).has_value();
+}
+
+auto TryGetAsPeriodSelf(Context& context, SemIR::InstId inst_id,
+                        bool canonicalize)
+    -> std::optional<SemIR::SymbolicBinding> {
+  auto query_inst_id = inst_id;
+  if (canonicalize) {
+    auto const_inst_id = context.constant_values().GetConstantInstId(inst_id);
+    if (!const_inst_id.has_value()) {
+      return {};
+    }
+    query_inst_id = GetCanonicalFacetOrTypeValue(context, const_inst_id);
   }
-  auto query_inst_id =
-      canonicalize ? GetCanonicalFacetOrTypeValue(context, const_inst_id)
-                   : inst_id;
   if (auto bind =
           context.insts().TryGetAs<SemIR::SymbolicBinding>(query_inst_id)) {
     const auto& entity_name = context.entity_names().Get(bind->entity_name_id);
-    return entity_name.name_id == SemIR::NameId::PeriodSelf;
+    if (entity_name.name_id == SemIR::NameId::PeriodSelf) {
+      return bind;
+    }
   }
-  return false;
+  return {};
 }
 
 class SearchNonCanonicalForExplicitPeriodSelf : public SubstInstCallbacks {
@@ -557,9 +633,8 @@ class SearchCanonicalForExplicitPeriodSelf : public SubstInstCallbacks {
             const_inst_id)) {
       if (auto lookup = context().insts().TryGetAs<SemIR::LookupImplWitness>(
               access->witness_id)) {
-        // Canonicalization not necessary; we are working with the constant
-        // value already, and the query self in a witness is already
-        // canonicalized.
+        // Canonicalization not necessary; the query self in a witness is
+        // already canonicalized.
         if (IsPeriodSelf(context(), lookup->query_self_inst_id,
                          /*canonicalize=*/false)) {
           // An implicit `.Self` in a member designator is always allowed.

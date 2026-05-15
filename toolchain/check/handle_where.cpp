@@ -77,13 +77,6 @@ auto HandleParseNode(Context& context, Parse::WhereOperandId node_id) -> bool {
   auto period_self_type_id =
       GetPeriodSelfType(context, self_with_constraints_type_id);
 
-  // Introduce a name scope so that we can remove the `.Self` entry we are
-  // adding to name lookup at the end of the `where` expression.
-  context.scope_stack().PushForSameRegion();
-  // Introduce `.Self` as a symbolic binding. Its type is the value of the
-  // expression to the left of `where`, so `MyInterface` in the example above.
-  MakePeriodSelfFacetValue(context, node_id, period_self_type_id);
-
   // Going to put each requirement on `args_type_info_stack`, so we can have an
   // inst block with the varying number of requirements but keeping other
   // instructions on the current inst block from the `inst_block_stack()`.
@@ -116,6 +109,14 @@ auto HandleParseNode(Context& context, Parse::WhereOperandId node_id) -> bool {
       }
     }
   }
+
+  // Introduce a name scope so that we can remove the `.Self` entry we are
+  // adding to name lookup at the end of the `where` expression.
+  context.scope_stack().PushForSameRegion();
+  // Introduce `.Self` as a symbolic binding. Its type is the value of the
+  // expression to the left of `where`, so `MyInterface` in the example above.
+  MakePeriodSelfFacetValue(context, node_id, period_self_type_id,
+                           context.CurrentPeriodSelfDepth());
 
   return true;
 }
@@ -275,6 +276,61 @@ static auto IsPeriodSelfAccess(Context& context, SemIR::InstId inst_id)
   }
 }
 
+static auto SubstPeriodSelfInImplsWhere(
+    Context& context, SemIR::TypeInstId inst_id,
+    SemIR::InstId period_self_replacement_id) -> SemIR::TypeInstId {
+  class SubstWhereExprCallbacks : public SubstInstCallbacks {
+   public:
+    explicit SubstWhereExprCallbacks(Context* context,
+                                     SemIR::InstId period_self_replacement_id)
+        : SubstInstCallbacks(context),
+          period_self_replacement_id_(period_self_replacement_id) {}
+    auto Subst(SemIR::InstId& inst_id) -> SubstResult override {
+      auto const_inst_id =
+          context().constant_values().GetConstantInstId(inst_id);
+      if (const_inst_id == SemIR::TypeType::TypeInstId ||
+          const_inst_id == SemIR::ErrorInst::InstId) {
+        return FullySubstituted;
+      }
+
+      CARBON_KIND_SWITCH(context().insts().Get(inst_id)) {
+        case CARBON_KIND(SemIR::SymbolicBinding bind): {
+          const auto& entity_name =
+              context().entity_names().Get(bind.entity_name_id);
+          // We're looking for `.Self` with `depth + 1` to find values on the
+          // RHS of a nested `where` expression in `inst_id`.
+          if (entity_name.period_self_depth ==
+              context().CurrentPeriodSelfDepth(1)) {
+            inst_id = SubstPeriodSelf(context(), SemIR::LocId(inst_id), inst_id,
+                                      period_self_replacement_id_);
+          }
+          return FullySubstituted;
+        }
+        default:
+          break;
+      }
+      return SubstOperands;
+    }
+    auto Rebuild(SemIR::InstId orig_inst_id, SemIR::Inst new_inst)
+        -> SemIR::InstId override {
+      // We are substituting non-canonical instructions, some of which have no
+      // constant representation at all. So when we replace things, just create
+      // a new non-canonical instruction.
+      return AddInst(context(), SemIR::LocIdAndInst::RuntimeVerified(
+                                    context().sem_ir(),
+                                    SemIR::LocId(orig_inst_id), new_inst));
+    }
+
+   private:
+    SemIR::InstId period_self_replacement_id_;
+  };
+
+  SubstWhereExprCallbacks callbacks(&context, period_self_replacement_id);
+  auto subst_inst_id = SubstInst(context, inst_id, callbacks);
+
+  return context.types().GetAsTypeInstId(subst_inst_id);
+}
+
 auto HandleParseNode(Context& context, Parse::RequirementImplsId node_id)
     -> bool {
   auto [rhs_node, rhs_id] = context.node_stack().PopExprWithNodeId();
@@ -340,9 +396,21 @@ auto HandleParseNode(Context& context, Parse::RequirementImplsId node_id)
   // that `.T impls Hash`.
 
   if (FindAndDiagnoseAmbiguousPeriodSelf(context, lhs_as_type.inst_id,
-                                         rhs_id)) {
+                                         rhs_as_type.inst_id)) {
     rhs_as_type.type_id = SemIR::ErrorInst::TypeId;
     rhs_as_type.inst_id = SemIR::ErrorInst::TypeInstId;
+  }
+
+  // Look for `.Self` introduced by a `where` in the RHS of the impls
+  // constraint, that were not diagnosed as ambiguous, such as because they are
+  // implicit. We replace them with the LHS of the impls.
+  {
+    auto subst_rhs = SubstPeriodSelfInImplsWhere(context, rhs_as_type.inst_id,
+                                                 lhs_as_type.inst_id);
+    if (subst_rhs != rhs_as_type.inst_id) {
+      rhs_as_type.inst_id = subst_rhs;
+      rhs_as_type.type_id = context.types().GetTypeIdForTypeInstId(subst_rhs);
+    }
   }
 
   // Build up the list of arguments for the `WhereExpr` inst.

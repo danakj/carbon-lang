@@ -279,6 +279,7 @@ auto EvalConstantInst(Context& context, SemIR::InstId inst_id,
     return ConstantEvalResult::Error;
   }
   if (witness_id.has_value()) {
+    // Found a final witness, which this instruction evaluates to.
     return ConstantEvalResult::Existing(witness_id);
   }
   // Try again when the query is modified by a specific.

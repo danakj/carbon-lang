@@ -417,7 +417,8 @@ auto HandleParseNode(Context& context,
   // compile time binding. This is popped when handling the
   // CompileTimeBindingPatternId.
   context.scope_stack().PushForSameRegion();
-  MakePeriodSelfFacetValue(context, node_id, GetEmptyFacetType(context));
+  MakePeriodSelfFacetValue(context, node_id, GetEmptyFacetType(context),
+                           context.CurrentPeriodSelfDepth());
   return true;
 }
 

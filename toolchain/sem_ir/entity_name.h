@@ -17,7 +17,11 @@ struct EntityName : public Printable<EntityName> {
   auto Print(llvm::raw_ostream& out) const -> void {
     out << "{name: " << name_id << ", parent_scope: " << parent_scope_id
         << ", index: " << bind_index_value << ", is_template: " << is_template
-        << ", is_unused: " << is_unused << ", form: " << form_id << "}";
+        << ", is_unused: " << is_unused << ", form: " << form_id;
+    if (period_self_depth.has_value()) {
+      out << ", period_self_depth: " << period_self_depth;
+    }
+    out << "}";
   }
 
   friend auto CarbonHashtableEq(const EntityName& lhs, const EntityName& rhs)
@@ -65,6 +69,14 @@ struct EntityName : public Printable<EntityName> {
   // TODO: Unify this with the previous three fields, which also represent form
   // information.
   InstId form_id = InstId::None;
+
+  // The depth of a `.Self` facet, which represents the number of `where`
+  // clauses it is nested within. This is only used for SymbolicBindings with
+  // the name PeriodSelf.
+  //
+  // TODO: We don't really need 32 bits for this, could we pack this in with
+  // another field?
+  ElementIndex period_self_depth = ElementIndex::None;
 };
 
 // Value store for EntityName. In addition to the regular ValueStore

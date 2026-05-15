@@ -19,12 +19,15 @@ namespace Carbon::Check {
 // This allows substitution with other facet values without requiring an
 // additional `FacetAccessType` to be inserted.
 auto MakePeriodSelfFacetValue(Context& context, SemIR::LocId loc_id,
-                              SemIR::TypeId self_type_id) -> SemIR::InstId;
+                              SemIR::TypeId self_type_id,
+                              SemIR::ElementIndex depth,
+                              bool insert_name = true) -> SemIR::InstId;
 
 enum class SubstPeriodSelfBehaviour {
   ImplicitOnly,
   ExplicitOnly,
   All,
+  MatchingDepth,
 };
 
 using SubstPeriodSelfRebuildInst =
@@ -40,7 +43,14 @@ auto SubstPeriodSelf(
     Context& context, SemIR::LocId loc_id, SemIR::ConstantId const_id,
     SemIR::ConstantId period_self_replacement_id,
     SubstPeriodSelfBehaviour behaviour = SubstPeriodSelfBehaviour::All,
+    SemIR::ElementIndex depth = SemIR::ElementIndex::None,
     SubstPeriodSelfRebuildInst rebuild = nullptr) -> SemIR::ConstantId;
+auto SubstPeriodSelf(
+    Context& context, SemIR::LocId loc_id, SemIR::InstId inst_id,
+    SemIR::InstId period_self_replacement_id,
+    SubstPeriodSelfBehaviour behaviour = SubstPeriodSelfBehaviour::All,
+    SemIR::ElementIndex depth = SemIR::ElementIndex::None,
+    SubstPeriodSelfRebuildInst rebuild = nullptr) -> SemIR::InstId;
 
 // Replace `.Self` references in the specific of the interface or named
 // constraint with `period_self_replacement_id`.
@@ -53,12 +63,14 @@ auto SubstPeriodSelf(
     Context& context, SemIR::LocId loc_id, SemIR::SpecificInterface interface,
     SemIR::ConstantId period_self_replacement_id,
     SubstPeriodSelfBehaviour behaviour = SubstPeriodSelfBehaviour::All,
+    SemIR::ElementIndex depth = SemIR::ElementIndex::None,
     SubstPeriodSelfRebuildInst rebuild = nullptr) -> SemIR::SpecificInterface;
 auto SubstPeriodSelf(
     Context& context, SemIR::LocId loc_id,
     SemIR::SpecificNamedConstraint constraint,
     SemIR::ConstantId period_self_replacement_id,
     SubstPeriodSelfBehaviour behaviour = SubstPeriodSelfBehaviour::All,
+    SemIR::ElementIndex depth = SemIR::ElementIndex::None,
     SubstPeriodSelfRebuildInst rebuild = nullptr)
     -> SemIR::SpecificNamedConstraint;
 
@@ -84,6 +96,11 @@ auto SubstPeriodSelfInFacetType(Context& context, SemIR::LocId loc_id,
 // the canonicalized facet or type to look through FacetAccessType.
 auto IsPeriodSelf(Context& context, SemIR::InstId inst_id,
                   bool canonicalize = true) -> bool;
+
+// FIXME: Docs
+auto TryGetAsPeriodSelf(Context& context, SemIR::InstId inst_id,
+                        bool canonicalize = true)
+    -> std::optional<SemIR::SymbolicBinding>;
 
 // Look for ambiguous `.Self` in a `T impls X where ...` statement. The given
 // inst ids are the non-canonical insts for the LHS and RHS of the `impls`

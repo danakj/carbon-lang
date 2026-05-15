@@ -2380,6 +2380,7 @@ struct WhereExpr {
        .is_type = InstIsType::Always,
        .constant_kind = InstConstantKind::Conditional});
 
+  // Always the builtin type TypeType, as WhereExpr evaluates to a FacetType.
   TypeId type_id;
   InstBlockId requirements_id;
 };

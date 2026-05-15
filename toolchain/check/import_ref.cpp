@@ -646,9 +646,16 @@ static auto GetLocalSymbolicEntityNameId(
   const auto& import_entity_name =
       context.import_entity_names().Get(import_entity_name_id);
   auto name_id = GetLocalNameId(context, import_entity_name.name_id);
-  return context.local_entity_names().AddSymbolicBindingName(
-      name_id, SemIR::NameScopeId::None, import_entity_name.bind_index(),
-      import_entity_name.is_template, import_entity_name.is_unused);
+  if (name_id == SemIR::NameId::PeriodSelf) {
+    return context.local_entity_names().AddCanonical(
+        {.name_id = name_id,
+         .parent_scope_id = SemIR::NameScopeId::None,
+         .period_self_depth = import_entity_name.period_self_depth});
+  } else {
+    return context.local_entity_names().AddSymbolicBindingName(
+        name_id, SemIR::NameScopeId::None, import_entity_name.bind_index(),
+        import_entity_name.is_template, import_entity_name.is_unused);
+  }
 }
 
 // Gets the local constant values corresponding to an imported inst block.
