@@ -285,6 +285,7 @@ static auto SubstPeriodSelfInImplsWhere(
                                      SemIR::InstId period_self_replacement_id)
         : SubstInstCallbacks(context),
           period_self_replacement_id_(period_self_replacement_id) {}
+
     auto Subst(SemIR::InstId& inst_id) -> SubstResult override {
       auto const_inst_id =
           context().constant_values().GetConstantInstId(inst_id);
@@ -293,24 +294,18 @@ static auto SubstPeriodSelfInImplsWhere(
         return FullySubstituted;
       }
 
-      CARBON_KIND_SWITCH(context().insts().Get(inst_id)) {
-        case CARBON_KIND(SemIR::SymbolicBinding bind): {
-          const auto& entity_name =
-              context().entity_names().Get(bind.entity_name_id);
-          // We're looking for `.Self` with `depth + 1` to find values on the
-          // RHS of a nested `where` expression in `inst_id`.
-          if (entity_name.period_self_depth ==
-              context().CurrentPeriodSelfDepth(1)) {
-            inst_id = SubstPeriodSelf(context(), SemIR::LocId(inst_id), inst_id,
-                                      period_self_replacement_id_);
-          }
-          return FullySubstituted;
-        }
-        default:
-          break;
+      // Don't canonicalize; we are substituting in non-canonical instructions.
+      if (IsPeriodSelf(context(), inst_id, /*canonicalize=*/false)) {
+        // We're looking for `.Self` with `depth + 1` to find values on the
+        // RHS of a nested `where` expression in `inst_id`.
+        inst_id = SubstPeriodSelf(context(), SemIR::LocId(inst_id), inst_id,
+                                  context().CurrentPeriodSelfDepth(1),
+                                  period_self_replacement_id_);
+        return FullySubstituted;
       }
       return SubstOperands;
     }
+
     auto Rebuild(SemIR::InstId orig_inst_id, SemIR::Inst new_inst)
         -> SemIR::InstId override {
       // We are substituting non-canonical instructions, some of which have no
@@ -439,10 +434,8 @@ auto HandleParseNode(Context& context, Parse::RequirementImplsId node_id)
       const auto& facet_type_info =
           context.facet_types().Get(facet_type.facet_type_id);
       for (const auto& rewrite : facet_type_info.rewrite_constraints) {
-        auto lhs = SubstPeriodSelf(
-            context, rhs_node, context.constant_values().Get(rewrite.lhs_id),
-            context.constant_values().Get(lhs_as_type.inst_id));
-        context.where_stack().back().rewrites.Insert(lhs, rewrite.rhs_id);
+        context.where_stack().back().rewrites.Insert(
+            context.constant_values().Get(rewrite.lhs_id), rewrite.rhs_id);
       }
     }
   }

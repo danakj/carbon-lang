@@ -58,18 +58,16 @@ static auto GetPeriodSelfDepth(Context& context, SemIR::SymbolicBinding bind)
 
 class SubstPeriodSelfCallbacks : public SubstInstCallbacks {
  public:
-  explicit SubstPeriodSelfCallbacks(
-      Context* context, SemIR::LocId loc_id,
-      SemIR::InstId period_self_replacement_id,
-      SemIR::ElementIndex period_self_replacement_depth,
-      SubstPeriodSelfBehaviour behaviour, SemIR::ElementIndex depth,
-      SubstPeriodSelfRebuildInst rebuild)
+  explicit SubstPeriodSelfCallbacks(Context* context, SemIR::LocId loc_id,
+                                    SemIR::InstId period_self_replacement_id,
+                                    SubstPeriodSelfBehaviour behaviour,
+                                    SemIR::ElementIndex matching_depth,
+                                    SubstPeriodSelfRebuildInst rebuild)
       : SubstInstCallbacks(context),
         loc_id_(loc_id),
         period_self_replacement_id_(period_self_replacement_id),
-        period_self_replacement_depth_(period_self_replacement_depth),
         behaviour_(behaviour),
-        depth_(depth),
+        matching_depth_(matching_depth),
         rebuild_callback_(rebuild) {}
 
   virtual ~SubstPeriodSelfCallbacks() {
@@ -131,8 +129,7 @@ class SubstPeriodSelfCallbacks : public SubstInstCallbacks {
       // contain `M(.Self(1))`. We never replace a lower depth with a higher
       // one, that would be escaping the higher depth `.Self` to a context where
       // it doesn't exist.
-      if (GetPeriodSelfDepth(context(), *period_self) <=
-          period_self_replacement_depth_) {
+      if (GetPeriodSelfDepth(context(), *period_self) != matching_depth_) {
         return FullySubstituted;
       }
 
@@ -140,14 +137,6 @@ class SubstPeriodSelfCallbacks : public SubstInstCallbacks {
         case SubstPeriodSelfBehaviour::All:
           inst_id = GetReplacement(*period_self);
           break;
-        case SubstPeriodSelfBehaviour::MatchingDepth: {
-          auto p = context().insts().GetAs<SemIR::SymbolicBinding>(
-              context().constant_values().GetConstantInstId(inst_id));
-          if (GetPeriodSelfDepth(context(), p) == depth_) {
-            inst_id = GetReplacement(*period_self);
-          }
-          break;
-        }
         case SubstPeriodSelfBehaviour::ImplicitOnly:
           if (is_implicit_self_in_desigator) {
             inst_id = GetReplacement(*period_self);
@@ -330,9 +319,8 @@ class SubstPeriodSelfCallbacks : public SubstInstCallbacks {
 
   SemIR::LocId loc_id_;
   SemIR::InstId period_self_replacement_id_;
-  SemIR::ElementIndex period_self_replacement_depth_;
   SubstPeriodSelfBehaviour behaviour_;
-  SemIR::ElementIndex depth_;
+  SemIR::ElementIndex matching_depth_;
   SubstPeriodSelfRebuildInst rebuild_callback_;
 
   // The last output of GetReplacement().
@@ -346,22 +334,22 @@ class SubstPeriodSelfCallbacks : public SubstInstCallbacks {
 
 auto SubstPeriodSelf(Context& context, SemIR::LocId loc_id,
                      SemIR::ConstantId const_id,
+                     SemIR::ElementIndex matching_depth,
                      SemIR::ConstantId period_self_replacement_id,
                      SubstPeriodSelfBehaviour behaviour,
-                     SemIR::ElementIndex depth,
                      SubstPeriodSelfRebuildInst rebuild) -> SemIR::ConstantId {
   auto inst_id = SubstPeriodSelf(
       context, loc_id, context.constant_values().GetInstId(const_id),
+      matching_depth,
       context.constant_values().GetInstId(period_self_replacement_id),
-      behaviour, depth, rebuild);
+      behaviour, rebuild);
   return context.constant_values().Get(inst_id);
 }
 
 auto SubstPeriodSelf(Context& context, SemIR::LocId loc_id,
-                     SemIR::InstId inst_id,
+                     SemIR::InstId inst_id, SemIR::ElementIndex matching_depth,
                      SemIR::InstId period_self_replacement_id,
                      SubstPeriodSelfBehaviour behaviour,
-                     SemIR::ElementIndex depth,
                      SubstPeriodSelfRebuildInst rebuild) -> SemIR::InstId {
   // Don't replace `.Self` with itself; that is cyclical.
   //
@@ -369,25 +357,30 @@ auto SubstPeriodSelf(Context& context, SemIR::LocId loc_id,
   // of the desired type in `const_id`, which is what we already have, so
   // there's nothing we need to do. But trying to do that conversion recurses
   // when the type of the `.Self` contains a `.Self`.
-  //
-  // FIXME: Fix comment.
-  auto replacement_depth = SemIR::ElementIndex::None;
   if (auto period_self =
           TryGetAsPeriodSelf(context, period_self_replacement_id)) {
-    replacement_depth = GetPeriodSelfDepth(context, *period_self);
+    auto replacement_depth = GetPeriodSelfDepth(context, *period_self);
+    CARBON_CHECK(replacement_depth <= matching_depth,
+                 "replacing `.Self` {0} with a more specific (larger `where` "
+                 "depth) value {1}",
+                 matching_depth, replacement_depth);
+    if (matching_depth == replacement_depth) {
+      return inst_id;
+    }
   }
 
-  SubstPeriodSelfCallbacks callbacks(
-      &context, loc_id, period_self_replacement_id, replacement_depth,
-      behaviour, depth, rebuild);
+  SubstPeriodSelfCallbacks callbacks(&context, loc_id,
+                                     period_self_replacement_id, behaviour,
+                                     matching_depth, rebuild);
   return SubstInst(context, inst_id, callbacks);
 }
 
 static auto SubstPeriodSelfInSpecific(
     Context& context, SemIR::LocId loc_id, SemIR::SpecificId specific_id,
+    SemIR::ElementIndex matching_depth,
     SemIR::ConstantId period_self_replacement_id,
-    SubstPeriodSelfBehaviour behaviour, SemIR::ElementIndex depth,
-    SubstPeriodSelfRebuildInst rebuild) -> SemIR::SpecificId {
+    SubstPeriodSelfBehaviour behaviour, SubstPeriodSelfRebuildInst rebuild)
+    -> SemIR::SpecificId {
   if (!specific_id.has_value()) {
     return specific_id;
   }
@@ -400,9 +393,8 @@ static auto SubstPeriodSelfInSpecific(
       context.inst_blocks().Get(specific.args_id));
   for (auto& arg_id : args) {
     auto const_id = context.constant_values().Get(arg_id);
-    const_id =
-        SubstPeriodSelf(context, loc_id, const_id, period_self_replacement_id,
-                        behaviour, depth, rebuild);
+    const_id = SubstPeriodSelf(context, loc_id, const_id, matching_depth,
+                               period_self_replacement_id, behaviour, rebuild);
     arg_id = context.constant_values().GetInstId(const_id);
   }
   return MakeSpecific(context, loc_id, specific.generic_id, args);
@@ -410,26 +402,26 @@ static auto SubstPeriodSelfInSpecific(
 
 auto SubstPeriodSelf(Context& context, SemIR::LocId loc_id,
                      SemIR::SpecificInterface interface,
+                     SemIR::ElementIndex matching_depth,
                      SemIR::ConstantId period_self_replacement_id,
                      SubstPeriodSelfBehaviour behaviour,
-                     SemIR::ElementIndex depth,
                      SubstPeriodSelfRebuildInst rebuild)
     -> SemIR::SpecificInterface {
   interface.specific_id = SubstPeriodSelfInSpecific(
-      context, loc_id, interface.specific_id, period_self_replacement_id,
-      behaviour, depth, rebuild);
+      context, loc_id, interface.specific_id, matching_depth,
+      period_self_replacement_id, behaviour, rebuild);
   return interface;
 }
 auto SubstPeriodSelf(Context& context, SemIR::LocId loc_id,
                      SemIR::SpecificNamedConstraint constraint,
+                     SemIR::ElementIndex matching_depth,
                      SemIR::ConstantId period_self_replacement_id,
                      SubstPeriodSelfBehaviour behaviour,
-                     SemIR::ElementIndex depth,
                      SubstPeriodSelfRebuildInst rebuild)
     -> SemIR::SpecificNamedConstraint {
   constraint.specific_id = SubstPeriodSelfInSpecific(
-      context, loc_id, constraint.specific_id, period_self_replacement_id,
-      behaviour, depth, rebuild);
+      context, loc_id, constraint.specific_id, matching_depth,
+      period_self_replacement_id, behaviour, rebuild);
   return constraint;
 }
 
@@ -445,6 +437,7 @@ auto SubstPeriodSelfInFacetType(Context& context, SemIR::LocId loc_id,
 
   auto period_self_replacement_id =
       context.constant_values().Get(self_type_inst_id);
+  auto period_self_match_depth = SemIR::ElementIndex(0);
 
   auto orig_facet_type =
       context.insts().GetAs<SemIR::FacetType>(canon_facet_type_inst_id);
@@ -452,22 +445,23 @@ auto SubstPeriodSelfInFacetType(Context& context, SemIR::LocId loc_id,
       context.facet_types().Get(orig_facet_type.facet_type_id);
 
   auto replace_interface = [&](SemIR::SpecificInterface si) {
-    return SubstPeriodSelf(context, loc_id, si, period_self_replacement_id,
-                           SubstPeriodSelfBehaviour::All);
+    return SubstPeriodSelf(context, loc_id, si, period_self_match_depth,
+                           period_self_replacement_id);
   };
   auto replace_constraint = [&](SemIR::SpecificNamedConstraint sc) {
-    return SubstPeriodSelf(context, loc_id, sc, period_self_replacement_id,
-                           SubstPeriodSelfBehaviour::All);
+    return SubstPeriodSelf(context, loc_id, sc, period_self_match_depth,
+                           period_self_replacement_id);
   };
   auto replace_type_impls_interface =
       [&](SemIR::FacetTypeInfo::TypeImplsInterface impls)
       -> SemIR::FacetTypeInfo::TypeImplsInterface {
     auto self = SubstPeriodSelf(
         context, loc_id, context.constant_values().Get(impls.self_type),
-        period_self_replacement_id, SubstPeriodSelfBehaviour::All);
-    auto interface = SubstPeriodSelf(context, loc_id, impls.specific_interface,
-                                     period_self_replacement_id,
-                                     SubstPeriodSelfBehaviour::All);
+        // FIXME: Plumb?
+        SemIR::ElementIndex(0), period_self_replacement_id);
+    auto interface =
+        SubstPeriodSelf(context, loc_id, impls.specific_interface,
+                        period_self_match_depth, period_self_replacement_id);
     return {context.constant_values().GetInstId(self), interface};
   };
   auto replace_type_impls_constraint =
@@ -475,10 +469,11 @@ auto SubstPeriodSelfInFacetType(Context& context, SemIR::LocId loc_id,
       -> SemIR::FacetTypeInfo::TypeImplsNamedConstraint {
     auto self = SubstPeriodSelf(
         context, loc_id, context.constant_values().Get(impls.self_type),
-        period_self_replacement_id, SubstPeriodSelfBehaviour::All);
-    auto constraint = SubstPeriodSelf(
-        context, loc_id, impls.specific_named_constraint,
-        period_self_replacement_id, SubstPeriodSelfBehaviour::All);
+        // FIXME: Plumb?
+        SemIR::ElementIndex(0), period_self_replacement_id);
+    auto constraint =
+        SubstPeriodSelf(context, loc_id, impls.specific_named_constraint,
+                        period_self_match_depth, period_self_replacement_id);
     return {context.constant_values().GetInstId(self), constraint};
   };
   auto replace_rewrite = [&](SemIR::FacetTypeInfo::RewriteConstraint r)
@@ -491,7 +486,9 @@ auto SubstPeriodSelfInFacetType(Context& context, SemIR::LocId loc_id,
     // just substitute the RHS.
     auto rhs = SubstPeriodSelf(
         context, loc_id, context.constant_values().Get(r.rhs_id),
-        period_self_replacement_id, SubstPeriodSelfBehaviour::ExplicitOnly);
+        // FIXME: Plumb?
+        SemIR::ElementIndex(0), period_self_replacement_id,
+        SubstPeriodSelfBehaviour::ExplicitOnly);
     return {r.lhs_id, context.constant_values().GetInstId(rhs)};
   };
 

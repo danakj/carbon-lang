@@ -477,8 +477,10 @@ static auto TryFindMatchingWitnessFromImplLookup(
   // replaced. We need to do the same for the self and interface in the
   // `orig_witness` for comparing with them.
   orig_const_self = SubstPeriodSelf(context, loc_id, orig_const_self,
+                                    context.CurrentPeriodSelfDepth(),
                                     canonical_query_self_const_id);
   orig_interface = SubstPeriodSelf(context, loc_id, orig_interface,
+                                   context.CurrentPeriodSelfDepth(),
                                    canonical_query_self_const_id);
 
   // Witnesses have a canonicalized self value. Perform the same
@@ -537,12 +539,12 @@ static auto VerifyQueryFacetTypeConstraints(
 
       auto lhs_id = context.constant_values().GetInstId(SubstPeriodSelf(
           context, loc_id, context.constant_values().Get(rewrite.lhs_id),
-          query_self_const_id, SubstPeriodSelfBehaviour::All,
-          SemIR::ElementIndex::None, rebuild));
+          context.CurrentPeriodSelfDepth(), query_self_const_id,
+          SubstPeriodSelfBehaviour::All, rebuild));
       auto rhs_id = context.constant_values().GetInstId(SubstPeriodSelf(
           context, loc_id, context.constant_values().Get(rewrite.rhs_id),
-          query_self_const_id, SubstPeriodSelfBehaviour::All,
-          SemIR::ElementIndex::None, rebuild));
+          context.CurrentPeriodSelfDepth(), query_self_const_id,
+          SubstPeriodSelfBehaviour::All, rebuild));
 
       if (lhs_id != rhs_id) {
         // TODO: Provide a diagnostic note and location for which rewrite

@@ -27,7 +27,6 @@ enum class SubstPeriodSelfBehaviour {
   ImplicitOnly,
   ExplicitOnly,
   All,
-  MatchingDepth,
 };
 
 using SubstPeriodSelfRebuildInst =
@@ -41,15 +40,17 @@ using SubstPeriodSelfRebuildInst =
 // can return None to fall back to the default of evaluating the inst.
 auto SubstPeriodSelf(
     Context& context, SemIR::LocId loc_id, SemIR::ConstantId const_id,
+    SemIR::ElementIndex matching_depth,
     SemIR::ConstantId period_self_replacement_id,
     SubstPeriodSelfBehaviour behaviour = SubstPeriodSelfBehaviour::All,
-    SemIR::ElementIndex depth = SemIR::ElementIndex::None,
     SubstPeriodSelfRebuildInst rebuild = nullptr) -> SemIR::ConstantId;
+
+// FIXME: Docs. Mention matching_depth.
 auto SubstPeriodSelf(
     Context& context, SemIR::LocId loc_id, SemIR::InstId inst_id,
+    SemIR::ElementIndex matching_depth,
     SemIR::InstId period_self_replacement_id,
     SubstPeriodSelfBehaviour behaviour = SubstPeriodSelfBehaviour::All,
-    SemIR::ElementIndex depth = SemIR::ElementIndex::None,
     SubstPeriodSelfRebuildInst rebuild = nullptr) -> SemIR::InstId;
 
 // Replace `.Self` references in the specific of the interface or named
@@ -61,16 +62,16 @@ auto SubstPeriodSelf(
 // can return None to fall back to the default of evaluating the inst.
 auto SubstPeriodSelf(
     Context& context, SemIR::LocId loc_id, SemIR::SpecificInterface interface,
+    SemIR::ElementIndex matching_depth,
     SemIR::ConstantId period_self_replacement_id,
     SubstPeriodSelfBehaviour behaviour = SubstPeriodSelfBehaviour::All,
-    SemIR::ElementIndex depth = SemIR::ElementIndex::None,
     SubstPeriodSelfRebuildInst rebuild = nullptr) -> SemIR::SpecificInterface;
 auto SubstPeriodSelf(
     Context& context, SemIR::LocId loc_id,
     SemIR::SpecificNamedConstraint constraint,
+    SemIR::ElementIndex matching_depth,
     SemIR::ConstantId period_self_replacement_id,
     SubstPeriodSelfBehaviour behaviour = SubstPeriodSelfBehaviour::All,
-    SemIR::ElementIndex depth = SemIR::ElementIndex::None,
     SubstPeriodSelfRebuildInst rebuild = nullptr)
     -> SemIR::SpecificNamedConstraint;
 
@@ -90,14 +91,17 @@ auto SubstPeriodSelfInFacetType(Context& context, SemIR::LocId loc_id,
                                 SemIR::TypeInstId facet_type_inst_id)
     -> SemIR::TypeInstId;
 
-// Returns whether the constant value of `inst_id` is a reference to `.Self`.
+// Returns whether the `inst_id` is a reference to `.Self`.
 //
 // If `canonicalize` is true, look at the constant value of `inst_id` and get
 // the canonicalized facet or type to look through FacetAccessType.
 auto IsPeriodSelf(Context& context, SemIR::InstId inst_id,
                   bool canonicalize = true) -> bool;
 
-// FIXME: Docs
+// If `inst_id` is a reference to `.Self`, return it.
+//
+// If `canonicalize` is true, look at the constant value of `inst_id` and get
+// the canonicalized facet or type to look through FacetAccessType.
 auto TryGetAsPeriodSelf(Context& context, SemIR::InstId inst_id,
                         bool canonicalize = true)
     -> std::optional<SemIR::SymbolicBinding>;

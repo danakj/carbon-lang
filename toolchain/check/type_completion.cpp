@@ -1006,6 +1006,7 @@ static auto IdentifyFacetType(Context& context, SemIR::LocId loc_id,
 
   // `.Self` is always replaced with the top-level self type.
   auto period_self_replacement_id = initial_self_const_id;
+  auto period_self_match_depth = context.CurrentPeriodSelfDepth();
 
   while (!work.empty()) {
     SelfImplsFacetType next_impls = work.pop_back_val();
@@ -1019,10 +1020,12 @@ static auto IdentifyFacetType(Context& context, SemIR::LocId loc_id,
         -> SemIR::IdentifiedFacetType::RequiredImpl {
       auto self = subst_period_self_in_self
                       ? SubstPeriodSelf(context, loc_id, self_const_id,
+                                        period_self_match_depth,
                                         period_self_replacement_id)
                       : self_const_id;
-      auto interface = SubstPeriodSelf(context, loc_id, impls_interface,
-                                       period_self_replacement_id);
+      auto interface =
+          SubstPeriodSelf(context, loc_id, impls_interface,
+                          period_self_match_depth, period_self_replacement_id);
       return {self, interface};
     };
     auto type_and_interface =
@@ -1030,10 +1033,10 @@ static auto IdentifyFacetType(Context& context, SemIR::LocId loc_id,
         -> SemIR::IdentifiedFacetType::RequiredImpl {
       auto self = SubstPeriodSelf(
           context, loc_id, context.constant_values().Get(impls.self_type),
-          period_self_replacement_id);
+          period_self_match_depth, period_self_replacement_id);
       auto interface =
           SubstPeriodSelf(context, loc_id, impls.specific_interface,
-                          period_self_replacement_id);
+                          period_self_match_depth, period_self_replacement_id);
       return {self, interface};
     };
 
