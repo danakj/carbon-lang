@@ -23,6 +23,11 @@ auto MakePeriodSelfFacetValue(Context& context, SemIR::LocId loc_id,
                               SemIR::ElementIndex depth,
                               bool insert_name = true) -> SemIR::InstId;
 
+// Get the depth of a `.Self` facet, which represents the number of `where`
+// clauses it is nested within.
+auto GetPeriodSelfDepth(Context& context, SemIR::SymbolicBinding bind)
+    -> SemIR::ElementIndex;
+
 enum class SubstPeriodSelfBehaviour {
   ImplicitOnly,
   ExplicitOnly,
@@ -40,7 +45,7 @@ using SubstPeriodSelfRebuildInst =
 // can return None to fall back to the default of evaluating the inst.
 auto SubstPeriodSelf(
     Context& context, SemIR::LocId loc_id, SemIR::ConstantId const_id,
-    SemIR::ElementIndex matching_depth,
+    SemIR::ElementIndex abstract_depth,
     SemIR::ConstantId period_self_replacement_id,
     SubstPeriodSelfBehaviour behaviour = SubstPeriodSelfBehaviour::All,
     SubstPeriodSelfRebuildInst rebuild = nullptr) -> SemIR::ConstantId;
@@ -48,7 +53,7 @@ auto SubstPeriodSelf(
 // FIXME: Docs. Mention matching_depth.
 auto SubstPeriodSelf(
     Context& context, SemIR::LocId loc_id, SemIR::InstId inst_id,
-    SemIR::ElementIndex matching_depth,
+    SemIR::ElementIndex abstract_depth,
     SemIR::InstId period_self_replacement_id,
     SubstPeriodSelfBehaviour behaviour = SubstPeriodSelfBehaviour::All,
     SubstPeriodSelfRebuildInst rebuild = nullptr) -> SemIR::InstId;
@@ -62,14 +67,14 @@ auto SubstPeriodSelf(
 // can return None to fall back to the default of evaluating the inst.
 auto SubstPeriodSelf(
     Context& context, SemIR::LocId loc_id, SemIR::SpecificInterface interface,
-    SemIR::ElementIndex matching_depth,
+    SemIR::ElementIndex abstract_depth,
     SemIR::ConstantId period_self_replacement_id,
     SubstPeriodSelfBehaviour behaviour = SubstPeriodSelfBehaviour::All,
     SubstPeriodSelfRebuildInst rebuild = nullptr) -> SemIR::SpecificInterface;
 auto SubstPeriodSelf(
     Context& context, SemIR::LocId loc_id,
     SemIR::SpecificNamedConstraint constraint,
-    SemIR::ElementIndex matching_depth,
+    SemIR::ElementIndex abstract_depth,
     SemIR::ConstantId period_self_replacement_id,
     SubstPeriodSelfBehaviour behaviour = SubstPeriodSelfBehaviour::All,
     SubstPeriodSelfRebuildInst rebuild = nullptr)

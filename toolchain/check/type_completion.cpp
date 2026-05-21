@@ -1006,7 +1006,7 @@ static auto IdentifyFacetType(Context& context, SemIR::LocId loc_id,
 
   // `.Self` is always replaced with the top-level self type.
   auto period_self_replacement_id = initial_self_const_id;
-  auto period_self_match_depth = context.CurrentPeriodSelfDepth();
+  auto period_self_match_depth = context.AbstractPeriodSelfDepth();
 
   while (!work.empty()) {
     SelfImplsFacetType next_impls = work.pop_back_val();

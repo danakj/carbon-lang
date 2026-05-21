@@ -435,6 +435,14 @@ static auto CollectFacetWitnessSources(
     collect_facets(iter, /*allow_partially_identified=*/true);
   }
 
+  // FIXME: Plan is something like:
+  // - Mark .Self as "active" inside the checking of the WhereExpr, an inactive
+  //   when it's done.
+  // - Don't subst "active" .Self ever.
+  // - Otherwise, replace .Self with the self in the identify.
+  // - I think that means we don't need to replace .Self above/below some depth
+  //   value.
+
   if (!context.where_stack().empty()) {
     // Grab witnesses from any `impls` constraints in the current `where`
     // expression.
@@ -477,10 +485,10 @@ static auto TryFindMatchingWitnessFromImplLookup(
   // replaced. We need to do the same for the self and interface in the
   // `orig_witness` for comparing with them.
   orig_const_self = SubstPeriodSelf(context, loc_id, orig_const_self,
-                                    context.CurrentPeriodSelfDepth(),
+                                    context.AbstractPeriodSelfDepth(),
                                     canonical_query_self_const_id);
   orig_interface = SubstPeriodSelf(context, loc_id, orig_interface,
-                                   context.CurrentPeriodSelfDepth(),
+                                   context.AbstractPeriodSelfDepth(),
                                    canonical_query_self_const_id);
 
   // Witnesses have a canonicalized self value. Perform the same
@@ -539,11 +547,11 @@ static auto VerifyQueryFacetTypeConstraints(
 
       auto lhs_id = context.constant_values().GetInstId(SubstPeriodSelf(
           context, loc_id, context.constant_values().Get(rewrite.lhs_id),
-          context.CurrentPeriodSelfDepth(), query_self_const_id,
+          context.AbstractPeriodSelfDepth(), query_self_const_id,
           SubstPeriodSelfBehaviour::All, rebuild));
       auto rhs_id = context.constant_values().GetInstId(SubstPeriodSelf(
           context, loc_id, context.constant_values().Get(rewrite.rhs_id),
-          context.CurrentPeriodSelfDepth(), query_self_const_id,
+          context.AbstractPeriodSelfDepth(), query_self_const_id,
           SubstPeriodSelfBehaviour::All, rebuild));
 
       if (lhs_id != rhs_id) {

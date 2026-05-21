@@ -417,8 +417,9 @@ auto HandleParseNode(Context& context,
   // compile time binding. This is popped when handling the
   // CompileTimeBindingPatternId.
   context.scope_stack().PushForSameRegion();
+  context.inside_compile_time_binding() = true;
   MakePeriodSelfFacetValue(context, node_id, GetEmptyFacetType(context),
-                           context.CurrentPeriodSelfDepth());
+                           context.AbstractPeriodSelfDepth());
   return true;
 }
 
@@ -427,6 +428,7 @@ auto HandleParseNode(Context& context,
   // Pop the `.Self` facet value name introduced by the
   // CompileTimeBindingPatternStart.
   context.scope_stack().Pop(/*check_unused=*/true);
+  context.inside_compile_time_binding() = false;
 
   auto node_kind = Parse::NodeKind::CompileTimeBindingPattern;
   const DeclIntroducerState& introducer =

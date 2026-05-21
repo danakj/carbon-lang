@@ -275,12 +275,24 @@ class Context {
     return where_stack_;
   }
 
-  auto CurrentPeriodSelfDepth(int offset = 0) -> SemIR::ElementIndex {
-    // `.Self` values of depth 0 and 1 both refer to the top level self, so we
-    // collapse them both down to depth 0. This simplifies semir, and gives them
-    // a depth that matches callers from outside of a `where` expression.
-    int size = where_stack_.empty() ? 0 : where_stack_.size() - 1;
-    return SemIR::ElementIndex(size + offset);
+  auto inside_compile_time_binding() -> bool& {
+    return inside_compile_time_binding_;
+  }
+
+  auto AbstractPeriodSelfDepth() -> SemIR::ElementIndex {
+    if (where_stack_.empty()) {
+      if (inside_compile_time_binding_) {
+        return SemIR::ElementIndex(1);
+      }
+      return SemIR::ElementIndex::None;
+    }
+    return SemIR::ElementIndex(where_stack_.size());
+  }
+
+  auto InnerKnownPeriodSelfDepth() -> SemIR::ElementIndex {
+    auto depth = where_stack_.size();
+    CARBON_CHECK(depth > 0);
+    return SemIR::ElementIndex(depth + 1);
   }
 
   // Data about a form expression.
@@ -561,6 +573,9 @@ class Context {
   // Tracks information about constraints in the current `where` expression
   // being checked so that they can be used by later constraints.
   llvm::SmallVector<WhereStackEntry> where_stack_;
+  // Tracks whether we are inside a CompileTimeBinding pattern, which has a
+  // `.Self` present without being inside a `where` expression.
+  bool inside_compile_time_binding_ = false;
 
   // Declared return form for the in-progress function declaration, if any.
   std::optional<FormExpr> return_form_expr_;

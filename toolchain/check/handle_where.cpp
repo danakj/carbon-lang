@@ -116,7 +116,7 @@ auto HandleParseNode(Context& context, Parse::WhereOperandId node_id) -> bool {
   // Introduce `.Self` as a symbolic binding. Its type is the value of the
   // expression to the left of `where`, so `MyInterface` in the example above.
   MakePeriodSelfFacetValue(context, node_id, period_self_type_id,
-                           context.CurrentPeriodSelfDepth());
+                           context.AbstractPeriodSelfDepth());
 
   return true;
 }
@@ -295,13 +295,17 @@ static auto SubstPeriodSelfInImplsWhere(
       }
 
       // Don't canonicalize; we are substituting in non-canonical instructions.
-      if (IsPeriodSelf(context(), inst_id, /*canonicalize=*/false)) {
+      if (auto period_self =
+              TryGetAsPeriodSelf(context(), inst_id, /*canonicalize=*/false)) {
         // We're looking for `.Self` with `depth + 1` to find values on the
         // RHS of a nested `where` expression in `inst_id`.
-        inst_id = SubstPeriodSelf(context(), SemIR::LocId(inst_id), inst_id,
-                                  context().CurrentPeriodSelfDepth(1),
-                                  period_self_replacement_id_);
-        return FullySubstituted;
+        if (GetPeriodSelfDepth(context(), *period_self) >
+            context().AbstractPeriodSelfDepth()) {
+          inst_id = SubstPeriodSelf(context(), SemIR::LocId(inst_id), inst_id,
+                                    context().AbstractPeriodSelfDepth(),
+                                    period_self_replacement_id_);
+          return FullySubstituted;
+        }
       }
       return SubstOperands;
     }
