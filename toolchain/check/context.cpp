@@ -101,4 +101,30 @@ auto Context::PrintForStackDump(llvm::raw_ostream& output) const -> void {
   args_type_info_stack_.PrintForStackDump(Indent, output);
 }
 
+auto Context::WhereStackEntry::InsertRewrite(Context& context,
+                                             SemIR::ImplWitnessAccess access,
+                                             SemIR::InstId rhs) -> void {
+  rewrites.Insert(
+      Assigned{.specific_interface_id =
+                   context.insts()
+                       .GetAs<SemIR::LookupImplWitness>(access.witness_id)
+                       .query_specific_interface_id,
+               .index = access.index},
+      rhs);
+}
+
+auto Context::WhereStackEntry::LookupRewrite(Context& context,
+                                             SemIR::ImplWitnessAccess access)
+    -> SemIR::InstId {
+  if (auto result = rewrites.Lookup(
+          Assigned{.specific_interface_id =
+                       context.insts()
+                           .GetAs<SemIR::LookupImplWitness>(access.witness_id)
+                           .query_specific_interface_id,
+                   .index = access.index})) {
+    return result.value();
+  }
+  return SemIR::InstId::None;
+}
+
 }  // namespace Carbon::Check

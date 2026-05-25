@@ -185,13 +185,19 @@ static auto PerformImplWitnessAccessAndSubstitute(
       GetOrAddInst<SemIR::ImplWitnessAccess>(context, loc_id, access);
 
   if (!context.where_stack().empty()) {
-    if (auto result = context.where_stack().back().rewrites.Lookup(
-            context.constant_values().Get(access_id))) {
-      return GetOrAddInst<SemIR::ImplWitnessAccessSubstituted>(
-          context, loc_id,
-          {.type_id = access.type_id,
-           .impl_witness_access_id = access_id,
-           .value_id = result.value()});
+    auto const_access_id =
+        context.constant_values().GetConstantInstId(access_id);
+    if (auto const_access = context.insts().TryGetAs<SemIR::ImplWitnessAccess>(
+            const_access_id)) {
+      if (auto rhs = context.where_stack().back().LookupRewrite(context,
+                                                                *const_access);
+          rhs.has_value()) {
+        return GetOrAddInst<SemIR::ImplWitnessAccessSubstituted>(
+            context, loc_id,
+            {.type_id = access.type_id,
+             .impl_witness_access_id = access_id,
+             .value_id = rhs});
+      }
     }
   }
 

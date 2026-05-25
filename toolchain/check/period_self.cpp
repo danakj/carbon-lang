@@ -54,6 +54,13 @@ auto GetPeriodSelfDepth(Context& context, SemIR::SymbolicBinding bind)
   return entity_name.period_self_depth;
 }
 
+auto GetPeriodSelfAbstract(Context& context, SemIR::InstId inst_id) -> bool {
+  auto bind = context.insts().GetAs<SemIR::SymbolicBinding>(inst_id);
+  auto& entity_name = context.entity_names().Get(bind.entity_name_id);
+  CARBON_CHECK(entity_name.name_id == SemIR::NameId::PeriodSelf);
+  return entity_name.period_self_depth.has_value();
+}
+
 class SubstPeriodSelfCallbacks : public SubstInstCallbacks {
  public:
   explicit SubstPeriodSelfCallbacks(Context* context, SemIR::LocId loc_id,
@@ -127,8 +134,7 @@ class SubstPeriodSelfCallbacks : public SubstInstCallbacks {
       // contain `M(.Self(1))`. We never replace a lower depth with a higher
       // one, that would be escaping the higher depth `.Self` to a context where
       // it doesn't exist.
-      if (GetPeriodSelfDepth(context(), *period_self) <=
-          context().AbstractPeriodSelfDepth()) {
+      if (GetPeriodSelfAbstract(context(), inst_id)) {
         return FullySubstituted;
       }
 
@@ -359,14 +365,6 @@ auto SubstPeriodSelf(Context& context, SemIR::LocId loc_id,
   // when the type of the `.Self` contains a `.Self`.
   if (auto period_self =
           TryGetAsPeriodSelf(context, period_self_replacement_id)) {
-    auto replacement_depth = GetPeriodSelfDepth(context, *period_self);
-    CARBON_CHECK(replacement_depth <= abstract_depth,
-                 "replacing `.Self` {0} with a more specific (larger `where` "
-                 "depth) value {1}",
-                 abstract_depth, replacement_depth);
-    if (abstract_depth == replacement_depth) {
-      return inst_id;
-    }
   }
 
   SubstPeriodSelfCallbacks callbacks(&context, loc_id,
@@ -530,6 +528,75 @@ auto SubstPeriodSelfInFacetType(Context& context, SemIR::LocId loc_id,
       context, loc_id,
       {.type_id = SemIR::TypeType::TypeId,
        .facet_type_id = context.facet_types().Add(info)});
+}
+
+class SubstReplacePeriodSelfDepthCallbacks : public SubstInstCallbacks {
+ public:
+  explicit SubstReplacePeriodSelfDepthCallbacks(
+      Context* context, SemIR::InstId period_self_to_be_replaced,
+      SemIR::InstId canon_period_self_to_be_replaced,
+      SemIR::InstId replacement_id)
+      : SubstInstCallbacks(context),
+        period_self_to_be_replaced_(period_self_to_be_replaced),
+        canon_period_self_to_be_replaced_(canon_period_self_to_be_replaced),
+        replacement_id_(replacement_id) {}
+
+  auto Subst(SemIR::InstId& inst_id) -> SubstResult override {
+    auto const_inst_id = context().constant_values().GetConstantInstId(inst_id);
+    if (const_inst_id == SemIR::TypeType::TypeInstId ||
+        const_inst_id == SemIR::ErrorInst::InstId) {
+      return FullySubstituted;
+    }
+
+    if (inst_id == period_self_to_be_replaced_) {
+      inst_id = replacement_id_;
+      return FullySubstituted;
+    }
+    if (inst_id == canon_period_self_to_be_replaced_) {
+      inst_id = context().constant_values().GetConstantInstId(replacement_id_);
+      return FullySubstituted;
+    }
+    return SubstOperands;
+  }
+
+  auto Rebuild(SemIR::InstId orig_inst_id, SemIR::Inst new_inst)
+      -> SemIR::InstId override {
+    bool is_canon = context().constant_values().GetConstantInstId(
+                        orig_inst_id) == orig_inst_id;
+    if (is_canon) {
+      return RebuildNewInst(SemIR::LocId(orig_inst_id), new_inst);
+    }
+    // We are substituting non-canonical instructions, some of which have no
+    // constant representation at all. So when we replace things, just create
+    // a new non-canonical instruction.
+    return AddInst(context(), SemIR::LocIdAndInst::RuntimeVerified(
+                                  context().sem_ir(),
+                                  SemIR::LocId(orig_inst_id), new_inst));
+  }
+
+ private:
+  SemIR::InstId period_self_to_be_replaced_;
+  SemIR::InstId canon_period_self_to_be_replaced_;
+  SemIR::InstId replacement_id_ = SemIR::InstId::None;
+};
+
+auto SubstPeriodSelfRemoveDepth(Context& context, SemIR::InstId inst_id,
+                                SemIR::InstId period_self_to_be_replaced)
+    -> SemIR::InstId {
+  // The input `.Self` should be non-canonical.
+  auto canon_period_self_to_be_replaced =
+      context.constant_values().GetConstantInstId(period_self_to_be_replaced);
+  CARBON_CHECK(canon_period_self_to_be_replaced != period_self_to_be_replaced);
+
+  auto type_id = context.insts().Get(period_self_to_be_replaced).type_id();
+  auto replacement_id = MakePeriodSelfFacetValue(
+      context, SemIR::LocId(period_self_to_be_replaced), type_id,
+      SemIR::ElementIndex::None, false);
+
+  SubstReplacePeriodSelfDepthCallbacks callbacks(
+      &context, period_self_to_be_replaced, canon_period_self_to_be_replaced,
+      replacement_id);
+  return SubstInst(context, inst_id, callbacks);
 }
 
 auto IsPeriodSelf(Context& context, SemIR::InstId inst_id, bool canonicalize)

@@ -146,12 +146,21 @@ static auto HandleAnyBindingPatternType(Context& context,
 // TODO: make this function shorter by factoring pieces out.
 static auto HandleAnyBindingPattern(Context& context, Parse::NodeId node_id,
                                     Parse::NodeKind node_kind,
-                                    bool is_unused = false) -> bool {
+                                    SemIR::InstId period_self) -> bool {
   auto type_expr = HandleAnyBindingPatternType(context, node_kind);
   if (context.types()
           .GetAsInst(type_expr.type_component_id)
           .Is<SemIR::TypeComponentOf>()) {
     return context.TODO(node_id, "Support symbolic form bindings");
+  }
+
+  if (period_self.has_value()) {
+    type_expr.inst_id =
+        SubstPeriodSelfRemoveDepth(context, type_expr.inst_id, period_self);
+    type_expr.type_component_id =
+        context.types().GetTypeIdForTypeInstId(SubstPeriodSelfRemoveDepth(
+            context, context.types().GetTypeInstId(type_expr.type_component_id),
+            period_self));
   }
 
   SemIR::ExprRegionId type_expr_region_id =
@@ -195,8 +204,8 @@ static auto HandleAnyBindingPattern(Context& context, Parse::NodeId node_id,
         context, node_id, type_expr_region_id,
         {.kind = kind,
          .type_id = GetPatternType(context, type_expr.type_component_id),
-         .entity_name_id =
-             AddBindingEntityName(context, name_id, form_id, is_unused, phase),
+         .entity_name_id = AddBindingEntityName(context, name_id, form_id,
+                                                /*is_unused=*/false, phase),
          .subpattern_id = subpattern_id});
 
     // TODO: If `is_generic`, then `binding.bind_id is a SymbolicBinding. Subst
@@ -396,19 +405,22 @@ static auto HandleAnyBindingPattern(Context& context, Parse::NodeId node_id,
 auto HandleParseNode(Context& context, Parse::LetBindingPatternId node_id)
     -> bool {
   return HandleAnyBindingPattern(context, node_id,
-                                 Parse::NodeKind::LetBindingPattern);
+                                 Parse::NodeKind::LetBindingPattern,
+                                 SemIR::InstId::None);
 }
 
 auto HandleParseNode(Context& context, Parse::VarBindingPatternId node_id)
     -> bool {
   return HandleAnyBindingPattern(context, node_id,
-                                 Parse::NodeKind::VarBindingPattern);
+                                 Parse::NodeKind::VarBindingPattern,
+                                 SemIR::InstId::None);
 }
 
 auto HandleParseNode(Context& context, Parse::FormBindingPatternId node_id)
     -> bool {
   return HandleAnyBindingPattern(context, node_id,
-                                 Parse::NodeKind::FormBindingPattern);
+                                 Parse::NodeKind::FormBindingPattern,
+                                 SemIR::InstId::None);
 }
 
 auto HandleParseNode(Context& context,
@@ -425,6 +437,10 @@ auto HandleParseNode(Context& context,
 
 auto HandleParseNode(Context& context,
                      Parse::CompileTimeBindingPatternId node_id) -> bool {
+  auto period_self =
+      LookupUnqualifiedName(context, node_id, SemIR::NameId::PeriodSelf)
+          .scope_result.target_inst_id();
+
   // Pop the `.Self` facet value name introduced by the
   // CompileTimeBindingPatternStart.
   context.scope_stack().Pop(/*check_unused=*/true);
@@ -453,7 +469,7 @@ auto HandleParseNode(Context& context,
     }
   }
 
-  return HandleAnyBindingPattern(context, node_id, node_kind);
+  return HandleAnyBindingPattern(context, node_id, node_kind, period_self);
 }
 
 auto HandleParseNode(Context& context,

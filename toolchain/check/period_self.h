@@ -28,6 +28,8 @@ auto MakePeriodSelfFacetValue(Context& context, SemIR::LocId loc_id,
 auto GetPeriodSelfDepth(Context& context, SemIR::SymbolicBinding bind)
     -> SemIR::ElementIndex;
 
+auto GetPeriodSelfAbstract(Context& context, SemIR::InstId inst_id) -> bool;
+
 enum class SubstPeriodSelfBehaviour {
   ImplicitOnly,
   ExplicitOnly,
@@ -95,6 +97,10 @@ auto SubstPeriodSelfInFacetType(Context& context, SemIR::LocId loc_id,
                                 SemIR::TypeInstId self_type_inst_id,
                                 SemIR::TypeInstId facet_type_inst_id)
     -> SemIR::TypeInstId;
+
+auto SubstPeriodSelfRemoveDepth(Context& context, SemIR::InstId inst_id,
+                                SemIR::InstId period_self_to_be_replaced)
+    -> SemIR::InstId;
 
 // Returns whether the `inst_id` is a reference to `.Self`.
 //
