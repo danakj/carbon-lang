@@ -343,6 +343,10 @@ auto HandleParseNode(Context& context, Parse::RequirementImplsId node_id)
     rhs_as_type.inst_id = SemIR::ErrorInst::TypeInstId;
   }
 
+  // FIXME: We should replace the nested .Self here. Why didn't we do that?
+  // First, we need to know the `.Self` instruction for the nested `where` if
+  // there was one.
+
   // Build up the list of arguments for the `WhereExpr` inst.
   context.args_type_info_stack().AddInstId(
       AddInstInNoBlock<SemIR::RequirementImpls>(

@@ -2937,6 +2937,11 @@ static auto AddRequirementImpls(Context& context, SemIR::LocId loc_id,
         info->type_impls_named_constraints,
         llvm::map_range(rhs.self_impls_named_constraints, extends_constraint));
 
+    // FIXME: Doing this here is too late. The WhereExpr code already dropped
+    // its depth from its own .Self before evaluating the WhereExpr. So the
+    // where's .Self is conflated with .Self introduced by a nested where inside
+    // the impls constraint.
+
     auto period_self_replacement_id =
         context.constant_values().Get(lhs_facet_or_type);
     auto type_impls_interface = [&](SemIR::FacetTypeInfo::TypeImplsInterface ti)
