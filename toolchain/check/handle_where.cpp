@@ -113,9 +113,9 @@ auto HandleParseNode(Context& context, Parse::WhereOperandId node_id) -> bool {
   context.scope_stack().PushForSameRegion();
   // Introduce `.Self` as a symbolic binding. Its type is the value of the
   // expression to the left of `where`, so `MyInterface` in the example above.
-  auto period_self = MakePeriodSelfFacetValue(
+  auto period_self_id = MakePeriodSelfFacetValue(
       context, node_id, period_self_type_id, context.AbstractPeriodSelfDepth());
-  context.node_stack().Push(node_id, period_self);
+  context.node_stack().Push(node_id, period_self_id);
 
   return true;
 }
@@ -346,6 +346,15 @@ auto HandleParseNode(Context& context, Parse::RequirementImplsId node_id)
   // FIXME: We should replace the nested .Self here. Why didn't we do that?
   // First, we need to know the `.Self` instruction for the nested `where` if
   // there was one.
+  if (auto nested_where =
+          context.insts().TryGetAs<SemIR::WhereExpr>(rhs_as_type.inst_id)) {
+    auto nested_period_self_id = nested_where->period_self_id;
+    llvm::errs() << nested_period_self_id;
+    rhs_as_type.inst_id = SubstPeriodSelfRemoveDepth(
+        context, rhs_as_type.inst_id, nested_period_self_id);
+    rhs_as_type.type_id =
+        context.types().GetTypeIdForTypeInstId(rhs_as_type.inst_id);
+  }
 
   // Build up the list of arguments for the `WhereExpr` inst.
   context.args_type_info_stack().AddInstId(
@@ -390,7 +399,8 @@ auto HandleParseNode(Context& /*context*/, Parse::RequirementAndId /*node_id*/)
 }
 
 auto HandleParseNode(Context& context, Parse::WhereExprId node_id) -> bool {
-  auto period_self = context.node_stack().Pop<Parse::NodeKind::WhereOperand>();
+  auto period_self_id =
+      context.node_stack().Pop<Parse::NodeKind::WhereOperand>();
 
   context.where_stack().pop_back();
   // Remove `PeriodSelf` from name lookup, undoing the `Push` done for the
@@ -401,13 +411,14 @@ auto HandleParseNode(Context& context, Parse::WhereExprId node_id) -> bool {
   llvm::SmallVector<SemIR::InstId> subst_reqs(
       context.inst_blocks().Get(requirements_id));
   for (auto& inst_id : subst_reqs) {
-    inst_id = SubstPeriodSelfRemoveDepth(context, inst_id, period_self);
+    inst_id = SubstPeriodSelfRemoveDepth(context, inst_id, period_self_id);
   }
   auto subst_reqs_id = context.inst_blocks().Add(subst_reqs);
 
-  AddInstAndPush<SemIR::WhereExpr>(
-      context, node_id,
-      {.type_id = SemIR::TypeType::TypeId, .requirements_id = subst_reqs_id});
+  AddInstAndPush<SemIR::WhereExpr>(context, node_id,
+                                   {.type_id = SemIR::TypeType::TypeId,
+                                    .period_self_id = period_self_id,
+                                    .requirements_id = subst_reqs_id});
   return true;
 }
 

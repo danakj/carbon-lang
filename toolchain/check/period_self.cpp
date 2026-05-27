@@ -591,6 +591,14 @@ auto SubstPeriodSelfRemoveDepth(Context& context, SemIR::InstId inst_id,
   return SubstInst(context, inst_id, callbacks);
 }
 
+auto SubstPeriodSelfRemoveDepth(Context& context, SemIR::TypeInstId inst_id,
+                                SemIR::InstId period_self_to_be_replaced)
+    -> SemIR::TypeInstId {
+  return context.types().GetAsTypeInstId(
+      SubstPeriodSelfRemoveDepth(context, static_cast<SemIR::InstId>(inst_id),
+                                 period_self_to_be_replaced));
+}
+
 auto IsPeriodSelf(Context& context, SemIR::InstId inst_id, bool canonicalize)
     -> bool {
   return TryGetAsPeriodSelf(context, inst_id, canonicalize).has_value();

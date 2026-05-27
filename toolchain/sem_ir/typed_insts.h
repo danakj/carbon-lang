@@ -2382,6 +2382,9 @@ struct WhereExpr {
 
   // Always the builtin type TypeType, as WhereExpr evaluates to a FacetType.
   TypeId type_id;
+  // This is the `.Self` symbolic binding. Its type matches the left type
+  // argument of the `where`.
+  InstId period_self_id;
   InstBlockId requirements_id;
 };
 

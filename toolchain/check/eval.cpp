@@ -2875,8 +2875,7 @@ static auto AddRequirementRewrite(Context& context,
       {.lhs_id = rewrite.lhs_id, .rhs_id = rewrite.rhs_id});
 }
 
-static auto AddRequirementImpls(Context& context, SemIR::LocId loc_id,
-                                SemIR::RequirementImpls impls,
+static auto AddRequirementImpls(Context& context, SemIR::RequirementImpls impls,
                                 SemIR::FacetTypeInfo* info, Phase* phase)
     -> void {
   auto lhs_id = context.constant_values().GetConstantInstId(impls.lhs_id);
@@ -2937,60 +2936,10 @@ static auto AddRequirementImpls(Context& context, SemIR::LocId loc_id,
         info->type_impls_named_constraints,
         llvm::map_range(rhs.self_impls_named_constraints, extends_constraint));
 
-    // FIXME: Doing this here is too late. The WhereExpr code already dropped
-    // its depth from its own .Self before evaluating the WhereExpr. So the
-    // where's .Self is conflated with .Self introduced by a nested where inside
-    // the impls constraint.
-
-    auto period_self_replacement_id =
-        context.constant_values().Get(lhs_facet_or_type);
-    auto type_impls_interface = [&](SemIR::FacetTypeInfo::TypeImplsInterface ti)
-        -> SemIR::FacetTypeInfo::TypeImplsInterface {
-      auto self_type = SubstPeriodSelf(
-          context, loc_id, context.constant_values().Get(ti.self_type),
-          SemIR::ElementIndex::None, period_self_replacement_id);
-      auto specific_interface = SubstPeriodSelf(
-          context, loc_id, ti.specific_interface, SemIR::ElementIndex::None,
-          period_self_replacement_id);
-      return {context.constant_values().GetInstId(self_type),
-              specific_interface};
-    };
-    auto type_impls_constraint =
-        [&](SemIR::FacetTypeInfo::TypeImplsNamedConstraint ti)
-        -> SemIR::FacetTypeInfo::TypeImplsNamedConstraint {
-      auto self_type = SubstPeriodSelf(
-          context, loc_id, context.constant_values().Get(ti.self_type),
-          SemIR::ElementIndex::None, period_self_replacement_id);
-      auto specific_named_constraint = SubstPeriodSelf(
-          context, loc_id, ti.specific_named_constraint,
-          SemIR::ElementIndex::None, period_self_replacement_id);
-      return {context.constant_values().GetInstId(self_type),
-              specific_named_constraint};
-    };
-
-    llvm::append_range(
-        info->type_impls_interfaces,
-        llvm::map_range(rhs.type_impls_interfaces, type_impls_interface));
+    llvm::append_range(info->type_impls_interfaces, rhs.type_impls_interfaces);
     llvm::append_range(info->type_impls_named_constraints,
-                       llvm::map_range(rhs.type_impls_named_constraints,
-                                       type_impls_constraint));
-
-    auto rewrite_constraint =
-        [&](SemIR::FacetTypeInfo::RewriteConstraint rewrite)
-        -> SemIR::FacetTypeInfo::RewriteConstraint {
-      auto lhs_id = SubstPeriodSelf(
-          context, loc_id, context.constant_values().Get(rewrite.lhs_id),
-          SemIR::ElementIndex::None, period_self_replacement_id);
-      auto rhs_id = SubstPeriodSelf(
-          context, loc_id, context.constant_values().Get(rewrite.rhs_id),
-          SemIR::ElementIndex::None, period_self_replacement_id);
-      return {context.constant_values().GetInstId(lhs_id),
-              context.constant_values().GetInstId(rhs_id)};
-    };
-
-    llvm::append_range(
-        info->rewrite_constraints,
-        llvm::map_range(rhs.rewrite_constraints, rewrite_constraint));
+                       rhs.type_impls_named_constraints);
+    llvm::append_range(info->rewrite_constraints, rhs.rewrite_constraints);
   }
 
   info->other_requirements |= rhs.other_requirements;
@@ -3031,8 +2980,7 @@ auto TryEvalTypedInst<SemIR::WhereExpr>(EvalContext& eval_context,
         break;
       }
       case CARBON_KIND(SemIR::RequirementImpls impls): {
-        AddRequirementImpls(eval_context.context(), SemIR::LocId(inst_id),
-                            impls, &info, &phase);
+        AddRequirementImpls(eval_context.context(), impls, &info, &phase);
         break;
       }
       case CARBON_KIND(SemIR::RequirementEquivalent _): {
