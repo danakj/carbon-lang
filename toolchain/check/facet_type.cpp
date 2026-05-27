@@ -242,17 +242,10 @@ class SubstImplWitnessAccessCallbacks : public SubstInstCallbacks {
       return SemIR::ErrorInst::InstId;
     }
 
-    // If we are substituting non-canonical instructions, some of them have no
-    // constant representation at all, and we want to preserve attachment of
-    // symbolic constants. So when we rebuild them, we must create a new
-    // non-canonical instruction.
-    bool is_canon = context().constant_values().GetConstantInstId(
-                        orig_inst_id) == orig_inst_id;
     auto inst_id =
-        is_canon ? RebuildNewInst(loc_id_, new_inst)
-                 : AddInstInNoBlock(context(),
-                                    SemIR::LocIdAndInst::RuntimeVerified(
-                                        context().sem_ir(), loc_id_, new_inst));
+        RebuildOrAddNonCanonicalInst(SemIR::LocId(orig_inst_id), orig_inst_id,
+                                     new_inst, AddInBlock::NoBlock);
+
     auto subst_inst_id = substs_in_progress_.pop_back_val();
     if (auto access =
             context().insts().TryGetAsWithId<SemIR::ImplWitnessAccess>(

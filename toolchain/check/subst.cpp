@@ -34,6 +34,25 @@ auto SubstInstCallbacks::RebuildNewInst(SemIR::LocId loc_id,
   return context().constant_values().GetInstId(const_id);
 }
 
+auto SubstInstCallbacks::RebuildOrAddNonCanonicalInst(
+    SemIR::LocId loc_id, SemIR::InstId orig_inst_id, SemIR::Inst new_inst,
+    AddInBlock add_in_block) const -> SemIR::InstId {
+  bool is_canon = context().constant_values().GetConstantInstId(orig_inst_id) ==
+                  orig_inst_id;
+  if (is_canon) {
+    return RebuildNewInst(loc_id, new_inst);
+  }
+
+  auto loc_and_inst = SemIR::LocIdAndInst::RuntimeVerified(context().sem_ir(),
+                                                           loc_id, new_inst);
+  switch (add_in_block) {
+    case AddInBlock::NoBlock:
+      return AddInstInNoBlock(context(), loc_and_inst);
+    case AddInBlock::CurrentBlock:
+      return AddInst(context(), loc_and_inst);
+  }
+}
+
 namespace {
 
 // Information about an instruction that we are substituting into.

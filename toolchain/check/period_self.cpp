@@ -561,17 +561,9 @@ class SubstReplacePeriodSelfDepthCallbacks : public SubstInstCallbacks {
 
   auto Rebuild(SemIR::InstId orig_inst_id, SemIR::Inst new_inst)
       -> SemIR::InstId override {
-    bool is_canon = context().constant_values().GetConstantInstId(
-                        orig_inst_id) == orig_inst_id;
-    if (is_canon) {
-      return RebuildNewInst(SemIR::LocId(orig_inst_id), new_inst);
-    }
-    // We are substituting non-canonical instructions, some of which have no
-    // constant representation at all. So when we replace things, just create
-    // a new non-canonical instruction.
-    return AddInst(context(), SemIR::LocIdAndInst::RuntimeVerified(
-                                  context().sem_ir(),
-                                  SemIR::LocId(orig_inst_id), new_inst));
+    return RebuildOrAddNonCanonicalInst(SemIR::LocId(orig_inst_id),
+                                        orig_inst_id, new_inst,
+                                        AddInBlock::NoBlock);
   }
 
  private:

@@ -88,6 +88,42 @@ class SubstInstCallbacks {
     return RebuildNewInst(loc_id, static_cast<SemIR::Inst>(new_inst));
   }
 
+  enum class AddInBlock {
+    NoBlock,
+    CurrentBlock,
+  };
+
+  // Builds a new instruction with support for non-canonical insts.
+  //
+  // If the instruction being rebuilt was canonical, then we evaluate `new_inst`
+  // and return its new canonical `InstId`.
+  //
+  // If the instruction being rebuilt was non-canonical, then it may not have a
+  // constant representation at all. So we add a new non-canonical inst and
+  // return its `InstId`.
+  //
+  // If the non-canonical instruction being rebuilt is symbolic, this can
+  // preserve attachment by making a new non-canonical inst. However it requires
+  // the substitution occurs within the generic context that contains the
+  // original instruction.
+  //
+  // This can be used to implement `Rebuild` in cases that handle non-canonical
+  // inputs.
+  auto RebuildOrAddNonCanonicalInst(SemIR::LocId loc_id,
+                                    SemIR::InstId orig_inst_id,
+                                    SemIR::Inst new_inst,
+                                    AddInBlock add_in_block) const
+      -> SemIR::InstId;
+
+  template <typename InstT>
+  auto RebuildOrAddNonCanonicalInst(SemIR::LocId loc_id,
+                                    SemIR::InstId orig_inst_id, InstT new_inst,
+                                    AddInBlock add_in_block) const
+      -> SemIR::InstId {
+    return RebuildOrAddNonCanonicalInst(loc_id, orig_inst_id, new_inst,
+                                        add_in_block);
+  }
+
  private:
   Context* context_;
 };
