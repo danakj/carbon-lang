@@ -392,13 +392,14 @@ auto HandleParseNode(Context& context, Parse::RequirementImplsId node_id)
   // that `.T impls Hash`.
 
   // FIXME: Move this and Subst up above AsType so we don't have to recompute
-  // TypeIds?
+  // TypeIds? And don't have to GetCanonicalFacetOrTypeValue?
   if (FindAndDiagnoseAmbiguousPeriodSelf(context, lhs_as_type.inst_id,
                                          rhs_as_type.inst_id)) {
     rhs_as_type.type_id = SemIR::ErrorInst::TypeId;
     rhs_as_type.inst_id = SemIR::ErrorInst::TypeInstId;
   }
 
+  // In `C impls Y where ...` we replace `.Self` with `C`.
   rhs_as_type.inst_id =
       context.types().GetAsTypeInstId(SubstPeriodSelfInNestedWhereExpressions(
           context, rhs_as_type.inst_id, lhs_as_type.inst_id));

@@ -126,9 +126,19 @@ struct BindingPatternTypeInfo {
 
 // Handle the type position of a binding pattern.
 static auto HandleAnyBindingPatternType(Context& context,
-                                        Parse::NodeKind node_kind)
+                                        Parse::NodeKind node_kind,
+                                        SemIR::InstId period_self_id)
     -> BindingPatternTypeInfo {
   auto [node_id, original_inst_id] = context.node_stack().PopExprWithNodeId();
+
+  if (period_self_id.has_value()) {
+    auto type_id = context.insts().Get(period_self_id).type_id();
+    auto replacement_id =
+        MakePeriodSelfFacetValue(context, SemIR::LocId(period_self_id), type_id,
+                                 SemIR::ElementIndex::None, false);
+    original_inst_id = SubstPeriodSelfWithDepth(context, original_inst_id,
+                                                period_self_id, replacement_id);
+  }
 
   if (node_kind == Parse::FormBindingPattern::Kind) {
     auto as_form = FormExprAsForm(context, node_id, original_inst_id);
@@ -147,25 +157,12 @@ static auto HandleAnyBindingPatternType(Context& context,
 static auto HandleAnyBindingPattern(Context& context, Parse::NodeId node_id,
                                     Parse::NodeKind node_kind,
                                     SemIR::InstId period_self_id) -> bool {
-  auto type_expr = HandleAnyBindingPatternType(context, node_kind);
+  auto type_expr =
+      HandleAnyBindingPatternType(context, node_kind, period_self_id);
   if (context.types()
           .GetAsInst(type_expr.type_component_id)
           .Is<SemIR::TypeComponentOf>()) {
     return context.TODO(node_id, "Support symbolic form bindings");
-  }
-
-  if (period_self_id.has_value()) {
-    auto type_id = context.insts().Get(period_self_id).type_id();
-    auto replacement_id =
-        MakePeriodSelfFacetValue(context, SemIR::LocId(period_self_id), type_id,
-                                 SemIR::ElementIndex::None, false);
-
-    type_expr.inst_id = SubstPeriodSelfWithDepth(
-        context, type_expr.inst_id, period_self_id, replacement_id);
-    type_expr.type_component_id =
-        context.types().GetTypeIdForTypeInstId(SubstPeriodSelfWithDepth(
-            context, context.types().GetTypeInstId(type_expr.type_component_id),
-            period_self_id, replacement_id));
   }
 
   SemIR::ExprRegionId type_expr_region_id =
