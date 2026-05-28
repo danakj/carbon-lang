@@ -572,31 +572,23 @@ class SubstReplacePeriodSelfDepthCallbacks : public SubstInstCallbacks {
   SemIR::InstId replacement_id_ = SemIR::InstId::None;
 };
 
-auto SubstPeriodSelfRemoveDepth(Context& context, SemIR::InstId inst_id,
-                                SemIR::InstId period_self_to_be_replaced)
-    -> SemIR::InstId {
+auto SubstPeriodSelfWithDepth(Context& context, SemIR::InstId inst_id,
+                              SemIR::InstId period_self_to_be_replaced,
+                              SemIR::InstId replacement_id) -> SemIR::InstId {
+  CARBON_CHECK(GetPeriodSelfAbstract(context, period_self_to_be_replaced),
+               "Replacing non-abstract `.Self`? Use SubstPeriodSelf() to "
+               "replace `.Self` in a fully checked facet type where `.Self` is "
+               "no longer abstract.");
+
   // The input `.Self` should be non-canonical.
   auto canon_period_self_to_be_replaced =
       context.constant_values().GetConstantInstId(period_self_to_be_replaced);
   CARBON_CHECK(canon_period_self_to_be_replaced != period_self_to_be_replaced);
 
-  auto type_id = context.insts().Get(period_self_to_be_replaced).type_id();
-  auto replacement_id = MakePeriodSelfFacetValue(
-      context, SemIR::LocId(period_self_to_be_replaced), type_id,
-      SemIR::ElementIndex::None, false);
-
   SubstReplacePeriodSelfDepthCallbacks callbacks(
       &context, period_self_to_be_replaced, canon_period_self_to_be_replaced,
       replacement_id);
   return SubstInst(context, inst_id, callbacks);
-}
-
-auto SubstPeriodSelfRemoveDepth(Context& context, SemIR::TypeInstId inst_id,
-                                SemIR::InstId period_self_to_be_replaced)
-    -> SemIR::TypeInstId {
-  return context.types().GetAsTypeInstId(
-      SubstPeriodSelfRemoveDepth(context, static_cast<SemIR::InstId>(inst_id),
-                                 period_self_to_be_replaced));
 }
 
 auto IsPeriodSelf(Context& context, SemIR::InstId inst_id, bool canonicalize)
@@ -844,6 +836,8 @@ auto FindAndDiagnoseAmbiguousPeriodSelf(Context& context,
   };
 
   llvm::SmallVector<WorkItem> work;
+  // FIXME: This could be an expression like (Z & (Y where...)) and we'd miss
+  // finding the WhereExpr.
   if (auto where_expr =
           context.insts().TryGetAs<SemIR::WhereExpr>(impls_rhs_id)) {
     work.push_back({.where_expr = *where_expr, .search_lhs = false});

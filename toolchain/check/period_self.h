@@ -98,12 +98,9 @@ auto SubstPeriodSelfInFacetType(Context& context, SemIR::LocId loc_id,
                                 SemIR::TypeInstId facet_type_inst_id)
     -> SemIR::TypeInstId;
 
-auto SubstPeriodSelfRemoveDepth(Context& context, SemIR::InstId inst_id,
-                                SemIR::InstId period_self_to_be_replaced)
-    -> SemIR::InstId;
-auto SubstPeriodSelfRemoveDepth(Context& context, SemIR::TypeInstId inst_id,
-                                SemIR::InstId period_self_to_be_replaced)
-    -> SemIR::TypeInstId;
+auto SubstPeriodSelfWithDepth(Context& context, SemIR::InstId inst_id,
+                              SemIR::InstId period_self_to_be_replaced,
+                              SemIR::InstId replacement_id) -> SemIR::InstId;
 
 // Returns whether the `inst_id` is a reference to `.Self`.
 //

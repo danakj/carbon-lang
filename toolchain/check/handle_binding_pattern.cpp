@@ -146,7 +146,7 @@ static auto HandleAnyBindingPatternType(Context& context,
 // TODO: make this function shorter by factoring pieces out.
 static auto HandleAnyBindingPattern(Context& context, Parse::NodeId node_id,
                                     Parse::NodeKind node_kind,
-                                    SemIR::InstId period_self) -> bool {
+                                    SemIR::InstId period_self_id) -> bool {
   auto type_expr = HandleAnyBindingPatternType(context, node_kind);
   if (context.types()
           .GetAsInst(type_expr.type_component_id)
@@ -154,13 +154,18 @@ static auto HandleAnyBindingPattern(Context& context, Parse::NodeId node_id,
     return context.TODO(node_id, "Support symbolic form bindings");
   }
 
-  if (period_self.has_value()) {
-    type_expr.inst_id =
-        SubstPeriodSelfRemoveDepth(context, type_expr.inst_id, period_self);
+  if (period_self_id.has_value()) {
+    auto type_id = context.insts().Get(period_self_id).type_id();
+    auto replacement_id =
+        MakePeriodSelfFacetValue(context, SemIR::LocId(period_self_id), type_id,
+                                 SemIR::ElementIndex::None, false);
+
+    type_expr.inst_id = SubstPeriodSelfWithDepth(
+        context, type_expr.inst_id, period_self_id, replacement_id);
     type_expr.type_component_id =
-        context.types().GetTypeIdForTypeInstId(SubstPeriodSelfRemoveDepth(
+        context.types().GetTypeIdForTypeInstId(SubstPeriodSelfWithDepth(
             context, context.types().GetTypeInstId(type_expr.type_component_id),
-            period_self));
+            period_self_id, replacement_id));
   }
 
   SemIR::ExprRegionId type_expr_region_id =

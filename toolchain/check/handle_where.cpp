@@ -183,6 +183,46 @@ static auto DiagnoseMissingDesignator(Context& context, SemIR::LocId loc_id)
   context.emitter().Emit(loc_id, WhereWithoutDesignator);
 }
 
+static auto SubstPeriodSelfInNestedWhereExpressions(
+    Context& context, SemIR::InstId inst_id, SemIR::InstId replacement_id)
+    -> SemIR::InstId {
+  class WhereExprCallbacks : public SubstInstCallbacks {
+   public:
+    explicit WhereExprCallbacks(Context* context, SemIR::InstId replacement_id)
+        : SubstInstCallbacks(context), replacement_id_(replacement_id) {}
+
+    auto Subst(SemIR::InstId& inst_id) -> SubstResult override {
+      if (context().constant_values().GetConstantInstId(inst_id) == inst_id) {
+        // WhereExpr is only found in non-canonical instructions, since it
+        // always evaluates to a FacetType. TypeType and ErrorInst evaluate to
+        // themselves, so this covers them as a base case a well.
+        return FullySubstituted;
+      }
+      if (auto nested_where =
+              context().insts().TryGetAs<SemIR::WhereExpr>(inst_id)) {
+        auto nested_period_self_id = nested_where->period_self_id;
+        inst_id = SubstPeriodSelfWithDepth(
+            context(), inst_id, nested_period_self_id, replacement_id_);
+        return FullySubstituted;
+      }
+      return SubstOperands;
+    }
+
+    auto Rebuild(SemIR::InstId orig_inst_id, SemIR::Inst new_inst)
+        -> SemIR::InstId override {
+      return RebuildOrAddNonCanonicalInst(SemIR::LocId(orig_inst_id),
+                                          orig_inst_id, new_inst,
+                                          AddInBlock::NoBlock);
+    }
+
+   private:
+    SemIR::InstId replacement_id_;
+  };
+
+  WhereExprCallbacks callbacks(&context, replacement_id);
+  return SubstInst(context, inst_id, callbacks);
+}
+
 auto HandleParseNode(Context& context, Parse::RequirementEqualId node_id)
     -> bool {
   auto [rhs_node, rhs_id] = context.node_stack().PopExprWithNodeId();
@@ -190,6 +230,13 @@ auto HandleParseNode(Context& context, Parse::RequirementEqualId node_id)
 
   // Rewrites always contain a designator since the LHS must be one. This is
   // checked elsewhere.
+
+  auto period_self_id =
+      context.node_stack().Peek<Parse::NodeKind::WhereOperand>();
+  lhs_id =
+      SubstPeriodSelfInNestedWhereExpressions(context, lhs_id, period_self_id);
+  rhs_id =
+      SubstPeriodSelfInNestedWhereExpressions(context, rhs_id, period_self_id);
 
   // Convert rhs to type of lhs.
   auto lhs_type_id = context.insts().Get(lhs_id).type_id();
@@ -225,25 +272,32 @@ auto HandleParseNode(Context& context, Parse::RequirementEqualId node_id)
 
 auto HandleParseNode(Context& context, Parse::RequirementEqualEqualId node_id)
     -> bool {
-  auto rhs = context.node_stack().PopExpr();
-  auto lhs = context.node_stack().PopExpr();
+  auto rhs_id = context.node_stack().PopExpr();
+  auto lhs_id = context.node_stack().PopExpr();
   // TODO: Type check lhs and rhs are comparable.
 
-  auto const_lhs = context.constant_values().Get(lhs);
-  auto const_rhs = context.constant_values().Get(rhs);
+  auto const_lhs = context.constant_values().Get(lhs_id);
+  auto const_rhs = context.constant_values().Get(rhs_id);
   if (!FindDesignator(context, const_lhs) &&
       !FindDesignator(context, const_rhs)) {
     if (const_lhs != SemIR::ErrorInst::ConstantId &&
         const_rhs != SemIR::ErrorInst::ConstantId) {
       DiagnoseMissingDesignator(context, node_id);
     }
-    lhs = rhs = SemIR::ErrorInst::InstId;
+    lhs_id = rhs_id = SemIR::ErrorInst::InstId;
   }
+
+  auto period_self_id =
+      context.node_stack().Peek<Parse::NodeKind::WhereOperand>();
+  lhs_id =
+      SubstPeriodSelfInNestedWhereExpressions(context, lhs_id, period_self_id);
+  rhs_id =
+      SubstPeriodSelfInNestedWhereExpressions(context, rhs_id, period_self_id);
 
   // Build up the list of arguments for the `WhereExpr` inst.
   context.args_type_info_stack().AddInstId(
       AddInstInNoBlock<SemIR::RequirementEquivalent>(
-          context, node_id, {.lhs_id = lhs, .rhs_id = rhs}));
+          context, node_id, {.lhs_id = lhs_id, .rhs_id = rhs_id}));
   return true;
 }
 
@@ -337,24 +391,19 @@ auto HandleParseNode(Context& context, Parse::RequirementImplsId node_id)
   // TODO: For things like `HashSet(.T) as type`, add an implied constraint
   // that `.T impls Hash`.
 
+  // FIXME: Move this and Subst up above AsType so we don't have to recompute
+  // TypeIds?
   if (FindAndDiagnoseAmbiguousPeriodSelf(context, lhs_as_type.inst_id,
                                          rhs_as_type.inst_id)) {
     rhs_as_type.type_id = SemIR::ErrorInst::TypeId;
     rhs_as_type.inst_id = SemIR::ErrorInst::TypeInstId;
   }
 
-  // FIXME: We should replace the nested .Self here. Why didn't we do that?
-  // First, we need to know the `.Self` instruction for the nested `where` if
-  // there was one.
-  if (auto nested_where =
-          context.insts().TryGetAs<SemIR::WhereExpr>(rhs_as_type.inst_id)) {
-    auto nested_period_self_id = nested_where->period_self_id;
-    llvm::errs() << nested_period_self_id;
-    rhs_as_type.inst_id = SubstPeriodSelfRemoveDepth(
-        context, rhs_as_type.inst_id, nested_period_self_id);
-    rhs_as_type.type_id =
-        context.types().GetTypeIdForTypeInstId(rhs_as_type.inst_id);
-  }
+  rhs_as_type.inst_id =
+      context.types().GetAsTypeInstId(SubstPeriodSelfInNestedWhereExpressions(
+          context, rhs_as_type.inst_id, lhs_as_type.inst_id));
+  rhs_as_type.type_id =
+      context.types().GetTypeIdForTypeInstId(rhs_as_type.inst_id);
 
   // Build up the list of arguments for the `WhereExpr` inst.
   context.args_type_info_stack().AddInstId(
@@ -408,17 +457,25 @@ auto HandleParseNode(Context& context, Parse::WhereExprId node_id) -> bool {
   context.scope_stack().Pop(/*check_unused=*/true);
   SemIR::InstBlockId requirements_id = context.args_type_info_stack().Pop();
 
-  llvm::SmallVector<SemIR::InstId> subst_reqs(
-      context.inst_blocks().Get(requirements_id));
-  for (auto& inst_id : subst_reqs) {
-    inst_id = SubstPeriodSelfRemoveDepth(context, inst_id, period_self_id);
+  if (context.where_stack().empty() &&
+      requirements_id != SemIR::InstBlockId::Empty) {
+    llvm::SmallVector<SemIR::InstId> subst_reqs(
+        context.inst_blocks().Get(requirements_id));
+    auto type_id = context.insts().Get(period_self_id).type_id();
+    auto replacement_id =
+        MakePeriodSelfFacetValue(context, SemIR::LocId(period_self_id), type_id,
+                                 SemIR::ElementIndex::None, false);
+    for (auto& inst_id : subst_reqs) {
+      inst_id = SubstPeriodSelfWithDepth(context, inst_id, period_self_id,
+                                         replacement_id);
+    }
+    requirements_id = context.inst_blocks().Add(subst_reqs);
   }
-  auto subst_reqs_id = context.inst_blocks().Add(subst_reqs);
 
   AddInstAndPush<SemIR::WhereExpr>(context, node_id,
                                    {.type_id = SemIR::TypeType::TypeId,
                                     .period_self_id = period_self_id,
-                                    .requirements_id = subst_reqs_id});
+                                    .requirements_id = requirements_id});
   return true;
 }
 
