@@ -1469,6 +1469,9 @@ auto Formatter::FormatArg(EntityNameId id) -> void {
   }
   const auto& info = sem_ir_->entity_names().Get(id);
   FormatName(info.name_id);
+  if (info.period_self_depth.has_value()) {
+    out() << "." << info.period_self_depth.index;
+  }
   if (info.bind_index().has_value()) {
     out() << ", " << info.bind_index().index;
   }

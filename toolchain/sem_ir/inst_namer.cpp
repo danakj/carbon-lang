@@ -58,6 +58,10 @@ class InstNamer::NamingContext {
     AddInstName((sem_ir().names().GetIRBaseName(name_id) + suffix).str());
   }
 
+  // Adds the instruction's name by `EntityNameId`.
+  auto AddInstEntityNameId(SemIR::EntityNameId entity_name_id,
+                           llvm::StringRef suffix = "") -> void;
+
   // Names an `IntType` or `FloatType`.
   auto AddIntOrFloatTypeName(char type_literal_prefix, InstId bit_width_id,
                              llvm::StringRef suffix = "") -> void;
@@ -854,6 +858,17 @@ auto InstNamer::NamingContext::AddStructTypeInstName(
   AddInstName(out.TakeStr());
 }
 
+auto InstNamer::NamingContext::AddInstEntityNameId(
+    SemIR::EntityNameId entity_name_id, llvm::StringRef suffix) -> void {
+  RawStringOstream out;
+  const auto& entity_name = sem_ir().entity_names().Get(entity_name_id);
+  if (entity_name.period_self_depth.has_value()) {
+    out << "." << entity_name.period_self_depth.index;
+  }
+  out << suffix;
+  AddInstNameId(entity_name.name_id, out.TakeStr());
+}
+
 auto InstNamer::NamingContext::AddIntOrFloatTypeName(char type_literal_prefix,
                                                      InstId bit_width_id,
                                                      llvm::StringRef suffix)
@@ -915,15 +930,15 @@ auto InstNamer::NamingContext::NameInst() -> void {
       return;
     }
     case CARBON_KIND_ANY(AnyBindingOrExportDecl, inst): {
-      AddInstNameId(sem_ir().entity_names().Get(inst.entity_name_id).name_id);
+      AddInstEntityNameId(inst.entity_name_id);
       return;
     }
     case CARBON_KIND_ANY(AnyBindingPattern, inst): {
-      auto name_id = NameId::Underscore;
       if (inst.entity_name_id.has_value()) {
-        name_id = sem_ir().entity_names().Get(inst.entity_name_id).name_id;
+        AddInstEntityNameId(inst.entity_name_id, ".patt");
+      } else {
+        AddInstNameId(NameId::Underscore, ".patt");
       }
-      AddInstNameId(name_id, ".patt");
       return;
     }
     case CARBON_KIND(BoolLiteral inst): {
@@ -1002,7 +1017,7 @@ auto InstNamer::NamingContext::NameInst() -> void {
       return;
     }
     case CARBON_KIND(CppTemplateNameType inst): {
-      AddInstNameId(sem_ir().entity_names().Get(inst.name_id).name_id, ".type");
+      AddInstEntityNameId(inst.name_id, ".type");
       return;
     }
     case CustomWitness::Kind: {
@@ -1018,16 +1033,12 @@ auto InstNamer::NamingContext::NameInst() -> void {
       return;
     }
     case CARBON_KIND(FacetAccessType inst): {
-      auto name_id = SemIR::NameId::None;
       if (auto name =
               sem_ir().insts().TryGetAs<NameRef>(inst.facet_value_inst_id)) {
-        name_id = name->name_id;
+        AddInstNameId(name->name_id, ".as_type");
       } else if (auto bind = sem_ir().insts().TryGetAs<SymbolicBinding>(
                      inst.facet_value_inst_id)) {
-        name_id = sem_ir().entity_names().Get(bind->entity_name_id).name_id;
-      }
-      if (name_id.has_value()) {
-        AddInstNameId(name_id, ".as_type");
+        AddInstEntityNameId(bind->entity_name_id, ".as_type");
       } else {
         AddInstName("as_type");
       }
@@ -1215,8 +1226,12 @@ auto InstNamer::NamingContext::NameInst() -> void {
 
       // Add entity name if available.
       if (inst.entity_name_id.has_value()) {
-        auto name_id = sem_ir().entity_names().Get(inst.entity_name_id).name_id;
-        out << sem_ir().names().GetIRBaseName(name_id);
+        const auto& entity_name =
+            sem_ir().entity_names().Get(inst.entity_name_id);
+        out << sem_ir().names().GetIRBaseName(entity_name.name_id);
+        if (entity_name.period_self_depth.has_value()) {
+          out << "." << entity_name.period_self_depth.index;
+        }
       } else {
         out << "import_ref";
       }
@@ -1380,9 +1395,7 @@ auto InstNamer::NamingContext::NameInst() -> void {
       } else if (auto template_name_ty =
                      sem_ir().types().TryGetAs<CppTemplateNameType>(
                          inst.type_id)) {
-        AddInstNameId(
-            sem_ir().entity_names().Get(template_name_ty->name_id).name_id,
-            ".template");
+        AddInstEntityNameId(template_name_ty->name_id, ".template");
       } else {
         if (sem_ir().inst_blocks().Get(inst.elements_id).empty()) {
           AddInstName("empty_struct");

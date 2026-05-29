@@ -278,8 +278,14 @@ struct Worklist {
       //
       // Also don't include the `is_template` flag. Changing that flag should
       // also be a compatible change from the perspective of users of a generic.
+    } else if (entity_name.name_id == SemIR::NameId::PeriodSelf) {
+      Add(entity_name.name_id);
+      // `.Self` can include a depth in its entity, which is part of its
+      // canonical entity.
+      Add(entity_name.period_self_depth);
     } else {
       Add(entity_name.name_id);
+      CARBON_CHECK(!entity_name.period_self_depth.has_value());
     }
     Add(entity_name.parent_scope_id);
 
