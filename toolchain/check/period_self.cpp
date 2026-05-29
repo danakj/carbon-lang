@@ -551,6 +551,11 @@ class SubstReplacePeriodSelfDepthCallbacks : public SubstInstCallbacks {
       return FullySubstituted;
     }
 
+    if (auto found = rebuilt_map_.Lookup(inst_id)) {
+      inst_id = found.value();
+      return FullySubstituted;
+    }
+
     auto replace_with = SemIR::InstId::None;
     if (inst_id == period_self_to_be_replaced_) {
       replace_with = replacement_id_;
@@ -570,11 +575,19 @@ class SubstReplacePeriodSelfDepthCallbacks : public SubstInstCallbacks {
     return SubstOperands;
   }
 
+  auto ReuseUnchanged(SemIR::InstId orig_inst_id) -> SemIR::InstId override {
+    rebuilt_map_.Insert(orig_inst_id, orig_inst_id);
+    return orig_inst_id;
+  }
+
   auto Rebuild(SemIR::InstId orig_inst_id, SemIR::Inst new_inst)
       -> SemIR::InstId override {
-    return RebuildOrAddNonCanonicalInst(SemIR::LocId(orig_inst_id),
-                                        orig_inst_id, new_inst,
-                                        AddInBlock::NoBlock);
+    auto inserted = rebuilt_map_.Insert(orig_inst_id, [&]() {
+      return RebuildOrAddNonCanonicalInst(SemIR::LocId(orig_inst_id),
+                                          orig_inst_id, new_inst,
+                                          AddInBlock::NoBlock);
+    });
+    return inserted.value();
   }
 
  private:
@@ -583,6 +596,7 @@ class SubstReplacePeriodSelfDepthCallbacks : public SubstInstCallbacks {
   SemIR::InstId canon_period_self_to_be_replaced_;
   SemIR::InstId replacement_id_;
   SemIR::TypeId replacement_type_id_;
+  Map<SemIR::InstId, SemIR::InstId, 16> rebuilt_map_;
 };
 
 auto SubstPeriodSelfWithDepth(Context& context, SemIR::InstId inst_id,
