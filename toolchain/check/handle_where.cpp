@@ -458,6 +458,16 @@ auto HandleParseNode(Context& context, Parse::WhereExprId node_id) -> bool {
   context.scope_stack().Pop(/*check_unused=*/true);
   SemIR::InstBlockId requirements_id = context.args_type_info_stack().Pop();
 
+  // If the `where_stack` is empty, we need to drop any depths from the `.Self`
+  // introduced by this `where` as the final facet type should not have any
+  // depths.
+  //
+  // But if the `where_stack` is not empty, this facet type may be on the RHS of
+  // an `impls` constraint. In that case we don't know what to replace our
+  // `.Self` with yet, but we'll know when handling that `impls` constraint.
+  // Since the stack is not empty this `where` clause must be part of some other
+  // constraint, and we will remove the depth from nested `where` clauses in
+  // each constraint.
   if (context.where_stack().empty() &&
       requirements_id != SemIR::InstBlockId::Empty) {
     llvm::SmallVector<SemIR::InstId> subst_reqs(
