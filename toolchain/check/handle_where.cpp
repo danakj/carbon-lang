@@ -327,10 +327,29 @@ static auto IsPeriodSelfAccess(Context& context, SemIR::InstId inst_id)
   }
 }
 
-auto HandleParseNode(Context& context, Parse::RequirementImplsId node_id)
-    -> bool {
-  auto [rhs_node, rhs_id] = context.node_stack().PopExprWithNodeId();
-  auto [lhs_node, lhs_id] = context.node_stack().PopExprWithNodeId();
+static auto ValidateRequirementImpls(Context& context, SemIR::LocId loc_id,
+                                     SemIR::InstId& lhs_id,
+                                     SemIR::InstId& rhs_id) -> bool {
+  // Check lhs is a facet and rhs is a facet type.
+  auto lhs_as_type = ExprAsType(context, SemIR::LocId(lhs_id), lhs_id);
+  auto rhs_as_type = ExprAsType(context, SemIR::LocId(rhs_id), rhs_id);
+  if (lhs_as_type.type_id == SemIR::ErrorInst::TypeId ||
+      rhs_as_type.type_id == SemIR::ErrorInst::TypeId) {
+    lhs_id = rhs_id = SemIR::ErrorInst::InstId;
+    return false;
+  }
+
+  if (!context.types().IsFacetType(rhs_as_type.type_id)) {
+    CARBON_DIAGNOSTIC(
+        ImplsOnNonFacetType, Error,
+        "right argument of `impls` requirement must be a facet type");
+    context.emitter().Emit(SemIR::LocId(rhs_id), ImplsOnNonFacetType);
+    lhs_id = rhs_id = SemIR::ErrorInst::InstId;
+    return false;
+  }
+
+  lhs_id = lhs_as_type.inst_id;
+  rhs_id = rhs_as_type.inst_id;
 
   auto const_lhs = context.constant_values().Get(lhs_id);
   auto const_rhs = context.constant_values().Get(rhs_id);
@@ -364,81 +383,66 @@ auto HandleParseNode(Context& context, Parse::RequirementImplsId node_id)
           }
         }
         if (!found_designator) {
-          if (const_lhs != SemIR::ErrorInst::ConstantId &&
-              const_rhs != SemIR::ErrorInst::ConstantId) {
-            DiagnoseMissingDesignator(context, node_id);
-          }
+          DiagnoseMissingDesignator(context, loc_id);
           lhs_id = rhs_id = SemIR::ErrorInst::InstId;
-          const_lhs = const_rhs = SemIR::ErrorInst::ConstantId;
-          break;
+          return false;
         }
       }
     }
   }
 
-  // Check lhs is a facet and rhs is a facet type.
-  auto lhs_as_type = ExprAsType(context, lhs_node, lhs_id);
-  auto rhs_as_type = ExprAsType(context, rhs_node, rhs_id);
-  if (rhs_as_type.type_id != SemIR::ErrorInst::TypeId &&
-      !context.types().IsFacetType(rhs_as_type.type_id)) {
-    CARBON_DIAGNOSTIC(
-        ImplsOnNonFacetType, Error,
-        "right argument of `impls` requirement must be a facet type");
-    context.emitter().Emit(rhs_node, ImplsOnNonFacetType);
-    rhs_as_type.type_id = SemIR::ErrorInst::TypeId;
-    rhs_as_type.inst_id = SemIR::ErrorInst::TypeInstId;
+  if (FindAndDiagnoseAmbiguousPeriodSelf(context, lhs_id, rhs_id)) {
+    lhs_id = rhs_id = SemIR::ErrorInst::InstId;
+    return false;
   }
+
+  return true;
+}
+
+auto HandleParseNode(Context& context, Parse::RequirementImplsId node_id)
+    -> bool {
+  auto rhs_id = context.node_stack().PopExpr();
+  auto lhs_id = context.node_stack().PopExpr();
+
   // TODO: For things like `HashSet(.T) as type`, add an implied constraint
   // that `.T impls Hash`.
 
-  // FIXME: Move this and Subst up above AsType so we don't have to recompute
-  // TypeIds? And don't have to GetCanonicalFacetOrTypeValue?
-  if (FindAndDiagnoseAmbiguousPeriodSelf(context, lhs_as_type.inst_id,
-                                         rhs_as_type.inst_id)) {
-    rhs_as_type.type_id = SemIR::ErrorInst::TypeId;
-    rhs_as_type.inst_id = SemIR::ErrorInst::TypeInstId;
-  }
+  if (ValidateRequirementImpls(context, node_id, lhs_id, rhs_id)) {
+    // In `C impls Y where ...` we replace `.Self` with `C`.
+    rhs_id = SubstPeriodSelfInNestedWhereExpressions(context, rhs_id, lhs_id);
 
-  // In `C impls Y where ...` we replace `.Self` with `C`.
-  rhs_as_type.inst_id =
-      context.types().GetAsTypeInstId(SubstPeriodSelfInNestedWhereExpressions(
-          context, rhs_as_type.inst_id, lhs_as_type.inst_id));
-  rhs_as_type.type_id =
-      context.types().GetTypeIdForTypeInstId(rhs_as_type.inst_id);
-
-  // Build up the list of arguments for the `WhereExpr` inst.
-  context.args_type_info_stack().AddInstId(
-      AddInstInNoBlock<SemIR::RequirementImpls>(
-          context, node_id,
-          {.lhs_id = lhs_as_type.inst_id, .rhs_id = rhs_as_type.inst_id}));
-
-  if (lhs_as_type.type_id != SemIR::ErrorInst::TypeId &&
-      rhs_as_type.type_id != SemIR::ErrorInst::TypeId &&
-      rhs_as_type.type_id != SemIR::TypeType::TypeId) {
     // Track the impls relationship so further constraints can use it
     // immediately, before they are evaluated. Impl lookup will search the top
     // of the stack.
     context.where_stack().back().impls.push_back({
-        context.constant_values().Get(lhs_as_type.inst_id),
-        context.constant_values().Get(rhs_as_type.inst_id),
+        context.constant_values().Get(lhs_id),
+        context.constant_values().Get(rhs_id),
     });
 
     // Track any rewrites that are inherited from the impls constraint as the
     // LHS can be referring to `.Self` or a member of it, which makes those
     // rewrites modification of this facet type's self.
-    if (IsPeriodSelfAccess(context, lhs_as_type.inst_id)) {
-      auto facet_type =
-          context.types().GetAs<SemIR::FacetType>(rhs_as_type.type_id);
-      const auto& facet_type_info =
-          context.facet_types().Get(facet_type.facet_type_id);
-      for (const auto& rewrite : facet_type_info.rewrite_constraints) {
-        auto access = context.insts().GetAs<SemIR::ImplWitnessAccess>(
-            context.constant_values().GetConstantInstId(rewrite.lhs_id));
-        context.where_stack().back().InsertRewrite(context, access,
-                                                   rewrite.rhs_id);
+    if (IsPeriodSelfAccess(
+            context, context.constant_values().GetConstantInstId(lhs_id))) {
+      if (auto facet_type = context.insts().TryGetAs<SemIR::FacetType>(
+              context.constant_values().GetConstantInstId(rhs_id))) {
+        const auto& facet_type_info =
+            context.facet_types().Get(facet_type->facet_type_id);
+        for (const auto& rewrite : facet_type_info.rewrite_constraints) {
+          auto access = context.insts().GetAs<SemIR::ImplWitnessAccess>(
+              rewrite.lhs_id);
+          context.where_stack().back().InsertRewrite(context, access,
+                                                     rewrite.rhs_id);
+        }
       }
     }
   }
+
+  // Build up the list of arguments for the `WhereExpr` inst.
+  context.args_type_info_stack().AddInstId(
+      AddInstInNoBlock<SemIR::RequirementImpls>(
+          context, node_id, {.lhs_id = lhs_id, .rhs_id = rhs_id}));
+
   return true;
 }
 
