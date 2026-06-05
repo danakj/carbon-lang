@@ -408,7 +408,6 @@ static auto WitnessQueryMatchesInterface(
   // construct the witness table from it? We do replace `.Self` in the facet
   // type, but we don't replace the designators.
   access_interface = SubstPeriodSelf(context, loc_id, access_interface,
-                                     context.AbstractPeriodSelfDepth(),
                                      context.constant_values().Get(impl_self));
   return access_interface == impl_interface;
 }

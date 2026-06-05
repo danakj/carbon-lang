@@ -355,7 +355,7 @@ static auto TryFindValueInRewriteConstraints(
         SubstPeriodSelf(context, loc_id,
                         context.specific_interfaces().Get(
                             rewrite_lhs_witness.query_specific_interface_id),
-                        context.AbstractPeriodSelfDepth(), self_const_id);
+                        self_const_id);
 
     if (rewrite_lhs_interface != access_interface) {
       // This rewrite is into a different interface than the access query.
@@ -367,7 +367,7 @@ static auto TryFindValueInRewriteConstraints(
     // the self type of the access.
     auto rewrite_rhs = SubstPeriodSelf(
         context, loc_id, context.constant_values().Get(rewrite.rhs_id),
-        context.AbstractPeriodSelfDepth(), self_const_id);
+        self_const_id);
     return rewrite_rhs;
   }
 

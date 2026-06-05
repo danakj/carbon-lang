@@ -47,7 +47,6 @@ using SubstPeriodSelfRebuildInst =
 // can return None to fall back to the default of evaluating the inst.
 auto SubstPeriodSelf(
     Context& context, SemIR::LocId loc_id, SemIR::ConstantId const_id,
-    SemIR::ElementIndex abstract_depth,
     SemIR::ConstantId period_self_replacement_id,
     SubstPeriodSelfBehaviour behaviour = SubstPeriodSelfBehaviour::All,
     SubstPeriodSelfRebuildInst rebuild = nullptr) -> SemIR::ConstantId;
@@ -55,7 +54,6 @@ auto SubstPeriodSelf(
 // FIXME: Docs. Mention matching_depth.
 auto SubstPeriodSelf(
     Context& context, SemIR::LocId loc_id, SemIR::InstId inst_id,
-    SemIR::ElementIndex abstract_depth,
     SemIR::InstId period_self_replacement_id,
     SubstPeriodSelfBehaviour behaviour = SubstPeriodSelfBehaviour::All,
     SubstPeriodSelfRebuildInst rebuild = nullptr) -> SemIR::InstId;
@@ -69,14 +67,12 @@ auto SubstPeriodSelf(
 // can return None to fall back to the default of evaluating the inst.
 auto SubstPeriodSelf(
     Context& context, SemIR::LocId loc_id, SemIR::SpecificInterface interface,
-    SemIR::ElementIndex abstract_depth,
     SemIR::ConstantId period_self_replacement_id,
     SubstPeriodSelfBehaviour behaviour = SubstPeriodSelfBehaviour::All,
     SubstPeriodSelfRebuildInst rebuild = nullptr) -> SemIR::SpecificInterface;
 auto SubstPeriodSelf(
     Context& context, SemIR::LocId loc_id,
     SemIR::SpecificNamedConstraint constraint,
-    SemIR::ElementIndex abstract_depth,
     SemIR::ConstantId period_self_replacement_id,
     SubstPeriodSelfBehaviour behaviour = SubstPeriodSelfBehaviour::All,
     SubstPeriodSelfRebuildInst rebuild = nullptr)
