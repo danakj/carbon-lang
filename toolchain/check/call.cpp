@@ -15,6 +15,7 @@
 #include "toolchain/check/deduce.h"
 #include "toolchain/check/facet_type.h"
 #include "toolchain/check/function.h"
+#include "toolchain/check/generic.h"
 #include "toolchain/check/import_ref.h"
 #include "toolchain/check/inst.h"
 #include "toolchain/check/name_ref.h"
@@ -143,24 +144,29 @@ static auto PerformCallToGenericInterfaceOrNamedConstaint(
   if constexpr (std::same_as<IdT, SemIR::NamedConstraintId>) {
     entity_kind_for_diagnostic = EntityKind::GenericNamedConstraint;
   }
-
-  llvm::SmallVector<SemIR::InstId> arg_ids_after_inc(arg_ids);
-  if constexpr (std::same_as<IdT, SemIR::InterfaceId>) {
-    for (auto& inst_id : arg_ids_after_inc) {
-      inst_id = IncrementPeriodSelfDistance(context, inst_id);
-    }
-  }
-
   auto callee_specific_id =
       ResolveCalleeInCall(context, loc_id, entity, entity_kind_for_diagnostic,
                           enclosing_specific_id,
-                          /*self_id=*/SemIR::InstId::None, arg_ids_after_inc);
+                          /*self_id=*/SemIR::InstId::None, arg_ids);
   if (!callee_specific_id) {
     return SemIR::ErrorInst::InstId;
   }
   std::optional<SemIR::FacetType> facet_type;
   if constexpr (std::same_as<IdT, SemIR::InterfaceId>) {
-    facet_type = FacetTypeFromInterface(context, id, *callee_specific_id);
+    auto specific_id = *callee_specific_id;
+    if (specific_id.has_value()) {
+      const auto& specific = context.specifics().Get(specific_id);
+      // FIXME: Helper for Increment on an InstBlockId?
+      llvm::SmallVector<SemIR::InstId> arg_ids_after_inc(
+          context.inst_blocks().Get(specific.args_id));
+      for (auto& inst_id : arg_ids_after_inc) {
+        inst_id = IncrementPeriodSelfDistance(context, inst_id);
+      }
+      specific_id =
+          MakeSpecific(context, loc_id, specific.generic_id, arg_ids_after_inc);
+    }
+
+    facet_type = FacetTypeFromInterface(context, id, specific_id);
   } else {
     facet_type = FacetTypeFromNamedConstraint(context, id, *callee_specific_id);
   }

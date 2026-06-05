@@ -460,7 +460,8 @@ static auto CollectFacetWitnessSources(
       auto facet_type = context.constant_values().GetInstAs<SemIR::FacetType>(
           facet_type_const_id);
       auto identified_id = TryToIdentifyFacetType(
-          context, loc_id, canon_self_const_id, facet_type,
+          context, loc_id,
+          canon_self_const_id, facet_type,
           /*allow_partially_identified=*/true);
       if (identified_id.has_value()) {
         witnesses.push_back({.facet_const_id = canon_self_const_id,

@@ -345,6 +345,77 @@ static auto ValidateRequirementImpls(Context& context, SemIR::LocId loc_id,
   return true;
 }
 
+// Track the impls relationship so further constraints can use it
+// immediately, before they are evaluated. Impl lookup will search the top
+// of the stack.
+static auto RecordImplsInWhereStack(Context& context, SemIR::InstId lhs_id,
+                                    SemIR::InstId rhs_id) -> void {
+  auto const_rhs_id = context.constant_values().GetConstantInstId(rhs_id);
+  if (!context.insts().Is<SemIR::FacetType>(const_rhs_id)) {
+    return;
+  }
+
+  // This will match specific interfaces with `.Self` arguments from inside
+  // the facet type. Such as `X(C(.Self) as Y(C(.Self)))`.
+  context.where_stack().back().impls.push_back({
+      context.constant_values().Get(lhs_id),
+      context.constant_values().Get(rhs_id),
+  });
+
+  // TODO: This should be able to go away, we think. But we would need to always
+  // decrement .Self when we replace, including in IdentifyFacetType. Then:
+  // - In SubstPerioSelf, we also have to decrement .Self in the type of the
+  //   .Self[0] being replaced. So that it matches the witnesses in the
+  //   FacetValue.
+  // - When we SubstPeriodSelf on a rewrite constraint, the SpecificInterface in
+  //   the witness came from an IdentifiedFacetType and is already decremented,
+  //   so should not be substituted. The proper fix is probably to put rewrite
+  //   constraints into the IdentifiedFacetType and then stop doing
+  //   SubstPeriodSelf on them, just get them from the identified facet type, so
+  //   they are substituted consistently.
+
+  // If the LHS is `C` and the RHS is a facet `Z(.Self) where .Self == ()`, turn
+  //   `Z(.Self) where .Self == ()`
+  // into a facet type
+  //   `type where C impls Z(.Self) where C == ()`
+
+  // FIXME: Share work with the caller?
+  const_rhs_id = DecrementPeriodSelfDistance(
+      context, const_rhs_id,
+      context.constant_values().GetConstantInstId(lhs_id));
+  auto facet_type = context.insts().GetAs<SemIR::FacetType>(const_rhs_id);
+
+  auto period_self_id =
+      context.node_stack().Peek<Parse::NodeKind::WhereOperand>();
+
+  auto info = context.facet_types().Get(facet_type.facet_type_id);
+  info.type_impls_interfaces.reserve(info.type_impls_interfaces.size() +
+                                     info.extend_constraints.size());
+  for (const auto& extend : info.extend_constraints) {
+    info.type_impls_interfaces.push_back(
+        {.self_type = lhs_id, .specific_interface = extend});
+  }
+  info.extend_constraints.clear();
+  info.type_impls_named_constraints.reserve(
+      info.type_impls_named_constraints.size() +
+      info.extend_named_constraints.size());
+  for (const auto& extend : info.extend_named_constraints) {
+    info.type_impls_named_constraints.push_back(
+        {.self_type = lhs_id, .specific_named_constraint = extend});
+  }
+  info.extend_named_constraints.clear();
+  info.Canonicalize();
+  auto type_id = GetFacetType(context, info);
+
+  // This will match specific interfaces with `.Self` arguments from outside
+  // the facet type. Such as `X(C(.Self))` where `X` has a `Y(.Self)`
+  // parameter.
+  context.where_stack().back().impls.push_back({
+      context.constant_values().Get(period_self_id),
+      context.types().GetConstantId(type_id),
+  });
+}
+
 auto HandleParseNode(Context& context, Parse::RequirementImplsId node_id)
     -> bool {
   auto rhs_id = context.node_stack().PopExpr();
@@ -354,13 +425,61 @@ auto HandleParseNode(Context& context, Parse::RequirementImplsId node_id)
   // that `.T impls Hash`.
 
   if (ValidateRequirementImpls(context, node_id, lhs_id, rhs_id)) {
-    // Track the impls relationship so further constraints can use it
-    // immediately, before they are evaluated. Impl lookup will search the top
-    // of the stack.
-    context.where_stack().back().impls.push_back({
-        context.constant_values().Get(lhs_id),
-        context.constant_values().Get(rhs_id),
-    });
+    RecordImplsInWhereStack(context, lhs_id, rhs_id);
+#if 0
+    // In `C impls Y where ...` we replace `.Self` with `C`.
+    rhs_id = DecrementPeriodSelfDistance(context, rhs_id, lhs_id);
+#endif
+
+    auto const_rhs_id = context.constant_values().GetConstantInstId(rhs_id);
+    if (auto facet_type =
+            context.insts().TryGetAs<SemIR::FacetType>(const_rhs_id)) {
+#if 0
+      // If the where stack was from `C impls Z(.Self)`, we want to construct a
+      // facet type `type where C impls Z(.Self)`. We can't just use `C as Z` as
+      // that would incorrectly replace `.Self` references with `C`.
+
+      auto period_self_id =
+          context.node_stack().Peek<Parse::NodeKind::WhereOperand>();
+
+      auto info = context.facet_types().Get(facet_type->facet_type_id);
+      info.type_impls_interfaces.reserve(info.type_impls_interfaces.size() +
+                                         info.extend_constraints.size());
+      for (const auto& extend : info.extend_constraints) {
+        info.type_impls_interfaces.push_back(
+            // FIXME: Needs to be canon??
+            {.self_type = lhs_id, .specific_interface = extend});
+      }
+      info.extend_constraints.clear();
+      info.type_impls_named_constraints.reserve(
+          info.type_impls_named_constraints.size() +
+          info.extend_named_constraints.size());
+      for (const auto& extend : info.extend_named_constraints) {
+        info.type_impls_named_constraints.push_back(
+            // FIXME: Needs to be canon??
+            {.self_type = lhs_id, .specific_named_constraint = extend});
+      }
+      info.extend_named_constraints.clear();
+      info.Canonicalize();
+      auto type_id = GetFacetType(context, info);
+
+      // Track the impls relationship so further constraints can use it
+      // immediately, before they are evaluated. Impl lookup will search the top
+      // of the stack.
+      context.where_stack().back().impls.push_back({
+          context.constant_values().Get(period_self_id),
+          context.types().GetConstantId(type_id),
+      });
+#else
+      // Track the impls relationship so further constraints can use it
+      // immediately, before they are evaluated. Impl lookup will search the top
+      // of the stack.
+      context.where_stack().back().impls.push_back({
+          context.constant_values().Get(lhs_id),
+          context.constant_values().Get(rhs_id),
+      });
+#endif
+    }
 
     // Track any rewrites that are inherited from the impls constraint as the
     // LHS can be referring to `.Self` or a member of it, which makes those
@@ -381,8 +500,10 @@ auto HandleParseNode(Context& context, Parse::RequirementImplsId node_id)
     }
   }
 
+#if 1
   // In `C impls Y where ...` we replace `.Self` with `C`.
   rhs_id = DecrementPeriodSelfDistance(context, rhs_id, lhs_id);
+#endif
 
   // Build up the list of arguments for the `WhereExpr` inst.
   context.args_type_info_stack().AddInstId(
