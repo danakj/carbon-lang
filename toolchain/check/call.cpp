@@ -18,6 +18,7 @@
 #include "toolchain/check/import_ref.h"
 #include "toolchain/check/inst.h"
 #include "toolchain/check/name_ref.h"
+#include "toolchain/check/period_self.h"
 #include "toolchain/check/thunk.h"
 #include "toolchain/check/type.h"
 #include "toolchain/diagnostics/format_providers.h"
@@ -142,10 +143,18 @@ static auto PerformCallToGenericInterfaceOrNamedConstaint(
   if constexpr (std::same_as<IdT, SemIR::NamedConstraintId>) {
     entity_kind_for_diagnostic = EntityKind::GenericNamedConstraint;
   }
+
+  llvm::SmallVector<SemIR::InstId> arg_ids_after_inc(arg_ids);
+  if constexpr (std::same_as<IdT, SemIR::InterfaceId>) {
+    for (auto& inst_id : arg_ids_after_inc) {
+      inst_id = IncrementPeriodSelfDistance(context, inst_id);
+    }
+  }
+
   auto callee_specific_id =
       ResolveCalleeInCall(context, loc_id, entity, entity_kind_for_diagnostic,
                           enclosing_specific_id,
-                          /*self_id=*/SemIR::InstId::None, arg_ids);
+                          /*self_id=*/SemIR::InstId::None, arg_ids_after_inc);
   if (!callee_specific_id) {
     return SemIR::ErrorInst::InstId;
   }

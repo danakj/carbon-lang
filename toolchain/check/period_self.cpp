@@ -213,7 +213,25 @@ class SubstPeriodSelfCallbacks : public SubstInstCallbacks {
       // contain `M(.Self(1))`. We never replace a lower depth with a higher
       // one, that would be escaping the higher depth `.Self` to a context where
       // it doesn't exist.
-      if (GetPeriodSelfAbstract(context(), inst_id)) {
+      //
+      // FIXME: Fix comment.
+      if (auto distance = GetPeriodSelfDepth(context(), *period_self).index;
+          distance > 0) {
+        // This fixes:
+        // ```
+        // fn F(unused T:! Z where C impls Y(.Self) and .Z1 = (C as Y(.Self)))
+        // {}
+        // ```
+        // As it gets a .Self[0] in the `C as Y(.Self)` but it breaks member
+        // access because the output witness of LookupImplWitness has a lower
+        // .Self than the input in the SpecificInterface.
+#if 0
+        auto replacement_distance = SemIR::ElementIndex(distance - 1);
+        inst_id =
+            MakePeriodSelfFacetValue(context(), SemIR::LocId(inst_id),
+                                     period_self->type_id, replacement_distance,
+                                     /*insert_name=*/false);
+#endif
         return FullySubstituted;
       }
 
@@ -597,6 +615,158 @@ auto SubstPeriodSelfWithDepth(Context& context, SemIR::InstId inst_id,
   SubstReplacePeriodSelfDepthCallbacks callbacks(
       &context, period_self_to_be_replaced, canon_period_self_to_be_replaced,
       replacement_id);
+  return SubstInst(context, inst_id, callbacks);
+}
+
+auto IncrementPeriodSelfDistance(Context& context, SemIR::InstId inst_id)
+    -> SemIR::InstId {
+  class Callbacks : public SubstInstCallbacks {
+   public:
+    explicit Callbacks(Context* context) : SubstInstCallbacks(context) {}
+
+    auto Subst(SemIR::InstId& inst_id) -> SubstResult override {
+      auto const_inst_id =
+          context().constant_values().GetConstantInstId(inst_id);
+      if (const_inst_id == SemIR::TypeType::TypeInstId ||
+          const_inst_id == SemIR::ErrorInst::InstId) {
+        return FullySubstituted;
+      }
+
+      if (auto found = rebuilt_map_.Lookup(inst_id)) {
+        inst_id = found.value();
+        return FullySubstituted;
+      }
+
+      if (auto self = TryGetAsPeriodSelf(context(), inst_id, false)) {
+        auto distance = GetPeriodSelfDepth(context(), *self).index;
+        // Avoids incrementing the distance of .Self that come from
+        // already-fully-formed facet types, such as the facet type of `V` in
+        // `Y(V)`.
+        // ```
+        // fn F(V:! type where {} impls Y(.Self)) {
+        //   {} as Y(V);
+        // }
+        // ```
+        if (!inside_facet_type_ || distance > 0) {
+          auto replacement_distance = SemIR::ElementIndex(distance + 1);
+          inst_id =
+              MakePeriodSelfFacetValue(context(), SemIR::LocId(inst_id),
+                                       self->type_id, replacement_distance,
+                                       /*insert_name=*/false);
+        }
+        return FullySubstituted;
+      }
+
+      if (const_inst_id.has_value() &&
+          context().insts().Is<SemIR::FacetType>(const_inst_id)) {
+        ++inside_facet_type_;
+      }
+
+      return SubstOperands;
+    }
+
+    auto ReuseUnchanged(SemIR::InstId orig_inst_id) -> SemIR::InstId override {
+      auto const_inst_id =
+          context().constant_values().GetConstantInstId(orig_inst_id);
+      if (const_inst_id.has_value() &&
+          context().insts().Is<SemIR::FacetType>(const_inst_id)) {
+        --inside_facet_type_;
+      }
+
+      rebuilt_map_.Insert(orig_inst_id, orig_inst_id);
+      return orig_inst_id;
+    }
+
+    auto Rebuild(SemIR::InstId orig_inst_id, SemIR::Inst new_inst)
+        -> SemIR::InstId override {
+      auto const_inst_id =
+          context().constant_values().GetConstantInstId(orig_inst_id);
+      if (const_inst_id.has_value() &&
+          context().insts().Is<SemIR::FacetType>(const_inst_id)) {
+        --inside_facet_type_;
+      }
+
+      auto inserted = rebuilt_map_.Insert(orig_inst_id, [&]() {
+        return RebuildOrAddNonCanonicalInst(SemIR::LocId(orig_inst_id),
+                                            orig_inst_id, new_inst,
+                                            AddInBlock::NoBlock);
+      });
+      return inserted.value();
+    }
+
+   private:
+    int inside_facet_type_ = 0;
+    Map<SemIR::InstId, SemIR::InstId, 16> rebuilt_map_;
+  };
+
+  Callbacks callbacks(&context);
+  return SubstInst(context, inst_id, callbacks);
+}
+
+auto DecrementPeriodSelfDistance(Context& context, SemIR::InstId inst_id,
+                                 SemIR::InstId replacement_id)
+    -> SemIR::InstId {
+  class Callbacks : public SubstInstCallbacks {
+   public:
+    explicit Callbacks(Context* context, SemIR::InstId replacement_id)
+        : SubstInstCallbacks(context), replacement_id_(replacement_id) {}
+
+    auto Subst(SemIR::InstId& inst_id) -> SubstResult override {
+      auto const_inst_id =
+          context().constant_values().GetConstantInstId(inst_id);
+      if (const_inst_id == SemIR::TypeType::TypeInstId ||
+          const_inst_id == SemIR::ErrorInst::InstId) {
+        return FullySubstituted;
+      }
+
+      if (auto found = rebuilt_map_.Lookup(inst_id)) {
+        inst_id = found.value();
+        return FullySubstituted;
+      }
+
+      if (auto self = TryGetAsPeriodSelf(context(), inst_id, false)) {
+        auto distance = GetPeriodSelfDepth(context(), *self).index;
+        if (distance == 0) {
+          if (replacement_id_.has_value()) {
+            inst_id = ConvertReplacement(
+                context(), SemIR::LocId(inst_id), replacement_id_,
+                context().insts().Get(replacement_id_).type_id(),
+                self->type_id);
+          }
+        } else {
+          auto replacement_distance = SemIR::ElementIndex(distance - 1);
+          inst_id =
+              MakePeriodSelfFacetValue(context(), SemIR::LocId(inst_id),
+                                       self->type_id, replacement_distance,
+                                       /*insert_name=*/false);
+        }
+        return FullySubstituted;
+      }
+
+      return SubstOperands;
+    }
+
+    auto ReuseUnchanged(SemIR::InstId orig_inst_id) -> SemIR::InstId override {
+      rebuilt_map_.Insert(orig_inst_id, orig_inst_id);
+      return orig_inst_id;
+    }
+
+    auto Rebuild(SemIR::InstId orig_inst_id, SemIR::Inst new_inst)
+        -> SemIR::InstId override {
+      auto inserted = rebuilt_map_.Insert(orig_inst_id, [&]() {
+        return RebuildOrAddNonCanonicalInst(SemIR::LocId(orig_inst_id),
+                                            orig_inst_id, new_inst,
+                                            AddInBlock::NoBlock);
+      });
+      return inserted.value();
+    }
+
+   private:
+    Map<SemIR::InstId, SemIR::InstId, 16> rebuilt_map_;
+    SemIR::InstId replacement_id_;
+  };
+
+  Callbacks callbacks(&context, replacement_id);
   return SubstInst(context, inst_id, callbacks);
 }
 

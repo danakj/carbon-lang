@@ -132,12 +132,8 @@ static auto HandleAnyBindingPatternType(Context& context,
   auto [node_id, original_inst_id] = context.node_stack().PopExprWithNodeId();
 
   if (period_self_id.has_value()) {
-    auto type_id = context.insts().Get(period_self_id).type_id();
-    auto replacement_id =
-        MakePeriodSelfFacetValue(context, SemIR::LocId(period_self_id), type_id,
-                                 SemIR::ElementIndex::None, false);
-    original_inst_id = SubstPeriodSelfWithDepth(context, original_inst_id,
-                                                period_self_id, replacement_id);
+    original_inst_id = DecrementPeriodSelfDistance(context, original_inst_id,
+                                                   SemIR::InstId::None);
   }
 
   if (node_kind == Parse::FormBindingPattern::Kind) {
@@ -433,7 +429,7 @@ auto HandleParseNode(Context& context,
   context.scope_stack().PushForSameRegion();
   context.inside_compile_time_binding() = true;
   MakePeriodSelfFacetValue(context, node_id, GetEmptyFacetType(context),
-                           context.AbstractPeriodSelfDepth());
+                           SemIR::ElementIndex(0));
   return true;
 }
 

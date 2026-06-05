@@ -114,7 +114,7 @@ auto HandleParseNode(Context& context, Parse::WhereOperandId node_id) -> bool {
   // Introduce `.Self` as a symbolic binding. Its type is the value of the
   // expression to the left of `where`, so `MyInterface` in the example above.
   auto period_self_id = MakePeriodSelfFacetValue(
-      context, node_id, period_self_type_id, context.AbstractPeriodSelfDepth());
+      context, node_id, period_self_type_id, SemIR::ElementIndex(0));
   context.node_stack().Push(node_id, period_self_id);
 
   return true;
@@ -183,46 +183,6 @@ static auto DiagnoseMissingDesignator(Context& context, SemIR::LocId loc_id)
   context.emitter().Emit(loc_id, WhereWithoutDesignator);
 }
 
-static auto SubstPeriodSelfInNestedWhereExpressions(
-    Context& context, SemIR::InstId inst_id, SemIR::InstId replacement_id)
-    -> SemIR::InstId {
-  class WhereExprCallbacks : public SubstInstCallbacks {
-   public:
-    explicit WhereExprCallbacks(Context* context, SemIR::InstId replacement_id)
-        : SubstInstCallbacks(context), replacement_id_(replacement_id) {}
-
-    auto Subst(SemIR::InstId& inst_id) -> SubstResult override {
-      if (context().constant_values().GetConstantInstId(inst_id) == inst_id) {
-        // WhereExpr is only found in non-canonical instructions, since it
-        // always evaluates to a FacetType. TypeType and ErrorInst evaluate to
-        // themselves, so this covers them as a base case a well.
-        return FullySubstituted;
-      }
-      if (auto nested_where =
-              context().insts().TryGetAs<SemIR::WhereExpr>(inst_id)) {
-        auto nested_period_self_id = nested_where->period_self_id;
-        inst_id = SubstPeriodSelfWithDepth(
-            context(), inst_id, nested_period_self_id, replacement_id_);
-        return FullySubstituted;
-      }
-      return SubstOperands;
-    }
-
-    auto Rebuild(SemIR::InstId orig_inst_id, SemIR::Inst new_inst)
-        -> SemIR::InstId override {
-      return RebuildOrAddNonCanonicalInst(SemIR::LocId(orig_inst_id),
-                                          orig_inst_id, new_inst,
-                                          AddInBlock::NoBlock);
-    }
-
-   private:
-    SemIR::InstId replacement_id_;
-  };
-
-  WhereExprCallbacks callbacks(&context, replacement_id);
-  return SubstInst(context, inst_id, callbacks);
-}
-
 auto HandleParseNode(Context& context, Parse::RequirementEqualId node_id)
     -> bool {
   auto [rhs_node, rhs_id] = context.node_stack().PopExprWithNodeId();
@@ -230,13 +190,6 @@ auto HandleParseNode(Context& context, Parse::RequirementEqualId node_id)
 
   // Rewrites always contain a designator since the LHS must be one. This is
   // checked elsewhere.
-
-  auto period_self_id =
-      context.node_stack().Peek<Parse::NodeKind::WhereOperand>();
-  lhs_id =
-      SubstPeriodSelfInNestedWhereExpressions(context, lhs_id, period_self_id);
-  rhs_id =
-      SubstPeriodSelfInNestedWhereExpressions(context, rhs_id, period_self_id);
 
   // Convert rhs to type of lhs.
   auto lhs_type_id = context.insts().Get(lhs_id).type_id();
@@ -286,13 +239,6 @@ auto HandleParseNode(Context& context, Parse::RequirementEqualEqualId node_id)
     }
     lhs_id = rhs_id = SemIR::ErrorInst::InstId;
   }
-
-  auto period_self_id =
-      context.node_stack().Peek<Parse::NodeKind::WhereOperand>();
-  lhs_id =
-      SubstPeriodSelfInNestedWhereExpressions(context, lhs_id, period_self_id);
-  rhs_id =
-      SubstPeriodSelfInNestedWhereExpressions(context, rhs_id, period_self_id);
 
   // Build up the list of arguments for the `WhereExpr` inst.
   context.args_type_info_stack().AddInstId(
@@ -408,9 +354,6 @@ auto HandleParseNode(Context& context, Parse::RequirementImplsId node_id)
   // that `.T impls Hash`.
 
   if (ValidateRequirementImpls(context, node_id, lhs_id, rhs_id)) {
-    // In `C impls Y where ...` we replace `.Self` with `C`.
-    rhs_id = SubstPeriodSelfInNestedWhereExpressions(context, rhs_id, lhs_id);
-
     // Track the impls relationship so further constraints can use it
     // immediately, before they are evaluated. Impl lookup will search the top
     // of the stack.
@@ -429,14 +372,17 @@ auto HandleParseNode(Context& context, Parse::RequirementImplsId node_id)
         const auto& facet_type_info =
             context.facet_types().Get(facet_type->facet_type_id);
         for (const auto& rewrite : facet_type_info.rewrite_constraints) {
-          auto access = context.insts().GetAs<SemIR::ImplWitnessAccess>(
-              rewrite.lhs_id);
+          auto access =
+              context.insts().GetAs<SemIR::ImplWitnessAccess>(rewrite.lhs_id);
           context.where_stack().back().InsertRewrite(context, access,
                                                      rewrite.rhs_id);
         }
       }
     }
   }
+
+  // In `C impls Y where ...` we replace `.Self` with `C`.
+  rhs_id = DecrementPeriodSelfDistance(context, rhs_id, lhs_id);
 
   // Build up the list of arguments for the `WhereExpr` inst.
   context.args_type_info_stack().AddInstId(
@@ -461,31 +407,6 @@ auto HandleParseNode(Context& context, Parse::WhereExprId node_id) -> bool {
   // `WhereOperand`.
   context.scope_stack().Pop(/*check_unused=*/true);
   SemIR::InstBlockId requirements_id = context.args_type_info_stack().Pop();
-
-  // If the `where_stack` is empty, we need to drop any depths from the `.Self`
-  // introduced by this `where` as the final facet type should not have any
-  // depths.
-  //
-  // But if the `where_stack` is not empty, this facet type may be on the RHS of
-  // an `impls` constraint. In that case we don't know what to replace our
-  // `.Self` with yet, but we'll know when handling that `impls` constraint.
-  // Since the stack is not empty this `where` clause must be part of some other
-  // constraint, and we will remove the depth from nested `where` clauses in
-  // each constraint.
-  if (context.where_stack().empty() &&
-      requirements_id != SemIR::InstBlockId::Empty) {
-    llvm::SmallVector<SemIR::InstId> subst_reqs(
-        context.inst_blocks().Get(requirements_id));
-    auto type_id = context.insts().Get(period_self_id).type_id();
-    auto replacement_id =
-        MakePeriodSelfFacetValue(context, SemIR::LocId(period_self_id), type_id,
-                                 SemIR::ElementIndex::None, false);
-    for (auto& inst_id : subst_reqs) {
-      inst_id = SubstPeriodSelfWithDepth(context, inst_id, period_self_id,
-                                         replacement_id);
-    }
-    requirements_id = context.inst_blocks().Add(subst_reqs);
-  }
 
   AddInstAndPush<SemIR::WhereExpr>(context, node_id,
                                    {.type_id = SemIR::TypeType::TypeId,

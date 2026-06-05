@@ -98,6 +98,15 @@ auto SubstPeriodSelfWithDepth(Context& context, SemIR::InstId inst_id,
                               SemIR::InstId period_self_to_be_replaced,
                               SemIR::InstId replacement_id) -> SemIR::InstId;
 
+// FIXME: Document.
+auto IncrementPeriodSelfDistance(Context& context, SemIR::InstId inst_id)
+    -> SemIR::InstId;
+
+// FIXME: Document.
+// Replaces .Self of distance 0 with `replacement_id` if it's not None.
+auto DecrementPeriodSelfDistance(Context& context, SemIR::InstId inst_id,
+                                 SemIR::InstId replacement_id) -> SemIR::InstId;
+
 // Returns whether the `inst_id` is a reference to `.Self`.
 //
 // If `canonicalize` is true, look at the constant value of `inst_id` and get

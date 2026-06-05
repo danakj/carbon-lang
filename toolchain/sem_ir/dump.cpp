@@ -370,9 +370,11 @@ static auto DumpInstCommonDetails(const File& file, const Inst& inst,
                                   RawStringOstream& out) -> void {
   if (inst.arg0_and_kind().kind() == IdKind::For<EntityNameId>) {
     auto entity_name_id = EntityNameId(inst.arg0());
-    out << "\n  - name:"
-        << DumpNameIfValid(file,
-                           file.entity_names().Get(entity_name_id).name_id);
+    const auto& entity_name = file.entity_names().Get(entity_name_id);
+    out << "\n  - name:" << DumpNameIfValid(file, entity_name.name_id);
+    if (entity_name.period_self_depth.has_value()) {
+      out << "[" << entity_name.period_self_depth.index << "]";
+    }
   }
 
   if (inst.type_id().has_value()) {

@@ -472,7 +472,7 @@ static auto CollectFacetWitnessSources(
   return witnesses;
 }
 
-// Given a query `orig_inst_self` and `orig_interface`, try find a matching
+// Given a query `orig_const_self` and `orig_interface`, try find a matching
 // witness from impl lookup to use for the query.
 static auto TryFindMatchingWitnessFromImplLookup(
     Context& context, SemIR::LocId loc_id,

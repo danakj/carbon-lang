@@ -18,7 +18,7 @@ struct EntityName : public Printable<EntityName> {
     out << "{name: " << name_id << ", parent_scope: " << parent_scope_id
         << ", index: " << bind_index_value << ", is_template: " << is_template
         << ", is_unused: " << is_unused << ", form: " << form_id;
-    if (period_self_depth.has_value()) {
+    if (period_self_depth.index > 0) {
       out << ", period_self_depth: " << period_self_depth;
     }
     out << "}";
@@ -76,6 +76,10 @@ struct EntityName : public Printable<EntityName> {
   //
   // TODO: We don't really need 32 bits for this, could we pack this in with
   // another field?
+  //
+  // FIXME: This is only set when .Self is abstract now, right? Document that.
+  //
+  // FIXME: Rename to distance here and elsewhere.
   ElementIndex period_self_depth = ElementIndex::None;
 };
 
