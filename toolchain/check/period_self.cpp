@@ -132,6 +132,18 @@ static auto ConvertReplacement(Context& context, SemIR::LocId loc_id,
              .query_specific_interface_id =
                  context.specific_interfaces().Add(req.specific_interface)})));
   }
+
+  // Identifying replaced .Self[0] and decremented the rest. Do the same for the
+  // type.
+  //
+  // FIXME: Can we construct a test that fails if we don't have the correct type
+  // on the FacetValue?
+  period_self_type_id =
+      context.types().GetTypeIdForTypeInstId(SubstPeriodSelfInFacetType(
+          context, loc_id,
+          context.types().GetAsTypeInstId(replacement_self_inst_id),
+          context.types().GetTypeInstId(period_self_type_id)));
+
   return context.constant_values().GetInstId(EvalOrAddInst<SemIR::FacetValue>(
       context, loc_id,
       {
@@ -217,21 +229,22 @@ class SubstPeriodSelfCallbacks : public SubstInstCallbacks {
       // FIXME: Fix comment.
       if (auto distance = GetPeriodSelfDepth(context(), *period_self).index;
           distance > 0) {
-        // This fixes:
-        // ```
-        // fn F(unused T:! Z where C impls Y(.Self) and .Z1 = (C as Y(.Self)))
-        // {}
-        // ```
-        // As it gets a .Self[0] in the `C as Y(.Self)` but it breaks member
-        // access because the output witness of LookupImplWitness has a lower
-        // .Self than the input in the SpecificInterface.
-#if 0
-        auto replacement_distance = SemIR::ElementIndex(distance - 1);
-        inst_id =
-            MakePeriodSelfFacetValue(context(), SemIR::LocId(inst_id),
-                                     period_self->type_id, replacement_distance,
-                                     /*insert_name=*/false);
-#endif
+        auto replacement_distance = -1;
+        if (auto replacement_period_self =
+                TryGetAsPeriodSelf(context(), period_self_replacement_id_)) {
+          replacement_distance =
+              GetPeriodSelfDepth(context(), *replacement_period_self).index;
+        }
+
+        // Avoid collapsing `.Self` into a replacement `.Self`. If they are
+        // above, keep them above.
+        if (distance > replacement_distance + 1) {
+          auto replacement_distance = SemIR::ElementIndex(distance - 1);
+          inst_id = MakePeriodSelfFacetValue(context(), SemIR::LocId(inst_id),
+                                             period_self->type_id,
+                                             replacement_distance,
+                                             /*insert_name=*/false);
+        }
         return FullySubstituted;
       }
 
@@ -296,6 +309,9 @@ class SubstPeriodSelfCallbacks : public SubstInstCallbacks {
         context().insts().Get(period_self_replacement_id_).type_id();
     CARBON_CHECK(context().types().IsFacetType(replacement_type_id));
 
+#if 0
+    // FIXME: Can we do this? When? Not if there is a .Self present?
+
     // If the replacement has the same type as `.Self`, use it directly.
     if (replacement_type_id == period_self_type_id) {
       return period_self_replacement_id_;
@@ -306,11 +322,13 @@ class SubstPeriodSelfCallbacks : public SubstInstCallbacks {
     if (period_self_type_id == cached_replacement_type_id_) {
       return cached_replacement_id_;
     }
+#endif
 
     // Convert the replacement facet to the type of `.Self`.
     cached_replacement_id_ =
         ConvertReplacement(context(), loc_id_, period_self_replacement_id_,
-                           replacement_type_id, period_self.type_id);
+                           replacement_type_id, period_self_type_id);
+    // FIXME: This is wrong if ConvertReplacement replaced .Self[0] in the type
     cached_replacement_type_id_ = period_self_type_id;
     return cached_replacement_id_;
   }
