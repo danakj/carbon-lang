@@ -365,8 +365,12 @@ auto HandleParseNode(Context& context, Parse::RequirementImplsId node_id)
       // immediately, before they are evaluated. Impl lookup will search the top
       // of the stack.
       //
-      // FIXME: Can we write a test that breaks if we DecrementPeriodSelf
-      // before/after this?
+      // We store the `LHS impls RHS` before substituting `.Self` in the RHS,
+      // because that substitution will happen when identifying the facet type
+      // on the RHS with the LHS as the self-type. Otherwise we would have to
+      // record `.Self` as the LHS and modify the facet type on the RHS to
+      // become of the form `type where LHS impls RHS` after substituting
+      // `.Self` which is more complicated and unnecessary.
       context.where_stack().back().impls.push_back({
           context.constant_values().Get(lhs_id),
           context.constant_values().Get(rhs_id),
