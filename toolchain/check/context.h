@@ -256,28 +256,10 @@ class Context {
   // A stack that tracks constraints from a `where` expression being checked.
   // The back of the stack is the currently checked `where` expression.
   struct WhereStackEntry {
-    // Not just a ConstantId of an ImplWitnessAccess for this case:
-    //  let J1:! (Z where .Z1 = ()) where .Z2 = C(.Z1);
-    // - .Z1 has .Self with depth 1 where it's used in C(.Z1)
-    // - .Z1 in the early rewrites stack has .Self with depth 0 when it's
-    //   inherited from the LHS of the second `where`.
-    struct Assigned {
-      SemIR::SpecificInterfaceId specific_interface_id;
-      SemIR::ElementIndex index;
-
-      friend auto operator==(Assigned /*lhs*/, Assigned /*rhs*/)
-          -> bool = default;
-    };
-
-    auto InsertRewrite(Context& context, SemIR::ImplWitnessAccess access,
-                       SemIR::InstId rhs) -> void;
-    auto LookupRewrite(Context& context, SemIR::ImplWitnessAccess access)
-        -> SemIR::InstId;
-
     // A map from an ImplWitnessAccess on the LHS of a rewrite constraint to its
     // value on the RHS. Used during checking of a `where` expression to allow
     // constraints to access values from earlier constraints.
-    Map<Assigned, SemIR::InstId> rewrites;
+    Map<SemIR::ConstantId, SemIR::InstId> rewrites;
 
     // A collection of `A impls B` facts known about the current `where`
     // expression being checked. Used to allow constraints to know about `impls`

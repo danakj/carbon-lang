@@ -100,10 +100,12 @@ auto HandleParseNode(Context& context, Parse::WhereOperandId node_id) -> bool {
     const auto& base_facet_type_info =
         context.facet_types().Get(self_facet_type->facet_type_id);
     for (const auto& rewrite : base_facet_type_info.rewrite_constraints) {
-      if (auto access = context.insts().TryGetAs<SemIR::ImplWitnessAccess>(
-              context.constant_values().GetConstantInstId(rewrite.lhs_id))) {
-        context.where_stack().back().InsertRewrite(context, *access,
-                                                   rewrite.rhs_id);
+      if (rewrite.lhs_id != SemIR::ErrorInst::InstId) {
+        context.where_stack().back().rewrites.Insert(
+            context.constant_values().Get(
+                GetImplWitnessAccessWithoutSubstitution(context,
+                                                        rewrite.lhs_id)),
+            rewrite.rhs_id);
       }
     }
   }
@@ -218,7 +220,10 @@ auto HandleParseNode(Context& context, Parse::RequirementEqualId node_id)
     // immediately, before they are evaluated. This happens directly where the
     // `ImplWitnessAccess` that refers to the rewrite constraint would have been
     // created, and the value of the constraint will be used instead.
-    context.where_stack().back().InsertRewrite(context, *access, rhs_id);
+    context.where_stack().back().rewrites.Insert(
+        context.constant_values().Get(
+            GetImplWitnessAccessWithoutSubstitution(context, lhs_id)),
+        rhs_id);
   }
   return true;
 }
@@ -354,23 +359,26 @@ auto HandleParseNode(Context& context, Parse::RequirementImplsId node_id)
   // that `.T impls Hash`.
 
   if (ValidateRequirementImpls(context, node_id, lhs_id, rhs_id)) {
-    auto const_rhs_id = context.constant_values().GetConstantInstId(rhs_id);
-    if (context.insts().Is<SemIR::FacetType>(const_rhs_id)) {
+    if (context.insts().Is<SemIR::FacetType>(
+            context.constant_values().GetConstantInstId(rhs_id))) {
       // Track the impls relationship so further constraints can use it
       // immediately, before they are evaluated. Impl lookup will search the top
       // of the stack.
+      //
+      // FIXME: Can we write a test that breaks if we DecrementPeriodSelf
+      // before/after this?
       context.where_stack().back().impls.push_back({
           context.constant_values().Get(lhs_id),
           context.constant_values().Get(rhs_id),
       });
     }
 
+    // In `C impls Y where ...` we replace `.Self` with `C`.
+    rhs_id = DecrementPeriodSelfDistance(context, rhs_id, lhs_id);
+
     // Track any rewrites that are inherited from the impls constraint as the
     // LHS can be referring to `.Self` or a member of it, which makes those
     // rewrites modification of this facet type's self.
-    //
-    // FIXME: Can we write a test that breaks if we DecrementPeriodSelf before
-    // this?
     if (IsPeriodSelfAccess(
             context, context.constant_values().GetConstantInstId(lhs_id))) {
       if (auto facet_type = context.insts().TryGetAs<SemIR::FacetType>(
@@ -378,17 +386,12 @@ auto HandleParseNode(Context& context, Parse::RequirementImplsId node_id)
         const auto& facet_type_info =
             context.facet_types().Get(facet_type->facet_type_id);
         for (const auto& rewrite : facet_type_info.rewrite_constraints) {
-          auto access =
-              context.insts().GetAs<SemIR::ImplWitnessAccess>(rewrite.lhs_id);
-          context.where_stack().back().InsertRewrite(context, access,
-                                                     rewrite.rhs_id);
+          context.where_stack().back().rewrites.Insert(
+              context.constant_values().Get(rewrite.lhs_id), rewrite.rhs_id);
         }
       }
     }
   }
-
-  // In `C impls Y where ...` we replace `.Self` with `C`.
-  rhs_id = DecrementPeriodSelfDistance(context, rhs_id, lhs_id);
 
   // Build up the list of arguments for the `WhereExpr` inst.
   context.args_type_info_stack().AddInstId(
