@@ -1357,19 +1357,17 @@ interface I {
   let Y:! type;
 }
 
+// The `.Self` in `.X` and in `.Y` are both given distance 0 from the type that
+// they constrain, meaning they both refer to `T`.
+//
+// When `T.X` is accessed, it should identify the facet type of `T` which
+// replaces both `.Self` with `T`. So `U` is constrained to `I where T.Y = {}`.
 fn F(T:! I where .X = (I where .Y = {}), unused U:! T.X) {}
 
 // The value `T.X.Y` in `F()` has a self value of `T`. Whereas the value `U.Y`
 // has a self value of `U`, so they are different facet types and this call to
 // `F()` should fail.
 fn G(T:! I where .X = (I where .Y = {}), U:! I where .Y = {}) {
-  // CHECK:STDERR: fail_nested_facet_type_has_different_self_than_independent_facet_type.carbon:[[@LINE+7]]:3: error: cannot convert type `U` that implements `I where .(I.Y) = {}` into type implementing `I where .(I.Y) = {}` [ConversionFailureFacetToFacet]
-  // CHECK:STDERR:   F(T, U);
-  // CHECK:STDERR:   ^~~~~~~
-  // CHECK:STDERR: fail_nested_facet_type_has_different_self_than_independent_facet_type.carbon:[[@LINE-9]]:49: note: initializing generic parameter `U` declared here [InitializingGenericParam]
-  // CHECK:STDERR: fn F(T:! I where .X = (I where .Y = {}), unused U:! T.X) {}
-  // CHECK:STDERR:                                                 ^~~~~~~
-  // CHECK:STDERR:
   F(T, U);
 }
 
