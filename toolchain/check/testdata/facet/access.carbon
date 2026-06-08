@@ -416,6 +416,62 @@ fn F(U:! W, V:! Z(.Self) where .Z1 impls (Y where .Y1 impls (X where .X1 = U))) 
   V.(Z(V).Z1).(Y.Y1).(X.X1) as W;
 }
 
+ // --- fail_todo_find_access_value_in_facet_from_specific_interface.carbon
+library "[[@TEST_NAME]]";
+ 
+interface Z {}
+interface Y(T:! type) {
+  let Y1:! type;
+}
+class C;
+
+// TODO: We need to look in `T` for the rewrite in the access of `(C as
+// Y(T)).Y1` but we currently only look in `C`. See the TODO in
+// `TryFindValueInRewriteConstraints()`.
+fn F(T:! Z where C impls (Y(.Self) where .Y1 = {})) -> C.(Y(T).Y1) {
+  // CHECK:STDERR: fail_todo_find_access_value_in_facet_from_specific_interface.carbon:[[@LINE+7]]:3: error: cannot implicitly convert expression of type `{}` to `C.(Y(T).Y1)` [ConversionFailure]
+  // CHECK:STDERR:   return {};
+  // CHECK:STDERR:   ^~~~~~~~~~
+  // CHECK:STDERR: fail_todo_find_access_value_in_facet_from_specific_interface.carbon:[[@LINE+4]]:3: note: type `{}` does not implement interface `Core.ImplicitAs(C.(Y(T).Y1))` [MissingImplInMemberAccessInContext]
+  // CHECK:STDERR:   return {};
+  // CHECK:STDERR:   ^~~~~~~~~~
+  // CHECK:STDERR:
+  return {};
+}
+ 
+// --- different_period_self_in_rewrite_self_and_specific.carbon
+library "[[@TEST_NAME]]";
+
+interface Z {
+  let Z1:! type;
+}
+interface Y(T:! type) {
+  let Y1:! type;
+}
+
+class C;
+
+// The expression `.Y1` has a witness:
+//   - self: .Self of type Y(.Z1)
+//   - interface: Y(.Z1)
+//
+// The `.Self` on the RHS of the nested where is substituted with `C` when
+// merged into the outer facet type. This converts the self of the witness in
+// `.Y1` to a `FacetValue(C as Y(.Z1))`.
+//
+// However, the interface Y(.Z1) has a `.Self` reference from outside the
+// `where` which must _not_ be replaced by `C`. If it is, then we lose our
+// required symbolic connection to the top level `.Self`.
+//
+// The canonicalization of the LookupImplWitness strips off the FacetValue in
+// the self type, which had a symbolic type, but then becomes concrete. This
+// causes a crash when the symbolic LookupImplWitness becomes concrete during
+// eval.
+
+fn F(T:! Z where C impls (Y(.Z1) where .Y1 = {}) and .Z1 = C.(Y(.Z1).Y1)) -> T.Z1 {
+  return {};
+}
+
 // CHECK:STDOUT: --- access_assoc_fn.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {

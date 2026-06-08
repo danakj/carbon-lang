@@ -1345,7 +1345,31 @@ interface I {
 
 fn F(T:! I where .X = (I where .Y = {}), unused U:! T.X) {}
 
+fn G(T:! I where .X = (I where .Y = {}), U:! T.X) {
+  F(T, U);
+}
+
+// --- fail_nested_facet_type_has_different_self_than_independent_facet_type.carbon
+library "[[@TEST_NAME]]";
+
+interface I {
+  let X:! type;
+  let Y:! type;
+}
+
+fn F(T:! I where .X = (I where .Y = {}), unused U:! T.X) {}
+
+// The value `T.X.Y` in `F()` has a self value of `T`. Whereas the value `U.Y`
+// has a self value of `U`, so they are different facet types and this call to
+// `F()` should fail.
 fn G(T:! I where .X = (I where .Y = {}), U:! I where .Y = {}) {
+  // CHECK:STDERR: fail_nested_facet_type_has_different_self_than_independent_facet_type.carbon:[[@LINE+7]]:3: error: cannot convert type `U` that implements `I where .(I.Y) = {}` into type implementing `I where .(I.Y) = {}` [ConversionFailureFacetToFacet]
+  // CHECK:STDERR:   F(T, U);
+  // CHECK:STDERR:   ^~~~~~~
+  // CHECK:STDERR: fail_nested_facet_type_has_different_self_than_independent_facet_type.carbon:[[@LINE-9]]:49: note: initializing generic parameter `U` declared here [InitializingGenericParam]
+  // CHECK:STDERR: fn F(T:! I where .X = (I where .Y = {}), unused U:! T.X) {}
+  // CHECK:STDERR:                                                 ^~~~~~~
+  // CHECK:STDERR:
   F(T, U);
 }
 

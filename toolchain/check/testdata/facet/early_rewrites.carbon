@@ -395,6 +395,79 @@ interface Y {
   let Y1:! type;
 }
 
-fn F(T:! Z where .Z1 impls (Y where .Y1 = ()) and .Z2 = .Z1.(Y.Y1)) -> T.Z2 {
-  return ();
+interface Tuple {}
+impl () as Tuple {}
+class C(U:! Tuple);
+
+fn F(unused T:! Z where .Z1 impls (Y where .Y1 = ()) and .Z2 = C(.Z1.(Y.Y1))) {}
+
+// --- fail_early_rewrite_correct_interface_wrong_self_access_rewrite_in_period_self.carbon
+library "[[@TEST_NAME]]";
+
+interface Z {
+  let Z1:! type;
+  let Z2:! type;
+}
+interface Y {
+  let Y1:! type;
+}
+
+interface Tuple {}
+impl () as Tuple {}
+class C(U:! Tuple);
+
+// This should fail: There is a rewrite of the correct specific interface and
+// index `.(Y.Y1)`, but it's written into the wrong self, so it should not be
+// used.
+//
+// CHECK:STDERR: fail_early_rewrite_correct_interface_wrong_self_access_rewrite_in_period_self.carbon:[[@LINE+7]]:82: error: cannot convert type `.(Z.Z1).(Y.Y1)` into type implementing `Tuple` [ConversionFailureTypeToFacet]
+// CHECK:STDERR: fn F(unused T:! Z where .Self impls (Y where .Y1 = ()) and .Z1 impls Y and .Z2 = C(.Z1.(Y.Y1))) {}
+// CHECK:STDERR:                                                                                  ^~~~~~~~~~~~~
+// CHECK:STDERR: fail_early_rewrite_correct_interface_wrong_self_access_rewrite_in_period_self.carbon:[[@LINE-9]]:9: note: initializing generic parameter `U` declared here [InitializingGenericParam]
+// CHECK:STDERR: class C(U:! Tuple);
+// CHECK:STDERR:         ^~~~~~~~~
+// CHECK:STDERR:
+fn F(unused T:! Z where .Self impls (Y where .Y1 = ()) and .Z1 impls Y and .Z2 = C(.Z1.(Y.Y1))) {}
+
+// --- fail_early_rewrite_correct_interface_wrong_self_access_rewrite_in_associated_constant.carbon
+library "[[@TEST_NAME]]";
+
+interface Z {
+  let Z1:! type;
+  let Z2:! type;
+}
+interface Y {
+  let Y1:! type;
+}
+
+interface Tuple {}
+impl () as Tuple {}
+class C(U:! Tuple);
+
+// This should fail for the same reason. `.Z1.(Y.Y1)` is rewritten but `.(Y.Y1)`
+// is used.
+//
+// CHECK:STDERR: fail_early_rewrite_correct_interface_wrong_self_access_rewrite_in_associated_constant.carbon:[[@LINE+4]]:84: error: name `Self` not found [NameNotFound]
+// CHECK:STDERR: fn G(unused T:! Z where .Z1 impls (Y where .Y1 = ()) and .Self impls Y and .Z2 = C(Self.(Y.Y1))) {}
+// CHECK:STDERR:                                                                                    ^~~~
+// CHECK:STDERR:
+fn G(unused T:! Z where .Z1 impls (Y where .Y1 = ()) and .Self impls Y and .Z2 = C(Self.(Y.Y1))) {}
+
+// --- fail_nested_facet_type_in_rewrite_does_not_use_rewrite_from_outside.carbon
+library "[[@TEST_NAME]]";
+
+interface Z {
+  let X:! type;
+  let Y:! type;
+}
+
+fn F(T:! Z where .Y = {} and .X = (Z where .X = .Y), U:! T.X) -> U.(Z.X) {
+  // CHECK:STDERR: fail_nested_facet_type_in_rewrite_does_not_use_rewrite_from_outside.carbon:[[@LINE+7]]:3: error: cannot implicitly convert expression of type `{}` to `U.(Z.Y)` [ConversionFailure]
+  // CHECK:STDERR:   return {};
+  // CHECK:STDERR:   ^~~~~~~~~~
+  // CHECK:STDERR: fail_nested_facet_type_in_rewrite_does_not_use_rewrite_from_outside.carbon:[[@LINE+4]]:3: note: type `{}` does not implement interface `Core.ImplicitAs(U.(Z.Y))` [MissingImplInMemberAccessInContext]
+  // CHECK:STDERR:   return {};
+  // CHECK:STDERR:   ^~~~~~~~~~
+  // CHECK:STDERR:
+  return {};
 }
