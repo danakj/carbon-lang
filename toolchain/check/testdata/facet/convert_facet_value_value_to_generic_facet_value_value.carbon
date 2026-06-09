@@ -71,6 +71,7 @@ fn F() {
 // CHECK:STDOUT:   %Animal.impl_witness: <witness> = impl_witness @Goat.as.Animal.impl.%Animal.impl_witness_table [concrete]
 // CHECK:STDOUT:   %Animal.facet: %Animal.type = facet_value %Goat, (%Animal.impl_witness) [concrete]
 // CHECK:STDOUT:   %Food.196: %Edible.type = symbolic_binding Food, 0 [symbolic]
+// CHECK:STDOUT:   %.Self.1: %type = symbolic_binding .Self.1 [symbolic_self]
 // CHECK:STDOUT:   %Food.as_type.bca: type = facet_access_type %Food.196 [symbolic]
 // CHECK:STDOUT:   %Eats.type.eb4: type = facet_type <@Eats, @Eats(%Food.as_type.bca)> [symbolic]
 // CHECK:STDOUT:   %pattern_type.560: type = pattern_type %Eats.type.eb4 [symbolic]
@@ -210,6 +211,7 @@ fn F() {
 // CHECK:STDOUT:     %.loc31_37.1: type = splice_block %Eats.type.loc31_37.2 [symbolic = %Eats.type.loc31_37.1 (constants.%Eats.type.eb4)] {
 // CHECK:STDOUT:       %.Self.0.loc31_25: %type = symbolic_binding .Self.0 [symbolic_self = constants.%.Self.0]
 // CHECK:STDOUT:       %Eats.ref: %Eats.type.8ef = name_ref Eats, file.%Eats.decl [concrete = constants.%Eats.generic]
+// CHECK:STDOUT:       %.Self.1: %type = symbolic_binding .Self.1 [symbolic_self = constants.%.Self.1]
 // CHECK:STDOUT:       %Food.ref.loc31_33: %Edible.type = name_ref Food, %Food.loc31_13.2 [symbolic = %Food.loc31_13.1 (constants.%Food.196)]
 // CHECK:STDOUT:       %Food.as_type.loc31_37.2: type = facet_access_type %Food.ref.loc31_33 [symbolic = %Food.as_type.loc31_37.1 (constants.%Food.as_type.bca)]
 // CHECK:STDOUT:       %.loc31_37.2: type = converted %Food.ref.loc31_33, %Food.as_type.loc31_37.2 [symbolic = %Food.as_type.loc31_37.1 (constants.%Food.as_type.bca)]

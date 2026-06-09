@@ -153,20 +153,7 @@ static auto PerformCallToGenericInterfaceOrNamedConstaint(
   }
   std::optional<SemIR::FacetType> facet_type;
   if constexpr (std::same_as<IdT, SemIR::InterfaceId>) {
-    auto specific_id = *callee_specific_id;
-    if (specific_id.has_value()) {
-      const auto& specific = context.specifics().Get(specific_id);
-      // FIXME: Helper for Increment on an InstBlockId?
-      llvm::SmallVector<SemIR::InstId> arg_ids_after_inc(
-          context.inst_blocks().Get(specific.args_id));
-      for (auto& inst_id : arg_ids_after_inc) {
-        inst_id = IncrementPeriodSelfDistance(context, inst_id);
-      }
-      specific_id =
-          MakeSpecific(context, loc_id, specific.generic_id, arg_ids_after_inc);
-    }
-
-    facet_type = FacetTypeFromInterface(context, id, specific_id);
+    facet_type = FacetTypeFromInterface(context, id, *callee_specific_id);
   } else {
     facet_type = FacetTypeFromNamedConstraint(context, id, *callee_specific_id);
   }

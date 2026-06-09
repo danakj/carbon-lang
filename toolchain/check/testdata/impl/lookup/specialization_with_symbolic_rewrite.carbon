@@ -138,6 +138,7 @@ fn F[T:! Ptr](var t: T) -> T.(Ptr.Type) {
 // CHECK:STDOUT:   %Z.impl_witness.2d9: <witness> = impl_witness @T.as.Z.impl.adf.%Z.impl_witness_table, @T.as.Z.impl.adf(%T.67d) [symbolic]
 // CHECK:STDOUT:   %require_complete.d7e: <witness> = require_complete_type %Z_where.type.b22 [symbolic]
 // CHECK:STDOUT:   %Z.facet.b21: %Z.type.963 = facet_value %T.67d, (%Z.impl_witness.2d9) [symbolic]
+// CHECK:STDOUT:   %.Self.1: %type = symbolic_binding .Self.1 [symbolic_self]
 // CHECK:STDOUT:   %pattern_type.d7e: type = pattern_type %Z.type.963 [concrete]
 // CHECK:STDOUT:   %T.4b3: %Z.type.963 = symbolic_binding T, 0 [symbolic]
 // CHECK:STDOUT:   %T.as_type: type = facet_access_type %T.4b3 [symbolic]
@@ -241,6 +242,7 @@ fn F[T:! Ptr](var t: T) -> T.(Ptr.Type) {
 // CHECK:STDOUT:     %.loc13_13: type = splice_block %Z.type [concrete = constants.%Z.type.963] {
 // CHECK:STDOUT:       %.Self.0: %type = symbolic_binding .Self.0 [symbolic_self = constants.%.Self.0.e0b]
 // CHECK:STDOUT:       %Z.ref: %Z.type.c39 = name_ref Z, file.%Z.decl [concrete = constants.%Z.generic]
+// CHECK:STDOUT:       %.Self.1: %type = symbolic_binding .Self.1 [symbolic_self = constants.%.Self.1]
 // CHECK:STDOUT:       %C.ref: type = name_ref C, file.%C.decl [concrete = constants.%C]
 // CHECK:STDOUT:       %Z.type: type = facet_type <@Z, @Z(constants.%C)> [concrete = constants.%Z.type.963]
 // CHECK:STDOUT:     }
@@ -516,6 +518,7 @@ fn F[T:! Ptr](var t: T) -> T.(Ptr.Type) {
 // CHECK:STDOUT:   %Z.impl_witness.2d9: <witness> = impl_witness @T.as.Z.impl.adf.%Z.impl_witness_table, @T.as.Z.impl.adf(%T.67d) [symbolic]
 // CHECK:STDOUT:   %require_complete.d7e: <witness> = require_complete_type %Z_where.type.b22 [symbolic]
 // CHECK:STDOUT:   %Z.facet.b21: %Z.type.963 = facet_value %T.67d, (%Z.impl_witness.2d9) [symbolic]
+// CHECK:STDOUT:   %.Self.1: %type = symbolic_binding .Self.1 [symbolic_self]
 // CHECK:STDOUT:   %pattern_type.d7e: type = pattern_type %Z.type.963 [concrete]
 // CHECK:STDOUT:   %T.4b3: %Z.type.963 = symbolic_binding T, 0 [symbolic]
 // CHECK:STDOUT:   %T.as_type: type = facet_access_type %T.4b3 [symbolic]
@@ -639,6 +642,7 @@ fn F[T:! Ptr](var t: T) -> T.(Ptr.Type) {
 // CHECK:STDOUT:     %.loc14_13: type = splice_block %Z.type [concrete = constants.%Z.type.963] {
 // CHECK:STDOUT:       %.Self.0: %type = symbolic_binding .Self.0 [symbolic_self = constants.%.Self.0.e0b]
 // CHECK:STDOUT:       %Z.ref: %Z.type.c39 = name_ref Z, file.%Z.decl [concrete = constants.%Z.generic]
+// CHECK:STDOUT:       %.Self.1: %type = symbolic_binding .Self.1 [symbolic_self = constants.%.Self.1]
 // CHECK:STDOUT:       %C.ref: type = name_ref C, file.%C.decl [concrete = constants.%C]
 // CHECK:STDOUT:       %Z.type: type = facet_type <@Z, @Z(constants.%C)> [concrete = constants.%Z.type.963]
 // CHECK:STDOUT:     }

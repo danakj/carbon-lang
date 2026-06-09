@@ -85,6 +85,7 @@ fn H(T:! type) {
 // CHECK:STDOUT:   %C.type: type = generic_class_type @C [concrete]
 // CHECK:STDOUT:   %C.generic: %C.type = struct_value () [concrete]
 // CHECK:STDOUT:   %C.1d0e8a.1: type = class_type @C, @C(%CC) [symbolic]
+// CHECK:STDOUT:   %.Self.1: %type = symbolic_binding .Self.1 [symbolic_self]
 // CHECK:STDOUT:   %A.type.acd3aa.2: type = facet_type <@A, @A(%CC)> [symbolic]
 // CHECK:STDOUT:   %.Self.0.a16688.1: %A.type.acd3aa.2 = symbolic_binding .Self.0 [symbolic]
 // CHECK:STDOUT:   %A.assoc_type.447662.2: type = assoc_entity_type @A, @A(%CC) [symbolic]
@@ -131,6 +132,7 @@ fn H(T:! type) {
 // CHECK:STDOUT:       %.loc11_25.1: type = splice_block %.loc11_25.2 [symbolic = %A_where.type (constants.%A_where.type.da43f4.1)] {
 // CHECK:STDOUT:         %.Self.0.loc11_16: %type = symbolic_binding .Self.0 [symbolic_self = constants.%.Self.0.e0b]
 // CHECK:STDOUT:         %A.ref: %A.type.55a = name_ref A, file.%A.decl [concrete = constants.%A.generic]
+// CHECK:STDOUT:         %.Self.1: %type = symbolic_binding .Self.1 [symbolic_self = constants.%.Self.1]
 // CHECK:STDOUT:         %CC.ref.loc11_21: type = name_ref CC, @C.%CC.loc6_11.2 [symbolic = %CC (constants.%CC)]
 // CHECK:STDOUT:         %A.type.loc11_23.2: type = facet_type <@A, @A(constants.%CC)> [symbolic = %A.type.loc11_23.1 (constants.%A.type.acd3aa.2)]
 // CHECK:STDOUT:         %.Self.0.loc11_25.2: @C.F.%A.type.loc11_23.1 (%A.type.acd3aa.2) = symbolic_binding .Self.0 [symbolic = %.Self.0.loc11_25.1 (constants.%.Self.0.a16688.1)]
@@ -306,6 +308,7 @@ fn H(T:! type) {
 // CHECK:STDOUT:   %assoc0: %A.assoc_type = assoc_entity element0, @A.WithSelf.%X [symbolic]
 // CHECK:STDOUT:   %B.type.d1b: type = generic_interface_type @B [concrete]
 // CHECK:STDOUT:   %B.generic: %B.type.d1b = struct_value () [concrete]
+// CHECK:STDOUT:   %.Self.1: %type = symbolic_binding .Self.1 [symbolic_self]
 // CHECK:STDOUT:   %.Self.0.a16688.1: %A.type.acd3aa.1 = symbolic_binding .Self.0 [symbolic]
 // CHECK:STDOUT:   %require_complete.21f: <witness> = require_complete_type %A.type.acd3aa.1 [symbolic]
 // CHECK:STDOUT:   %.Self.0.as_type: type = facet_access_type %.Self.0.a16688.1 [symbolic]
@@ -361,6 +364,7 @@ fn H(T:! type) {
 // CHECK:STDOUT:     %.loc9_36.1: type = splice_block %.loc9_36.2 [symbolic = %A_where.type (constants.%A_where.type.ce6fa0.1)] {
 // CHECK:STDOUT:       %.Self.0.loc9_27: %type = symbolic_binding .Self.0 [symbolic_self = constants.%.Self.0.e0b]
 // CHECK:STDOUT:       %A.ref: %A.type.55a = name_ref A, file.%A.decl [concrete = constants.%A.generic]
+// CHECK:STDOUT:       %.Self.1: %type = symbolic_binding .Self.1 [symbolic_self = constants.%.Self.1]
 // CHECK:STDOUT:       %AA.ref.loc9_32: type = name_ref AA, %AA.loc9_16.1 [symbolic = %AA.loc9_16.2 (constants.%AA)]
 // CHECK:STDOUT:       %A.type.loc9_34.1: type = facet_type <@A, @A(constants.%AA)> [symbolic = %A.type.loc9_34.2 (constants.%A.type.acd3aa.1)]
 // CHECK:STDOUT:       %.Self.0.loc9_36.1: @BB.as_type.as.B.impl.%A.type.loc9_34.2 (%A.type.acd3aa.1) = symbolic_binding .Self.0 [symbolic = %.Self.0.loc9_36.2 (constants.%.Self.0.a16688.1)]

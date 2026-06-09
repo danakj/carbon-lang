@@ -10,6 +10,7 @@
 #include "toolchain/check/facet_type.h"
 #include "toolchain/check/generic.h"
 #include "toolchain/check/inst.h"
+#include "toolchain/check/name_lookup.h"
 #include "toolchain/check/subst.h"
 #include "toolchain/check/type.h"
 #include "toolchain/check/type_completion.h"
@@ -45,6 +46,37 @@ auto MakePeriodSelfFacetValue(Context& context, SemIR::LocId loc_id,
     CARBON_CHECK(!existing.has_value());
   }
   return inst_id;
+}
+
+auto IncrementAndShadowPeriodSelfName(Context& context, SemIR::LocId loc_id)
+    -> void {
+  auto orig_inst_id =
+      LookupUnqualifiedName(context, loc_id, SemIR::NameId::PeriodSelf,
+                            /*required=*/false)
+          .scope_result.target_inst_id();
+  if (orig_inst_id == SemIR::ErrorInst::InstId) {
+    // No `.Self` in this scope.
+    return;
+  }
+  auto orig_inst = context.insts().GetAs<SemIR::SymbolicBinding>(orig_inst_id);
+  auto entity_name = context.entity_names().Get(orig_inst.entity_name_id);
+  auto depth = entity_name.period_self_depth.index;
+  entity_name.period_self_depth = SemIR::ElementIndex(depth + 1);
+  auto entity_name_id = context.entity_names().AddCanonical(entity_name);
+
+  auto inst_id = AddInst<SemIR::SymbolicBinding>(
+      context, loc_id,
+      {
+          .type_id = orig_inst.type_id,
+          .entity_name_id = entity_name_id,
+          // `None` because there is no equivalent non-symbolic value.
+          .value_id = SemIR::InstId::None,
+      });
+  auto existing = context.scope_stack().LookupOrAddName(
+      SemIR::NameId::PeriodSelf, inst_id, ScopeIndex::None,
+      IsCurrentPositionReachable(context));
+  // Shouldn't have any names in newly created scope.
+  CARBON_CHECK(!existing.has_value());
 }
 
 auto GetPeriodSelfDepth(Context& context, SemIR::SymbolicBinding bind)

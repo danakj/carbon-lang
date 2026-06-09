@@ -124,6 +124,7 @@ fn F(unused T:! Generic((), ())) {}
 // CHECK:STDOUT:   %N: %T.67d = symbolic_binding N, 1 [symbolic]
 // CHECK:STDOUT:   %WithImplicitArgs.type: type = generic_interface_type @WithImplicitArgs [concrete]
 // CHECK:STDOUT:   %WithImplicitArgs.generic: %WithImplicitArgs.type = struct_value () [concrete]
+// CHECK:STDOUT:   %.Self.1: %type = symbolic_binding .Self.1 [symbolic_self]
 // CHECK:STDOUT:   %pattern_type.472: type = pattern_type %Simple.type.d50 [concrete]
 // CHECK:STDOUT:   %T.16788c.1: %Simple.type.d50 = symbolic_binding T, 0 [symbolic]
 // CHECK:STDOUT:   %T.16788c.2: %Simple.type.d50 = symbolic_binding T, 0 [symbolic]
@@ -185,6 +186,7 @@ fn F(unused T:! Generic((), ())) {}
 // CHECK:STDOUT:     %.loc24: type = splice_block %Simple.type [concrete = constants.%Simple.type.d50] {
 // CHECK:STDOUT:       %.Self.0: %type = symbolic_binding .Self.0 [symbolic_self = constants.%.Self.0]
 // CHECK:STDOUT:       %Simple.ref: %Simple.type.887 = name_ref Simple, file.%Simple.decl [concrete = constants.%Simple.generic]
+// CHECK:STDOUT:       %.Self.1: %type = symbolic_binding .Self.1 [symbolic_self = constants.%.Self.1]
 // CHECK:STDOUT:       %C.ref: type = name_ref C, file.%C.decl [concrete = constants.%C]
 // CHECK:STDOUT:       %Simple.type: type = facet_type <@Simple, @Simple(constants.%C)> [concrete = constants.%Simple.type.d50]
 // CHECK:STDOUT:     }
@@ -196,6 +198,7 @@ fn F(unused T:! Generic((), ())) {}
 // CHECK:STDOUT:     %.loc25: type = splice_block %Simple.type [concrete = constants.%Simple.type.d50] {
 // CHECK:STDOUT:       %.Self.0: %type = symbolic_binding .Self.0 [symbolic_self = constants.%.Self.0]
 // CHECK:STDOUT:       %Simple.ref: %Simple.type.887 = name_ref Simple, file.%Simple.decl [concrete = constants.%Simple.generic]
+// CHECK:STDOUT:       %.Self.1: %type = symbolic_binding .Self.1 [symbolic_self = constants.%.Self.1]
 // CHECK:STDOUT:       %C.ref: type = name_ref C, file.%C.decl [concrete = constants.%C]
 // CHECK:STDOUT:       %Simple.type: type = facet_type <@Simple, @Simple(constants.%C)> [concrete = constants.%Simple.type.d50]
 // CHECK:STDOUT:     }
@@ -464,6 +467,7 @@ fn F(unused T:! Generic((), ())) {}
 // CHECK:STDOUT:   %empty_struct_type: type = struct_type {} [concrete]
 // CHECK:STDOUT:   %complete_type: <witness> = complete_type_witness %empty_struct_type [concrete]
 // CHECK:STDOUT:   %B: type = class_type @B [concrete]
+// CHECK:STDOUT:   %.Self.1: %type = symbolic_binding .Self.1 [symbolic_self]
 // CHECK:STDOUT:   %Generic.type.c3a: type = facet_type <@Generic, @Generic(%A)> [concrete]
 // CHECK:STDOUT:   %pattern_type.338: type = pattern_type %Generic.type.c3a [concrete]
 // CHECK:STDOUT:   %T.ca1: %Generic.type.c3a = symbolic_binding T, 0 [symbolic]
@@ -503,6 +507,7 @@ fn F(unused T:! Generic((), ())) {}
 // CHECK:STDOUT:     %.loc9: type = splice_block %Generic.type [concrete = constants.%Generic.type.c3a] {
 // CHECK:STDOUT:       %.Self.0: %type = symbolic_binding .Self.0 [symbolic_self = constants.%.Self.0]
 // CHECK:STDOUT:       %Generic.ref: %Generic.type.30d = name_ref Generic, file.%Generic.decl [concrete = constants.%Generic.generic]
+// CHECK:STDOUT:       %.Self.1: %type = symbolic_binding .Self.1 [symbolic_self = constants.%.Self.1]
 // CHECK:STDOUT:       %A.ref: type = name_ref A, file.%A.decl [concrete = constants.%A]
 // CHECK:STDOUT:       %Generic.type: type = facet_type <@Generic, @Generic(constants.%A)> [concrete = constants.%Generic.type.c3a]
 // CHECK:STDOUT:     }
@@ -514,6 +519,7 @@ fn F(unused T:! Generic((), ())) {}
 // CHECK:STDOUT:     %.loc10: type = splice_block %Generic.type [concrete = constants.%Generic.type.57d] {
 // CHECK:STDOUT:       %.Self.0: %type = symbolic_binding .Self.0 [symbolic_self = constants.%.Self.0]
 // CHECK:STDOUT:       %Generic.ref: %Generic.type.30d = name_ref Generic, file.%Generic.decl [concrete = constants.%Generic.generic]
+// CHECK:STDOUT:       %.Self.1: %type = symbolic_binding .Self.1 [symbolic_self = constants.%.Self.1]
 // CHECK:STDOUT:       %B.ref: type = name_ref B, file.%B.decl [concrete = constants.%B]
 // CHECK:STDOUT:       %Generic.type: type = facet_type <@Generic, @Generic(constants.%B)> [concrete = constants.%Generic.type.57d]
 // CHECK:STDOUT:     }
@@ -619,6 +625,7 @@ fn F(unused T:! Generic((), ())) {}
 // CHECK:STDOUT:   %Generic.generic: %Generic.type.30d = struct_value () [concrete]
 // CHECK:STDOUT:   %Generic.type.ee1: type = facet_type <@Generic, @Generic(%T)> [symbolic]
 // CHECK:STDOUT:   %Self: %Generic.type.ee1 = symbolic_binding Self, 1 [symbolic]
+// CHECK:STDOUT:   %.Self.1: %type = symbolic_binding .Self.1 [symbolic_self]
 // CHECK:STDOUT:   %empty_tuple: %empty_tuple.type = tuple_value () [concrete]
 // CHECK:STDOUT:   %F.type: type = fn_type @F [concrete]
 // CHECK:STDOUT:   %F: %F.type = struct_value () [concrete]
@@ -644,6 +651,7 @@ fn F(unused T:! Generic((), ())) {}
 // CHECK:STDOUT:     %.1: <error> = splice_block <error> [concrete = <error>] {
 // CHECK:STDOUT:       %.Self.0: %type = symbolic_binding .Self.0 [symbolic_self = constants.%.Self.0]
 // CHECK:STDOUT:       %Generic.ref: %Generic.type.30d = name_ref Generic, file.%Generic.decl [concrete = constants.%Generic.generic]
+// CHECK:STDOUT:       %.Self.1: %type = symbolic_binding .Self.1 [symbolic_self = constants.%.Self.1]
 // CHECK:STDOUT:       %.loc12_26: %empty_tuple.type = tuple_literal () [concrete = constants.%empty_tuple]
 // CHECK:STDOUT:       %.loc12_30: %empty_tuple.type = tuple_literal () [concrete = constants.%empty_tuple]
 // CHECK:STDOUT:     }

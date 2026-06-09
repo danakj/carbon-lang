@@ -78,6 +78,13 @@ class D(V:! type);
 // `.Self` to `D` since it refers to `T`. But we _do_ need to replace the
 // `.Self` in the type of `U`, since it refers to `U` which is being replaced by
 // `D(.Self)` in this specific.
+// CHECK:STDERR: early_class_impls_generic_interface.carbon:[[@LINE+7]]:71: error: cannot convert type `D(.Self)` into type implementing `Y(.Self)` [ConversionFailureTypeToFacet]
+// CHECK:STDERR: fn G(unused T:! Z where D(.Self) impls Y(D(.Self)) and D(.Self) impls X(D(.Self))) {}
+// CHECK:STDERR:                                                                       ^~~~~~~~~~~
+// CHECK:STDERR: early_class_impls_generic_interface.carbon:[[@LINE-16]]:1: note: while deducing parameters of generic declared here [DeductionGenericHere]
+// CHECK:STDERR: interface X(U:! Y(.Self)) {}
+// CHECK:STDERR: ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+// CHECK:STDERR:
 fn G(unused T:! Z where D(.Self) impls Y(D(.Self)) and D(.Self) impls X(D(.Self))) {}
 
 // --- early_class_impls_generic_interface_with_member_designator.carbon

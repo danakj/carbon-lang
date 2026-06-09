@@ -23,6 +23,9 @@ auto MakePeriodSelfFacetValue(Context& context, SemIR::LocId loc_id,
                               SemIR::ElementIndex depth,
                               bool insert_name = true) -> SemIR::InstId;
 
+auto IncrementAndShadowPeriodSelfName(Context& context, SemIR::LocId loc_id)
+    -> void;
+
 // Get the depth of a `.Self` facet, which represents the number of `where`
 // clauses it is nested within.
 auto GetPeriodSelfDepth(Context& context, SemIR::SymbolicBinding bind)

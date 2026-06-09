@@ -6,15 +6,21 @@
 #include "toolchain/check/context.h"
 #include "toolchain/check/handle.h"
 #include "toolchain/check/inst.h"
+#include "toolchain/check/period_self.h"
 #include "toolchain/sem_ir/expr_info.h"
 #include "toolchain/sem_ir/inst.h"
 
 namespace Carbon::Check {
 
 auto HandleParseNode(Context& context, Parse::CallExprStartId node_id) -> bool {
-  auto name_id = context.node_stack().PopExpr();
-  context.node_stack().Push(node_id, name_id);
+  auto callee_id = context.node_stack().PopExpr();
+  context.node_stack().Push(node_id, callee_id);
   context.param_and_arg_refs_stack().Push();
+  if (context.types().Is<SemIR::GenericInterfaceType>(
+          context.insts().Get(callee_id).type_id())) {
+    context.scope_stack().PushForSameRegion();
+    IncrementAndShadowPeriodSelfName(context, node_id);
+  }
   return true;
 }
 
@@ -28,6 +34,10 @@ auto HandleParseNode(Context& context, Parse::CallExprId node_id) -> bool {
       context, node_id, callee_id,
       context.param_and_arg_refs_stack().PeekCurrentBlockContents());
 
+  if (context.types().Is<SemIR::GenericInterfaceType>(
+          context.insts().Get(callee_id).type_id())) {
+    context.scope_stack().Pop();
+  }
   context.param_and_arg_refs_stack().PopAndDiscard();
   context.node_stack().Push(node_id, call_id);
   return true;
