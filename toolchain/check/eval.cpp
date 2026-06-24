@@ -3166,21 +3166,22 @@ static auto AddRequirementImpls(Context& context, SemIR::LocId loc_id,
 
     auto self_impls_interface = [&](SemIR::SpecificInterface si) {
       return SubstPeriodSelf(context, loc_id, si, period_self_replacement_id,
-                             SubstPeriodSelfBehaviour::ImplicitOnly);
+                             false, SubstPeriodSelfBehaviour::ImplicitOnly);
     };
     auto self_impls_constraint = [&](SemIR::SpecificNamedConstraint sc) {
       return SubstPeriodSelf(context, loc_id, sc, period_self_replacement_id,
-                             SubstPeriodSelfBehaviour::ImplicitOnly);
+                             false, SubstPeriodSelfBehaviour::ImplicitOnly);
     };
     auto type_impls_interface =
         [&](SemIR::FacetTypeInfo::TypeImplsInterface impls)
         -> SemIR::FacetTypeInfo::TypeImplsInterface {
       auto self = SubstPeriodSelf(
           context, loc_id, context.constant_values().Get(impls.self_type),
-          period_self_replacement_id, SubstPeriodSelfBehaviour::ImplicitOnly);
+          period_self_replacement_id, false,
+          SubstPeriodSelfBehaviour::ImplicitOnly);
       auto interface = SubstPeriodSelf(
           context, loc_id, impls.specific_interface, period_self_replacement_id,
-          SubstPeriodSelfBehaviour::ImplicitOnly);
+          false, SubstPeriodSelfBehaviour::ImplicitOnly);
       return {context.constant_values().GetInstId(self), interface};
     };
     auto type_impls_constraint =
@@ -3188,10 +3189,12 @@ static auto AddRequirementImpls(Context& context, SemIR::LocId loc_id,
         -> SemIR::FacetTypeInfo::TypeImplsNamedConstraint {
       auto self = SubstPeriodSelf(
           context, loc_id, context.constant_values().Get(impls.self_type),
-          period_self_replacement_id, SubstPeriodSelfBehaviour::ImplicitOnly);
-      auto constraint = SubstPeriodSelf(
-          context, loc_id, impls.specific_named_constraint,
-          period_self_replacement_id, SubstPeriodSelfBehaviour::ImplicitOnly);
+          period_self_replacement_id, false,
+          SubstPeriodSelfBehaviour::ImplicitOnly);
+      auto constraint =
+          SubstPeriodSelf(context, loc_id, impls.specific_named_constraint,
+                          period_self_replacement_id, false,
+                          SubstPeriodSelfBehaviour::ImplicitOnly);
       return {context.constant_values().GetInstId(self), constraint};
     };
 
@@ -3213,10 +3216,12 @@ static auto AddRequirementImpls(Context& context, SemIR::LocId loc_id,
         -> SemIR::FacetTypeInfo::RewriteConstraint {
       auto lhs_id = SubstPeriodSelf(
           context, loc_id, context.constant_values().Get(rewrite.lhs_id),
-          period_self_replacement_id, SubstPeriodSelfBehaviour::ImplicitOnly);
+          period_self_replacement_id, false,
+          SubstPeriodSelfBehaviour::ImplicitOnly);
       auto rhs_id = SubstPeriodSelf(
           context, loc_id, context.constant_values().Get(rewrite.rhs_id),
-          period_self_replacement_id, SubstPeriodSelfBehaviour::ImplicitOnly);
+          period_self_replacement_id, false,
+          SubstPeriodSelfBehaviour::ImplicitOnly);
       return {context.constant_values().GetInstId(lhs_id),
               context.constant_values().GetInstId(rhs_id)};
     };

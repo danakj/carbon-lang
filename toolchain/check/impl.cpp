@@ -400,15 +400,21 @@ static auto WitnessQueryMatchesInterface(
   auto access_interface =
       context.specific_interfaces().Get(lookup.query_specific_interface_id);
 
-  // The `impl_interface` comes from an IdentifiedFacetType so it has `.Self`
-  // replaced. The access comes from a rewrite constraint, which do not have
-  // `.Self` replaced, so we need to do that here.
-  //
-  // TODO: Do this more eagerly as soon as we know the full decl before we
-  // construct the witness table from it? We do replace `.Self` in the facet
-  // type, but we don't replace the designators.
-  access_interface = SubstPeriodSelf(context, loc_id, access_interface,
-                                     context.constant_values().Get(impl_self));
+// The `impl_interface` comes from an IdentifiedFacetType so it has `.Self`
+// replaced. The access comes from a rewrite constraint, which do not have
+// `.Self` replaced, so we need to do that here.
+//
+// TODO: Do this more eagerly as soon as we know the full decl before we
+// construct the witness table from it? We do replace `.Self` in the facet
+// type, but we don't replace the designators.
+#if 0  // FIXME: Not anymore, identify did not subst.
+  access_interface =
+      SubstPeriodSelf(context, loc_id, access_interface,
+                      context.constant_values().Get(impl_self), false);
+#else
+  (void)loc_id;
+  (void)impl_self;
+#endif
   return access_interface == impl_interface;
 }
 

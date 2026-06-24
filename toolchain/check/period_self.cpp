@@ -45,11 +45,12 @@ class SubstPeriodSelfCallbacks : public SubstInstCallbacks {
  public:
   explicit SubstPeriodSelfCallbacks(
       Context* context, SemIR::LocId loc_id,
-      SemIR::ConstantId period_self_replacement_id,
+      SemIR::ConstantId period_self_replacement_id, bool freeze_witnesses,
       SubstPeriodSelfBehaviour behaviour, SubstPeriodSelfRebuildInst rebuild)
       : SubstInstCallbacks(context),
         loc_id_(loc_id),
         period_self_replacement_id_(period_self_replacement_id),
+        freeze_witnesses_(freeze_witnesses),
         behaviour_(behaviour),
         rebuild_callback_(rebuild) {}
 
@@ -70,11 +71,34 @@ class SubstPeriodSelfCallbacks : public SubstInstCallbacks {
       return FullySubstituted;
     }
 
+    if (freeze_witnesses_) {
+      if (auto witness =
+              context().insts().TryGetAs<SemIR::LookupImplWitness>(inst_id)) {
+        inst_id = RebuildNewInst<SemIR::FrozenImplWitness>(
+            loc_id_, {.type_id = witness->type_id,
+                      .query_self_inst_id = witness->query_self_inst_id,
+                      .query_specific_interface_id =
+                          witness->query_specific_interface_id});
+      }
+    }
+
     // Look for implicit use of `.Self` in designators: `.X` is really
     // `.Self.X`.
     if (auto access =
             context().insts().TryGetAs<SemIR::ImplWitnessAccess>(inst_id)) {
       if (auto witness = context().insts().TryGetAs<SemIR::LookupImplWitness>(
+              access->witness_id)) {
+        // Canonicalization not necessary; we are working with the constant
+        // value already, and the query self in a witness is already
+        // canonicalized.
+        if (IsPeriodSelf(context(), witness->query_self_inst_id,
+                         /*canonicalize=*/false)) {
+          // We are entering a designator. We watch for the witness next.
+          designator_states_.push_back(WitnessNext);
+          return SubstOperands;
+        }
+      }
+      if (auto witness = context().insts().TryGetAs<SemIR::FrozenImplWitness>(
               access->witness_id)) {
         // Canonicalization not necessary; we are working with the constant
         // value already, and the query self in a witness is already
@@ -92,8 +116,18 @@ class SubstPeriodSelfCallbacks : public SubstInstCallbacks {
       if (auto witness =
               context().insts().TryGetAs<SemIR::LookupImplWitness>(inst_id)) {
         // The query self comes next, before the specific interface. This
-        // deepnds on the order of the operands in the LookupImplWitness, and
-        // that Subst visits them in top to bottom order.
+        // depends on the order of the operands in the
+        // FrozenImplWitness/LookupImplWitness, and that Subst visits them in
+        // top to bottom order.
+        designator_states_.back() = WitnessSelfNext;
+        return SubstOperands;
+      }
+      if (auto witness =
+              context().insts().TryGetAs<SemIR::FrozenImplWitness>(inst_id)) {
+        // The query self comes next, before the specific interface. This
+        // depends on the order of the operands in the
+        // FrozenImplWitness/LookupImplWitness, and that Subst visits them in
+        // top to bottom order.
         designator_states_.back() = WitnessSelfNext;
         return SubstOperands;
       }
@@ -151,10 +185,10 @@ class SubstPeriodSelfCallbacks : public SubstInstCallbacks {
   enum DesignatorState {
     // We are not inside a designator.
     None,
-    // We are looking for the LookupImplWitness of a designator next.
+    // We are looking for the witness of a designator next.
     WitnessNext,
     // We are looking for `.Self`, the next one will be the query self of the
-    // LookupImplWitness of a designator. This is the implicit use of `.Self`.
+    // witness of a designator. This is the implicit use of `.Self`.
     WitnessSelfNext,
     // We have seen the query self of the designator, and are now looking for
     // the designator to be rebuilt with the replacement. Any other `.Self` that
@@ -237,16 +271,28 @@ class SubstPeriodSelfCallbacks : public SubstInstCallbacks {
     llvm::SmallVector<SemIR::InstId> witnesses;
     witnesses.reserve(required_impls.size());
     for (const auto& req : required_impls) {
-      witnesses.push_back(context().constant_values().GetInstId(
-          EvalOrAddInst<SemIR::LookupImplWitness>(
-              context(), loc_id_,
-              {.type_id =
-                   GetSingletonType(context(), SemIR::WitnessType::TypeInstId),
-               .query_self_inst_id =
-                   context().constant_values().GetInstId(req.self_facet_value),
-               .query_specific_interface_id =
-                   context().specific_interfaces().Add(
-                       req.specific_interface)})));
+      auto witness_const_id = SemIR::ConstantId::None;
+      if (freeze_witnesses_) {
+        witness_const_id = EvalOrAddInst<SemIR::FrozenImplWitness>(
+            context(), loc_id_,
+            {.type_id =
+                 GetSingletonType(context(), SemIR::WitnessType::TypeInstId),
+             .query_self_inst_id =
+                 context().constant_values().GetInstId(req.self_facet_value),
+             .query_specific_interface_id =
+                 context().specific_interfaces().Add(req.specific_interface)});
+      } else {
+        witness_const_id = EvalOrAddInst<SemIR::LookupImplWitness>(
+            context(), loc_id_,
+            {.type_id =
+                 GetSingletonType(context(), SemIR::WitnessType::TypeInstId),
+             .query_self_inst_id =
+                 context().constant_values().GetInstId(req.self_facet_value),
+             .query_specific_interface_id =
+                 context().specific_interfaces().Add(req.specific_interface)});
+      }
+      witnesses.push_back(
+          context().constant_values().GetInstId(witness_const_id));
     }
     return context().constant_values().GetInstId(
         EvalOrAddInst<SemIR::FacetValue>(
@@ -268,6 +314,16 @@ class SubstPeriodSelfCallbacks : public SubstInstCallbacks {
     if (GetDesignatorState() == RebuildNext) {
       if (auto access = context().insts().TryGetAs<SemIR::ImplWitnessAccess>(
               orig_inst_id)) {
+        if (auto witness = context().insts().TryGetAs<SemIR::FrozenImplWitness>(
+                access->witness_id)) {
+          // Canonicalization not necessary; we are working with the constant
+          // value already, and the query self in a witness is already
+          // canonicalized.
+          if (IsPeriodSelf(context(), witness->query_self_inst_id,
+                           /*canonicalize=*/false)) {
+            designator_states_.pop_back();
+          }
+        }
         if (auto witness = context().insts().TryGetAs<SemIR::LookupImplWitness>(
                 access->witness_id)) {
           // Canonicalization not necessary; we are working with the constant
@@ -284,6 +340,7 @@ class SubstPeriodSelfCallbacks : public SubstInstCallbacks {
 
   SemIR::LocId loc_id_;
   SemIR::ConstantId period_self_replacement_id_;
+  bool freeze_witnesses_;
   SubstPeriodSelfBehaviour behaviour_;
   SubstPeriodSelfRebuildInst rebuild_callback_;
 
@@ -299,7 +356,7 @@ class SubstPeriodSelfCallbacks : public SubstInstCallbacks {
 auto SubstPeriodSelf(Context& context, SemIR::LocId loc_id,
                      SemIR::ConstantId const_id,
                      SemIR::ConstantId period_self_replacement_id,
-                     SubstPeriodSelfBehaviour behaviour,
+                     bool freeze_witnesses, SubstPeriodSelfBehaviour behaviour,
                      SubstPeriodSelfRebuildInst rebuild) -> SemIR::ConstantId {
   // Don't replace `.Self` with itself; that is cyclical.
   //
@@ -312,8 +369,9 @@ auto SubstPeriodSelf(Context& context, SemIR::LocId loc_id,
     return const_id;
   }
 
-  SubstPeriodSelfCallbacks callbacks(
-      &context, loc_id, period_self_replacement_id, behaviour, rebuild);
+  SubstPeriodSelfCallbacks callbacks(&context, loc_id,
+                                     period_self_replacement_id,
+                                     freeze_witnesses, behaviour, rebuild);
   auto subst_id = SubstInst(
       context, context.constant_values().GetInstId(const_id), callbacks);
   return context.constant_values().Get(subst_id);
@@ -321,7 +379,7 @@ auto SubstPeriodSelf(Context& context, SemIR::LocId loc_id,
 
 static auto SubstPeriodSelfInSpecific(
     Context& context, SemIR::LocId loc_id, SemIR::SpecificId specific_id,
-    SemIR::ConstantId period_self_replacement_id,
+    SemIR::ConstantId period_self_replacement_id, bool freeze_witnesses,
     SubstPeriodSelfBehaviour behaviour, SubstPeriodSelfRebuildInst rebuild)
     -> SemIR::SpecificId {
   if (!specific_id.has_value()) {
@@ -336,8 +394,9 @@ static auto SubstPeriodSelfInSpecific(
       context.inst_blocks().Get(specific.args_id));
   for (auto& arg_id : args) {
     auto const_id = context.constant_values().Get(arg_id);
-    const_id = SubstPeriodSelf(context, loc_id, const_id,
-                               period_self_replacement_id, behaviour, rebuild);
+    const_id =
+        SubstPeriodSelf(context, loc_id, const_id, period_self_replacement_id,
+                        freeze_witnesses, behaviour, rebuild);
     arg_id = context.constant_values().GetInstId(const_id);
   }
   return MakeSpecific(context, loc_id, specific.generic_id, args);
@@ -346,23 +405,23 @@ static auto SubstPeriodSelfInSpecific(
 auto SubstPeriodSelf(Context& context, SemIR::LocId loc_id,
                      SemIR::SpecificInterface interface,
                      SemIR::ConstantId period_self_replacement_id,
-                     SubstPeriodSelfBehaviour behaviour,
+                     bool freeze_witnesses, SubstPeriodSelfBehaviour behaviour,
                      SubstPeriodSelfRebuildInst rebuild)
     -> SemIR::SpecificInterface {
-  interface.specific_id =
-      SubstPeriodSelfInSpecific(context, loc_id, interface.specific_id,
-                                period_self_replacement_id, behaviour, rebuild);
+  interface.specific_id = SubstPeriodSelfInSpecific(
+      context, loc_id, interface.specific_id, period_self_replacement_id,
+      freeze_witnesses, behaviour, rebuild);
   return interface;
 }
 auto SubstPeriodSelf(Context& context, SemIR::LocId loc_id,
                      SemIR::SpecificNamedConstraint constraint,
                      SemIR::ConstantId period_self_replacement_id,
-                     SubstPeriodSelfBehaviour behaviour,
+                     bool freeze_witnesses, SubstPeriodSelfBehaviour behaviour,
                      SubstPeriodSelfRebuildInst rebuild)
     -> SemIR::SpecificNamedConstraint {
-  constraint.specific_id =
-      SubstPeriodSelfInSpecific(context, loc_id, constraint.specific_id,
-                                period_self_replacement_id, behaviour, rebuild);
+  constraint.specific_id = SubstPeriodSelfInSpecific(
+      context, loc_id, constraint.specific_id, period_self_replacement_id,
+      freeze_witnesses, behaviour, rebuild);
   return constraint;
 }
 
@@ -386,20 +445,20 @@ auto SubstPeriodSelfInFacetType(Context& context, SemIR::LocId loc_id,
 
   auto replace_interface = [&](SemIR::SpecificInterface si) {
     return SubstPeriodSelf(context, loc_id, si, period_self_replacement_id,
-                           SubstPeriodSelfBehaviour::All);
+                           false, SubstPeriodSelfBehaviour::All);
   };
   auto replace_constraint = [&](SemIR::SpecificNamedConstraint sc) {
     return SubstPeriodSelf(context, loc_id, sc, period_self_replacement_id,
-                           SubstPeriodSelfBehaviour::All);
+                           false, SubstPeriodSelfBehaviour::All);
   };
   auto replace_type_impls_interface =
       [&](SemIR::FacetTypeInfo::TypeImplsInterface impls)
       -> SemIR::FacetTypeInfo::TypeImplsInterface {
     auto self = SubstPeriodSelf(
         context, loc_id, context.constant_values().Get(impls.self_type),
-        period_self_replacement_id, SubstPeriodSelfBehaviour::All);
+        period_self_replacement_id, false, SubstPeriodSelfBehaviour::All);
     auto interface = SubstPeriodSelf(context, loc_id, impls.specific_interface,
-                                     period_self_replacement_id,
+                                     period_self_replacement_id, false,
                                      SubstPeriodSelfBehaviour::All);
     return {context.constant_values().GetInstId(self), interface};
   };
@@ -408,10 +467,10 @@ auto SubstPeriodSelfInFacetType(Context& context, SemIR::LocId loc_id,
       -> SemIR::FacetTypeInfo::TypeImplsNamedConstraint {
     auto self = SubstPeriodSelf(
         context, loc_id, context.constant_values().Get(impls.self_type),
-        period_self_replacement_id, SubstPeriodSelfBehaviour::All);
+        period_self_replacement_id, false, SubstPeriodSelfBehaviour::All);
     auto constraint = SubstPeriodSelf(
         context, loc_id, impls.specific_named_constraint,
-        period_self_replacement_id, SubstPeriodSelfBehaviour::All);
+        period_self_replacement_id, false, SubstPeriodSelfBehaviour::All);
     return {context.constant_values().GetInstId(self), constraint};
   };
   auto replace_rewrite = [&](SemIR::FacetTypeInfo::RewriteConstraint r)
@@ -422,9 +481,10 @@ auto SubstPeriodSelfInFacetType(Context& context, SemIR::LocId loc_id,
     //
     // The LHS is always a simple designator since only that is allowed, so we
     // just substitute the RHS.
-    auto rhs = SubstPeriodSelf(
-        context, loc_id, context.constant_values().Get(r.rhs_id),
-        period_self_replacement_id, SubstPeriodSelfBehaviour::ExplicitOnly);
+    auto rhs = SubstPeriodSelf(context, loc_id,
+                               context.constant_values().Get(r.rhs_id),
+                               period_self_replacement_id, false,
+                               SubstPeriodSelfBehaviour::ExplicitOnly);
     return {r.lhs_id, context.constant_values().GetInstId(rhs)};
   };
 

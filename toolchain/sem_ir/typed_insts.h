@@ -1240,6 +1240,22 @@ struct LookupImplWitness {
   SpecificInterfaceId query_specific_interface_id;
 };
 
+// FIXME: Use a category and replace all the if/else branches on these two
+// non-final witness types?
+struct FrozenImplWitness {
+  static constexpr auto Kind =
+      InstKind::FrozenImplWitness.Define<Parse::NodeId>(
+          {.ir_name = "frozen_impl_witness",
+           .constant_kind = InstConstantKind::Conditional,
+           .is_lowered = false});
+
+  // Always the type of the builtin `WitnessType` singleton instruction.
+  TypeId type_id;
+  // The self type (or facet value) and interface of the impl lookup query.
+  InstId query_self_inst_id;
+  SpecificInterfaceId query_specific_interface_id;
+};
+
 // Records that evaluation of the expression `src_id` will initialize the
 // storage identified by `dest_id` (even if its type's initializing
 // representation is not normally in-place), and forms an in-place initializing

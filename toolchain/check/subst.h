@@ -12,6 +12,40 @@ namespace Carbon::Check {
 
 // Callbacks used by SubstInst to recursively substitute into and rebuild an
 // instruction.
+//
+// Example usage boilerplate:
+// ```
+// auto DoSubst(Context& context, SemIR::LocId loc_id,
+//              SemIR::ConstantId const_id) -> SemIR::ConstantId {
+//   class Callbacks : public SubstInstCallbacks {
+//    public:
+//     explicit Callbacks(Context* context, SemIR::LocId loc_id)
+//         : SubstInstCallbacks(context), loc_id_(loc_id) {}
+//     auto Subst(SemIR::InstId& inst_id) -> SubstResult override {
+//       auto const_inst_id =
+//           context().constant_values().GetConstantInstId(inst_id);
+//       if (const_inst_id == SemIR::TypeType::TypeInstId ||
+//           const_inst_id == SemIR::ErrorInst::InstId) {
+//         return FullySubstituted;
+//       }
+//   
+//       return SubstOperands;
+//     }
+//   
+//     auto Rebuild(SemIR::InstId /*orig_inst_id*/, SemIR::Inst new_inst)
+//         -> SemIR::InstId override {
+//       return RebuildNewInst(loc_id_, new_inst);
+//     }
+//    private:
+//     SemIR::LocId loc_id_;
+//   };
+//   
+//   Callbacks callbacks(&context, loc_id);
+//   auto inst_id = context.constant_values().GetInstId(const_id);
+//   inst_id = SubstInst(context, inst_id, callbacks);
+//   return context.constant_values().Get(inst_id);
+// }
+// ```
 class SubstInstCallbacks {
  public:
   explicit SubstInstCallbacks(Context* context) : context_(context) {}

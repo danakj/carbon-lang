@@ -17,6 +17,7 @@
 #include "toolchain/sem_ir/ids.h"
 #include "toolchain/sem_ir/inst_kind.h"
 #include "toolchain/sem_ir/singleton_insts.h"
+#include "toolchain/sem_ir/specific_interface.h"
 #include "toolchain/sem_ir/struct_type_field.h"
 #include "toolchain/sem_ir/type_info.h"
 #include "toolchain/sem_ir/typed_insts.h"
@@ -471,9 +472,19 @@ class Stringifier {
   auto StringifyInst(InstId /*inst_id*/, ImplWitnessAccess inst) -> void {
     auto witness_inst_id =
         sem_ir_->constant_values().GetConstantInstId(inst.witness_id);
-    auto lookup = sem_ir_->insts().GetAs<LookupImplWitness>(witness_inst_id);
-    auto specific_interface =
-        sem_ir_->specific_interfaces().Get(lookup.query_specific_interface_id);
+
+    auto specific_interface = SemIR::SpecificInterface::None;
+
+    if (auto lookup =
+            sem_ir_->insts().TryGetAs<LookupImplWitness>(witness_inst_id)) {
+      specific_interface = sem_ir_->specific_interfaces().Get(
+          lookup->query_specific_interface_id);
+    } else {
+      auto frozen = sem_ir_->insts().GetAs<FrozenImplWitness>(witness_inst_id);
+      specific_interface = sem_ir_->specific_interfaces().Get(
+          frozen.query_specific_interface_id);
+    }
+
     const auto& interface =
         sem_ir_->interfaces().Get(specific_interface.interface_id);
     if (!interface.associated_entities_id.has_value()) {
@@ -553,6 +564,12 @@ class Stringifier {
   }
 
   auto StringifyInst(InstId /*inst_id*/, LookupImplWitness inst) -> void {
+    step_stack_->Push(
+        inst.query_self_inst_id, " as ",
+        sem_ir_->specific_interfaces().Get(inst.query_specific_interface_id));
+  }
+
+  auto StringifyInst(InstId /*inst_id*/, FrozenImplWitness inst) -> void {
     step_stack_->Push(
         inst.query_self_inst_id, " as ",
         sem_ir_->specific_interfaces().Get(inst.query_specific_interface_id));

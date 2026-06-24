@@ -286,6 +286,19 @@ auto EvalConstantInst(Context& context, SemIR::InstId inst_id,
   return ConstantEvalResult::NewSamePhase(inst);
 }
 
+auto EvalConstantInst(Context& context, SemIR::FrozenImplWitness inst)
+    -> ConstantEvalResult {
+  // Canonicalize the query self in the same way as LookupImplWitness.
+  auto self_facet_value_inst_id = SemIR::InstId::None;
+  inst.query_self_inst_id = context.constant_values().GetInstId(
+      GetCanonicalQuerySelfForLookupImplWitness(
+          context, context.constant_values().Get(inst.query_self_inst_id),
+          &self_facet_value_inst_id));
+
+  // FrozenImplWitness doesn't actually do lookups. It's frozen!
+  return ConstantEvalResult::NewSamePhase(inst);
+}
+
 // Given a SpecificInterface and an index of an associated constant in that
 // interface, try find a value for that constant in the rewrite constraints of
 // the type of `search_facet`.
@@ -412,11 +425,12 @@ static auto TryFindValueInRewriteConstraints(
       continue;
     }
 
+    // FIXME: Do we need this subst?
     auto rewrite_lhs_interface =
         SubstPeriodSelf(context, loc_id,
                         context.specific_interfaces().Get(
                             rewrite_lhs_witness.query_specific_interface_id),
-                        self_const_id);
+                        self_const_id, false);
 
     if (rewrite_lhs_interface != access_interface) {
       // This rewrite is into a different interface than the access query.
@@ -428,7 +442,7 @@ static auto TryFindValueInRewriteConstraints(
     // the self type of the access.
     auto rewrite_rhs = SubstPeriodSelf(
         context, loc_id, context.constant_values().Get(rewrite.rhs_id),
-        self_const_id);
+        self_const_id, false);
     return rewrite_rhs;
   }
 

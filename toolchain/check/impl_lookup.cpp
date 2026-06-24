@@ -157,6 +157,120 @@ static auto FindAssociatedImportIRs(
   return result;
 }
 
+static auto ThawWitnesses(Context& context, SemIR::LocId loc_id,
+                          SemIR::InstId inst_id) -> SemIR::InstId {
+  class Callbacks : public SubstInstCallbacks {
+   public:
+    explicit Callbacks(Context* context, SemIR::LocId loc_id)
+        : SubstInstCallbacks(context), loc_id_(loc_id) {}
+    auto Subst(SemIR::InstId& inst_id) -> SubstResult override {
+      auto const_inst_id =
+          context().constant_values().GetConstantInstId(inst_id);
+      if (const_inst_id == SemIR::TypeType::TypeInstId ||
+          const_inst_id == SemIR::ErrorInst::InstId) {
+        return FullySubstituted;
+      }
+      return SubstOperands;
+    }
+
+    auto ReuseUnchanged(SemIR::InstId inst_id) -> SemIR::InstId override {
+      if (auto witness =
+              context().insts().TryGetAs<SemIR::FrozenImplWitness>(inst_id)) {
+        inst_id = RebuildNewInst<SemIR::LookupImplWitness>(
+            loc_id_, {.type_id = witness->type_id,
+                      .query_self_inst_id = witness->query_self_inst_id,
+                      .query_specific_interface_id =
+                          witness->query_specific_interface_id});
+      }
+      return inst_id;
+    }
+
+    auto Rebuild(SemIR::InstId /*orig_inst_id*/, SemIR::Inst new_inst)
+        -> SemIR::InstId override {
+      if (auto witness = new_inst.TryAs<SemIR::FrozenImplWitness>()) {
+        new_inst = SemIR::LookupImplWitness{
+            .type_id = witness->type_id,
+            .query_self_inst_id = witness->query_self_inst_id,
+            .query_specific_interface_id =
+                witness->query_specific_interface_id};
+      }
+      return RebuildNewInst(loc_id_, new_inst);
+    }
+
+   private:
+    SemIR::LocId loc_id_;
+  };
+
+  Callbacks callbacks(&context, loc_id);
+  return SubstInst(context, inst_id, callbacks);
+}
+
+#if 0
+static auto FreezeWitnesses(Context& context, SemIR::LocId loc_id,
+                            SemIR::ConstantId const_id) -> SemIR::ConstantId {
+  class Callbacks : public SubstInstCallbacks {
+   public:
+    explicit Callbacks(Context* context, SemIR::LocId loc_id)
+        : SubstInstCallbacks(context), loc_id_(loc_id) {}
+    auto Subst(SemIR::InstId& inst_id) -> SubstResult override {
+      auto const_inst_id =
+          context().constant_values().GetConstantInstId(inst_id);
+      if (const_inst_id == SemIR::TypeType::TypeInstId ||
+          const_inst_id == SemIR::ErrorInst::InstId) {
+        return FullySubstituted;
+      }
+
+      if (auto lookup =
+              context().insts().TryGetAs<SemIR::LookupImplWitness>(inst_id)) {
+        inst_id = RebuildNewInst<SemIR::FrozenImplWitness>(
+            loc_id_, {.type_id = lookup->type_id,
+                      .query_self_inst_id = lookup->query_self_inst_id,
+                      .query_specific_interface_id =
+                          lookup->query_specific_interface_id});
+        return FullySubstituted;
+      }
+
+      return SubstOperands;
+    }
+
+    auto Rebuild(SemIR::InstId /*orig_inst_id*/, SemIR::Inst new_inst)
+        -> SemIR::InstId override {
+      return RebuildNewInst(loc_id_, new_inst);
+    }
+
+   private:
+    SemIR::LocId loc_id_;
+  };
+
+  Callbacks callbacks(&context, loc_id);
+  auto inst_id = context.constant_values().GetInstId(const_id);
+  inst_id = SubstInst(context, inst_id, callbacks);
+  return context.constant_values().Get(inst_id);
+}
+
+static auto FreezeWitnesses(Context& context, SemIR::LocId loc_id,
+                            SemIR::SpecificInterface specific_interface)
+    -> SemIR::SpecificInterface {
+  if (!specific_interface.specific_id.has_value()) {
+    return specific_interface;
+  }
+
+  const auto& specific =
+      context.specifics().Get(specific_interface.specific_id);
+
+  llvm::SmallVector<SemIR::InstId> args(
+      context.inst_blocks().Get(specific.args_id));
+  for (auto& inst_id : args) {
+    auto const_id = context.constant_values().Get(inst_id);
+    const_id = FreezeWitnesses(context, loc_id, const_id);
+    inst_id = context.constant_values().GetInstId(const_id);
+  }
+
+  auto specific_id = MakeSpecific(context, loc_id, specific.generic_id, args);
+  return {specific_interface.interface_id, specific_id};
+}
+#endif
+
 // Returns true if a cycle was found and diagnosed.
 static auto FindAndDiagnoseImplLookupCycle(
     Context& context, llvm::SmallVector<Context::ImplLookupStackEntry>& stack,
@@ -204,7 +318,7 @@ static auto FindAndDiagnoseImplLookupCycle(
 }
 
 struct RequiredImplsFromConstraint {
-  llvm::ArrayRef<SemIR::IdentifiedFacetType::RequiredImpl> req_impls;
+  llvm::SmallVector<SemIR::IdentifiedFacetType::RequiredImpl> req_impls;
   bool other_requirements;
 };
 
@@ -234,10 +348,18 @@ static auto GetRequiredImplsFromConstraint(
   if (!identified_id.has_value()) {
     return std::nullopt;
   }
-  return {
-      {.req_impls =
-           context.identified_facet_types().Get(identified_id).required_impls(),
-       .other_requirements = facet_type_info.other_requirements}};
+
+  llvm::SmallVector<SemIR::IdentifiedFacetType::RequiredImpl> req_impls(
+      context.identified_facet_types().Get(identified_id).required_impls());
+  for (auto& req : req_impls) {
+    req.self_facet_value = SubstPeriodSelf(
+        context, loc_id, req.self_facet_value, query_self_const_id, true);
+    req.specific_interface = SubstPeriodSelf(
+        context, loc_id, req.specific_interface, query_self_const_id, true);
+  }
+
+  return {{.req_impls = std::move(req_impls),
+           .other_requirements = facet_type_info.other_requirements}};
 }
 
 static auto TreatImplAsFinal(Context& context, const SemIR::Impl& impl)
@@ -477,9 +599,9 @@ static auto TryFindMatchingWitnessFromImplLookup(
   // replaced. We need to do the same for the self and interface in the
   // `orig_witness` for comparing with them.
   orig_const_self = SubstPeriodSelf(context, loc_id, orig_const_self,
-                                    canonical_query_self_const_id);
+                                    canonical_query_self_const_id, true);
   orig_interface = SubstPeriodSelf(context, loc_id, orig_interface,
-                                   canonical_query_self_const_id);
+                                   canonical_query_self_const_id, true);
 
   // Witnesses have a canonicalized self value. Perform the same
   // canonicalization here so that we can compare them.
@@ -537,10 +659,10 @@ static auto VerifyQueryFacetTypeConstraints(
 
       auto lhs_id = context.constant_values().GetInstId(SubstPeriodSelf(
           context, loc_id, context.constant_values().Get(rewrite.lhs_id),
-          query_self_const_id, SubstPeriodSelfBehaviour::All, rebuild));
+          query_self_const_id, false, SubstPeriodSelfBehaviour::All, rebuild));
       auto rhs_id = context.constant_values().GetInstId(SubstPeriodSelf(
           context, loc_id, context.constant_values().Get(rewrite.rhs_id),
-          query_self_const_id, SubstPeriodSelfBehaviour::All, rebuild));
+          query_self_const_id, false, SubstPeriodSelfBehaviour::All, rebuild));
 
       if (lhs_id != rhs_id) {
         // TODO: Provide a diagnostic note and location for which rewrite
@@ -793,19 +915,34 @@ inline constexpr auto IndexInFacetValue::Unstable = IndexInFacetValue(-2);
 // If the `query_specific_interface` is not part of the facet type, returns -1
 // to indicate it was not found.
 static auto IndexOfImplWitnessInIdentifiedFacetType(
-    Context& context, SemIR::IdentifiedFacetTypeId identified_facet_type_id,
+    Context& context, SemIR::LocId loc_id, SemIR::ConstantId identified_self_id,
+    SemIR::IdentifiedFacetTypeId identified_facet_type_id,
     SemIR::ConstantId query_self_const_id,
     SemIR::SpecificInterface query_specific_interface) -> IndexInFacetValue {
   // The self in the identified facet type is a canonicalized facet value, so we
   // canonicalize the query for comparison.
+  //
+  // FIXME: Should not be needed. This came from an identified facet type and
+  // identify already does this for the self.
   auto canonical_query_self_const_id =
       GetCanonicalFacetOrTypeValue(context, query_self_const_id);
 
+  // The query self/interface here came from an IdentifiedFacetType that we
+  // already froze and replaced .Self within. We need to do the same for the
+  // constants in `identified` in order to compare them.
+  //
+  // FIXME: Should we do this when we collect witnesses and store it all instead
+  // of the IdentifiedFacetTypeId?
   const auto& identified =
       context.identified_facet_types().Get(identified_facet_type_id);
   auto facet_type_req_impls = llvm::enumerate(identified.required_impls());
   auto it = llvm::find_if(facet_type_req_impls, [&](auto e) {
     auto [req_self, req_specific_interface] = e.value();
+    req_self =
+        SubstPeriodSelf(context, loc_id, req_self, identified_self_id, true);
+    req_specific_interface = SubstPeriodSelf(
+        context, loc_id, req_specific_interface, identified_self_id, true);
+
     return req_self == canonical_query_self_const_id &&
            req_specific_interface == query_specific_interface;
   });
@@ -820,7 +957,8 @@ static auto IndexOfImplWitnessInIdentifiedFacetType(
 }
 
 static auto FindFinalWitnessFromFacetValue(
-    Context& context, llvm::ArrayRef<FacetWitnessSource> witness_sources,
+    Context& context, SemIR::LocId loc_id,
+    llvm::ArrayRef<FacetWitnessSource> witness_sources,
     SemIR::ConstantId query_self_const_id,
     SemIR::SpecificInterface query_specific_interface) -> SemIR::InstId {
   for (auto [facet, identified_id] : witness_sources) {
@@ -832,7 +970,8 @@ static auto FindFinalWitnessFromFacetValue(
     }
 
     auto index_in_facet_value = IndexOfImplWitnessInIdentifiedFacetType(
-        context, identified_id, query_self_const_id, query_specific_interface);
+        context, loc_id, facet, identified_id, query_self_const_id,
+        query_specific_interface);
     auto stable_index = index_in_facet_value.GetStableIndex();
     if (stable_index < 0) {
       // No witness in this facet, keep looking.
@@ -854,9 +993,10 @@ static auto FindNonFinalWitness(
     llvm::ArrayRef<FacetWitnessSource> witness_sources,
     SemIR::ConstantId query_self_const_id,
     SemIR::SpecificInterface query_specific_interface) -> bool {
-  for (auto [_, identified_id] : witness_sources) {
+  for (auto [facet, identified_id] : witness_sources) {
     auto index = IndexOfImplWitnessInIdentifiedFacetType(
-        context, identified_id, query_self_const_id, query_specific_interface);
+        context, loc_id, facet, identified_id, query_self_const_id,
+        query_specific_interface);
     if (index.WasFound()) {
       return true;
     }
@@ -982,7 +1122,7 @@ auto LookupImplWitness(Context& context, SemIR::LocId loc_id,
     // since that same final witness should be found by evaluating a
     // LookupImplWitness instruction for the required self+interface pair.
     auto result_witness_id = FindFinalWitnessFromFacetValue(
-        context, witness_sources, req_impl.self_facet_value,
+        context, loc_id, witness_sources, req_impl.self_facet_value,
         req_impl.specific_interface);
     if (result_witness_id.has_value()) {
       // Found a final witness, use it.
@@ -1036,6 +1176,11 @@ auto LookupImplWitness(Context& context, SemIR::LocId loc_id,
   // `query_self_const_id` is a facet value.
   if (result_witness_ids.size() != req_impls.size()) {
     return SemIR::InstBlockId::None;
+  }
+
+  // Thaw the non-final witnesses.
+  for (auto& witness : result_witness_ids) {
+    witness = ThawWitnesses(context, loc_id, witness);
   }
 
   // Verify rewrite constraints in the query constraint are satisfied after

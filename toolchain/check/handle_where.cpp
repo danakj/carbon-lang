@@ -373,7 +373,7 @@ auto HandleParseNode(Context& context, Parse::RequirementImplsId node_id)
       for (const auto& rewrite : facet_type_info.rewrite_constraints) {
         auto lhs = SubstPeriodSelf(
             context, rhs_node, context.constant_values().Get(rewrite.lhs_id),
-            context.constant_values().Get(lhs_as_type.inst_id));
+            context.constant_values().Get(lhs_as_type.inst_id), false);
         context.where_stack().back().rewrites.Insert(lhs, rewrite.rhs_id);
       }
     }

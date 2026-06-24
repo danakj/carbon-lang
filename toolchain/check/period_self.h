@@ -39,6 +39,7 @@ using SubstPeriodSelfRebuildInst =
 auto SubstPeriodSelf(
     Context& context, SemIR::LocId loc_id, SemIR::ConstantId const_id,
     SemIR::ConstantId period_self_replacement_id,
+    bool freeze_witnesses,
     SubstPeriodSelfBehaviour behaviour = SubstPeriodSelfBehaviour::All,
     SubstPeriodSelfRebuildInst rebuild = nullptr) -> SemIR::ConstantId;
 
@@ -52,12 +53,14 @@ auto SubstPeriodSelf(
 auto SubstPeriodSelf(
     Context& context, SemIR::LocId loc_id, SemIR::SpecificInterface interface,
     SemIR::ConstantId period_self_replacement_id,
+    bool freeze_witnesses,
     SubstPeriodSelfBehaviour behaviour = SubstPeriodSelfBehaviour::All,
     SubstPeriodSelfRebuildInst rebuild = nullptr) -> SemIR::SpecificInterface;
 auto SubstPeriodSelf(
     Context& context, SemIR::LocId loc_id,
     SemIR::SpecificNamedConstraint constraint,
     SemIR::ConstantId period_self_replacement_id,
+    bool freeze_witnesses,
     SubstPeriodSelfBehaviour behaviour = SubstPeriodSelfBehaviour::All,
     SubstPeriodSelfRebuildInst rebuild = nullptr)
     -> SemIR::SpecificNamedConstraint;

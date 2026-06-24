@@ -256,12 +256,19 @@ auto TypeIterator::ProcessType(InstId inst_id) -> std::optional<Step> {
       //
       // If ImplWitnessAccess did not evaluate to some other value, it must
       // contain a non-final witness.
-      auto witness =
-          sem_ir_->insts().GetAs<LookupImplWitness>(access.witness_id);
+      auto self_id = SemIR::InstId::None;
+      if (auto lookup =
+              sem_ir_->insts().TryGetAs<LookupImplWitness>(access.witness_id)) {
+        self_id = lookup->query_self_inst_id;
+      } else {
+        auto frozen =
+            sem_ir_->insts().GetAs<FrozenImplWitness>(access.witness_id);
+        self_id = frozen.query_self_inst_id;
+      }
       // Recurse into symbolic ImplWitnessAccess, replacing it with the self
       // value for the iteration. If there are nested accesses, this replaces
       // them all with the root self.
-      PushInstId(witness.query_self_inst_id);
+      PushInstId(self_id);
       return Step::TypeWrapper{.kind = Step::TypeWrapper::ImplWitnessAccess,
                                .inst_id = inst_id};
     }
