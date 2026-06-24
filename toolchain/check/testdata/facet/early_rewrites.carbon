@@ -399,6 +399,13 @@ interface Tuple {}
 impl () as Tuple {}
 class C(U:! Tuple);
 
+// CHECK:STDERR: early_rewrite_from_previous_impls_constraint.carbon:[[@LINE+7]]:64: error: cannot convert type `.(Z.Z1).(Z.Z1).(Z.Z1).(Y.Y1)` into type implementing `Tuple` [ConversionFailureTypeToFacet]
+// CHECK:STDERR: fn F(unused T:! Z where .Z1 impls (Y where .Y1 = ()) and .Z2 = C(.Z1.(Y.Y1))) {}
+// CHECK:STDERR:                                                                ^~~~~~~~~~~~~
+// CHECK:STDERR: early_rewrite_from_previous_impls_constraint.carbon:[[@LINE-5]]:9: note: initializing generic parameter `U` declared here [InitializingGenericParam]
+// CHECK:STDERR: class C(U:! Tuple);
+// CHECK:STDERR:         ^~~~~~~~~
+// CHECK:STDERR:
 fn F(unused T:! Z where .Z1 impls (Y where .Y1 = ()) and .Z2 = C(.Z1.(Y.Y1))) {}
 
 // --- fail_early_rewrite_correct_interface_wrong_self_access_rewrite_in_period_self.carbon
@@ -419,7 +426,7 @@ class C(U:! Tuple);
 // This should fail: `T.(Y.Y1)` is rewritten to be `()` but `T.(Z.Z1).(Y.Y1)`
 // is used in the argument to `C`.
 //
-// CHECK:STDERR: fail_early_rewrite_correct_interface_wrong_self_access_rewrite_in_period_self.carbon:[[@LINE+7]]:82: error: cannot convert type `.(Z.Z1).(Y.Y1)` into type implementing `Tuple` [ConversionFailureTypeToFacet]
+// CHECK:STDERR: fail_early_rewrite_correct_interface_wrong_self_access_rewrite_in_period_self.carbon:[[@LINE+7]]:82: error: cannot convert type `.(Z.Z1).(Z.Z1).(Z.Z1).(Y.Y1)` into type implementing `Tuple` [ConversionFailureTypeToFacet]
 // CHECK:STDERR: fn F(unused T:! Z where .Self impls (Y where .Y1 = ()) and .Z1 impls Y and .Z2 = C(.Z1.(Y.Y1))) {}
 // CHECK:STDERR:                                                                                  ^~~~~~~~~~~~~
 // CHECK:STDERR: fail_early_rewrite_correct_interface_wrong_self_access_rewrite_in_period_self.carbon:[[@LINE-8]]:9: note: initializing generic parameter `U` declared here [InitializingGenericParam]

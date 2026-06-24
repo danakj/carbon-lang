@@ -391,6 +391,10 @@ fn F(U:! W, V:! Z(U, .Self)) {
   // it finds the rewrite of `.Y1.X1 = U`.
   //
   // Only U impls W so we use `as W` to test that the LHS is U.
+  // CHECK:STDERR: find_access_value_in_second_nested_access.carbon:[[@LINE+4]]:3: error: cannot convert type `V.(Z(U, V).Z1).(Y(V).Y1)` into type implementing `X` [ConversionFailureTypeToFacet]
+  // CHECK:STDERR:   V.(Z(U, V).Z1).(Y(V).Y1).(X.X1) as W;
+  // CHECK:STDERR:   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  // CHECK:STDERR:
   V.(Z(U, V).Z1).(Y(V).Y1).(X.X1) as W;
 }
 
@@ -451,12 +455,9 @@ fn F(V:! Z(.Self)) {
   //
   // TODO: The identified facet type `NX` includes `X` and should provide a
   // same-type constraint `X.X1 == {}` which would allow this conversion.
-  // CHECK:STDERR: fail_todo_find_access_value_in_second_nested_access_through_named_constraint.carbon:[[@LINE+7]]:3: error: cannot convert expression of type `{}` to `V.(Z(V).Z1).(Y(V).Y1).(X.X1)` with `as` [ConversionFailure]
+  // CHECK:STDERR: fail_todo_find_access_value_in_second_nested_access_through_named_constraint.carbon:[[@LINE+4]]:9: error: cannot convert type `V.(Z(V).Z1).(Y(V).Y1)` into type implementing `X` [ConversionFailureTypeToFacet]
   // CHECK:STDERR:   {} as V.(Z(V).Z1).(Y(V).Y1).(X.X1);
-  // CHECK:STDERR:   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  // CHECK:STDERR: fail_todo_find_access_value_in_second_nested_access_through_named_constraint.carbon:[[@LINE+4]]:3: note: type `{}` does not implement interface `Core.As(V.(Z(V).Z1).(Y(V).Y1).(X.X1))` [MissingImplInMemberAccessInContext]
-  // CHECK:STDERR:   {} as V.(Z(V).Z1).(Y(V).Y1).(X.X1);
-  // CHECK:STDERR:   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  // CHECK:STDERR:         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // CHECK:STDERR:
   {} as V.(Z(V).Z1).(Y(V).Y1).(X.X1);
 }

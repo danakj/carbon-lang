@@ -157,6 +157,10 @@ static auto FindAssociatedImportIRs(
   return result;
 }
 
+// Convert all FrozenImplWitness to LookupImplWitness.
+//
+// This conversion happens from the inside out, so we never see a
+// FrozenImplWitness inside a LookupImplWitness during eval.
 static auto ThawWitnesses(Context& context, SemIR::LocId loc_id,
                           SemIR::InstId inst_id) -> SemIR::InstId {
   class Callbacks : public SubstInstCallbacks {

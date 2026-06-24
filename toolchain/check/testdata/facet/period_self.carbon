@@ -460,6 +460,10 @@ impl C as Z where .Z1 = .Self {}
 impl C as Y {}
 
 fn F() {
+  // CHECK:STDERR: impl_as_impls_with_period_self.carbon:[[@LINE+4]]:3: error: cannot convert type `C` into type implementing `Z where .(Z.Z1) impls Y` [ConversionFailureTypeToFacet]
+  // CHECK:STDERR:   C as (Z where .Z1 impls Y);
+  // CHECK:STDERR:   ^~~~~~~~~~~~~~~~~~~~~~~~~~
+  // CHECK:STDERR:
   C as (Z where .Z1 impls Y);
 }
 
@@ -571,11 +575,16 @@ fn F() {
 // CHECK:STDOUT:     %.loc12_47.1: type = converted %T.ref, %T.as_type.loc12_47.2 [symbolic = %T.as_type.loc12_47.1 (constants.%T.as_type)]
 // CHECK:STDOUT:     %.loc12_47.2: %I.assoc_type.ea7 = specific_constant @I1.%assoc0, @I.WithSelf(constants.%.Self.as_type.246, constants.%T.8c8) [symbolic_self = constants.%assoc0.c72]
 // CHECK:STDOUT:     %I1.ref.loc12_47: %I.assoc_type.ea7 = name_ref I1, %.loc12_47.2 [symbolic_self = constants.%assoc0.c72]
+// CHECK:STDOUT:     %facet_value.loc12_47.2: %type = facet_value constants.%T.as_type, () [symbolic = %facet_value.loc12_47.1 (constants.%facet_value)]
+// CHECK:STDOUT:     %.loc12_47.3: %type = converted constants.%T.as_type, %facet_value.loc12_47.2 [symbolic = %facet_value.loc12_47.1 (constants.%facet_value)]
 // CHECK:STDOUT:     %T.as_type.loc12_47.3: type = facet_access_type constants.%T.8c8 [symbolic = %T.as_type.loc12_47.1 (constants.%T.as_type)]
-// CHECK:STDOUT:     %facet_value.loc12_47.2: %type = facet_value %T.as_type.loc12_47.3, () [symbolic = %facet_value.loc12_47.1 (constants.%facet_value)]
-// CHECK:STDOUT:     %.loc12_47.3: %type = converted constants.%T.8c8, %facet_value.loc12_47.2 [symbolic = %facet_value.loc12_47.1 (constants.%facet_value)]
+// CHECK:STDOUT:     %facet_value.loc12_47.3: %type = facet_value %T.as_type.loc12_47.3, () [symbolic = %facet_value.loc12_47.1 (constants.%facet_value)]
+// CHECK:STDOUT:     %.loc12_47.4: %type = converted constants.%T.8c8, %facet_value.loc12_47.3 [symbolic = %facet_value.loc12_47.1 (constants.%facet_value)]
+// CHECK:STDOUT:     %T.as_type.loc12_47.4: type = facet_access_type constants.%T.8c8 [symbolic = %T.as_type.loc12_47.1 (constants.%T.as_type)]
+// CHECK:STDOUT:     %facet_value.loc12_47.4: %type = facet_value %T.as_type.loc12_47.4, () [symbolic = %facet_value.loc12_47.1 (constants.%facet_value)]
+// CHECK:STDOUT:     %.loc12_47.5: %type = converted constants.%T.8c8, %facet_value.loc12_47.4 [symbolic = %facet_value.loc12_47.1 (constants.%facet_value)]
 // CHECK:STDOUT:     %impl.elem0.loc12_47: type = impl_witness_access constants.%I.lookup_impl_witness.506, element0 [concrete = constants.%empty_tuple.type]
-// CHECK:STDOUT:     %.loc12_47.4: Core.Form = init_form %impl.elem0.loc12_47 [concrete = constants.%.262]
+// CHECK:STDOUT:     %.loc12_47.6: Core.Form = init_form %impl.elem0.loc12_47 [concrete = constants.%.262]
 // CHECK:STDOUT:     %.loc12_27.1: type = splice_block %.loc12_27.2 [symbolic_self = constants.%I_where.type] {
 // CHECK:STDOUT:       %.Self.loc12_7: %type = symbolic_binding .Self [symbolic_self = constants.%.Self.c39]
 // CHECK:STDOUT:       %I.ref: %I.type.335 = name_ref I, file.%I.decl [concrete = constants.%I.generic]

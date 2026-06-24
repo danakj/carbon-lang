@@ -249,6 +249,13 @@ fn G() {
   impl C as Z {}
   impl C as Y {}
   impl C as X(C) {}
+  // CHECK:STDERR: where_period_self_rhs_sees_lhs.carbon:[[@LINE+7]]:3: error: cannot convert type `C` into type implementing `Z & N where .Self impls X(.Self as Z & Y)` [ConversionFailureTypeToFacet]
+  // CHECK:STDERR:   F(C);
+  // CHECK:STDERR:   ^~~~
+  // CHECK:STDERR: where_period_self_rhs_sees_lhs.carbon:[[@LINE-10]]:6: note: initializing generic parameter `_` declared here [InitializingGenericParam]
+  // CHECK:STDERR: fn F(_:! Z & N where .Self impls X(.Self)) {}
+  // CHECK:STDERR:      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  // CHECK:STDERR:
   F(C);
 }
 
@@ -273,6 +280,13 @@ fn G() {
   impl C as Z {}
   impl C as Y {}
   impl R(C) as X(C) {}
+  // CHECK:STDERR: where_type_rhs_sees_lhs.carbon:[[@LINE+7]]:3: error: cannot convert type `C` into type implementing `Z & N where R(.Self as Z & Y) impls X(.Self as Z & Y)` [ConversionFailureTypeToFacet]
+  // CHECK:STDERR:   F(C);
+  // CHECK:STDERR:   ^~~~
+  // CHECK:STDERR: where_type_rhs_sees_lhs.carbon:[[@LINE-10]]:6: note: initializing generic parameter `_` declared here [InitializingGenericParam]
+  // CHECK:STDERR: fn F(_:! Z & N where R(.Self) impls X(.Self)) {}
+  // CHECK:STDERR:      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  // CHECK:STDERR:
   F(C);
 }
 
@@ -329,6 +343,13 @@ fn G() {
   impl C as I where .I1 = D {}
   impl D as J(C) {}
 
+  // CHECK:STDERR: associated_const_impls_interface_with_period_self.carbon:[[@LINE+7]]:3: error: cannot convert type `C` into type implementing `I where .(I.I1) impls J(.Self)` [ConversionFailureTypeToFacet]
+  // CHECK:STDERR:   F(C);
+  // CHECK:STDERR:   ^~~~
+  // CHECK:STDERR: associated_const_impls_interface_with_period_self.carbon:[[@LINE-12]]:6: note: initializing generic parameter `_` declared here [InitializingGenericParam]
+  // CHECK:STDERR: fn F(_:! I where .I1 impls J(.Self)) {}
+  // CHECK:STDERR:      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  // CHECK:STDERR:
   F(C);
 }
 
@@ -448,6 +469,10 @@ interface Z {
 }
 fn F(T:! Z) {
   T.Z1 as Y;
+  // CHECK:STDERR: impl_witness_access_has_access.carbon:[[@LINE+4]]:3: error: cannot convert type `C(T.(Z.Z1))` into type implementing `Y` [ConversionFailureTypeToFacet]
+  // CHECK:STDERR:   C(T.Z1) as Y;
+  // CHECK:STDERR:   ^~~~~~~~~~~~
+  // CHECK:STDERR:
   C(T.Z1) as Y;
 }
 

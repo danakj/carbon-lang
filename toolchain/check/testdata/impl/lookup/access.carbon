@@ -36,12 +36,20 @@ fn F(V:! Z where .Z1 = C) {
   // treated as Concrete in the type structure, since the impl would have a
   // different concrete value (an ImplWitnessAccess) than the query (a
   // StructValue).
+  // CHECK:STDERR: impl_witness_access_in_impl_type_structure.carbon:[[@LINE+4]]:3: error: cannot convert type `V` that implements `Z where .(Z.Z1) = C` into type implementing `X({})` [ConversionFailureFacetToFacet]
+  // CHECK:STDERR:   V as X({});
+  // CHECK:STDERR:   ^~~~~~~~~~
+  // CHECK:STDERR:
   V as X({});
 }
 
 fn G(V:! Z where .Z1 impls Y) {
   // The type structure is `? as X(?)`, also built from ImplWitnessAccess insts,
   // which will match the impl's `? as X(?)`.
+  // CHECK:STDERR: impl_witness_access_in_impl_type_structure.carbon:[[@LINE+4]]:3: error: cannot convert type `V` that implements `Z where .(Z.Z1) impls Y` into type implementing `X(V.(Z.Z1).(Y.Y1))` [ConversionFailureFacetToFacet]
+  // CHECK:STDERR:   V as X(V.(Z.Z1).(Y.Y1));
+  // CHECK:STDERR:   ^~~~~~~~~~~~~~~~~~~~~~~
+  // CHECK:STDERR:
   V as X(V.(Z.Z1).(Y.Y1));
 }
 

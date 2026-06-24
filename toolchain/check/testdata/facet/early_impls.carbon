@@ -31,6 +31,10 @@ constraint X {
   require C(Self) impls Y;
 }
 
+// CHECK:STDERR: member_access_uses_impls_constraint.carbon:[[@LINE+4]]:40: error: cannot convert type `C(.(Z.Z1))` into type implementing `Y` [ConversionFailureTypeToFacet]
+// CHECK:STDERR: fn G(_:! Z where .Z1 impls X and .Z2 = C(.Z1).(Y.Y1)) {}
+// CHECK:STDERR:                                        ^~~~~~~~~~~~~
+// CHECK:STDERR:
 fn G(_:! Z where .Z1 impls X and .Z2 = C(.Z1).(Y.Y1)) {}
 
 // --- early_self_impls.carbon
@@ -219,6 +223,10 @@ constraint N(V:! type) {
 }
 
 // `C impls N(.Z1)` gives `.Z1 impls Y(C)`.
+// CHECK:STDERR: early_impl_named_constraint_gives_witness_for_different_self.carbon:[[@LINE+4]]:44: error: cannot convert type `.(Z.Z1)` into type implementing `Y(C)` [ConversionFailureTypeToFacet]
+// CHECK:STDERR: fn F(_:! Z where C impls N(.Z1) and .Z2 = (.Z1 as Y(C))) {}
+// CHECK:STDERR:                                            ^~~~~~~~~~~
+// CHECK:STDERR:
 fn F(_:! Z where C impls N(.Z1) and .Z2 = (.Z1 as Y(C))) {}
 
 // --- fail_early_impl_named_constraint_gives_wrong_witness_for_different_self.carbon
@@ -264,4 +272,11 @@ class D(T:! X);
 // A lookup of `C(V).(Y.Y1) as X` requires us to see that the `.Y1 impls X`
 // constraint is visible through the `C(.Self) impls (Y...)` constraint and that
 // `C(.Self)` is used as the implied `.Self` in `.Y1 impls X`.
+// CHECK:STDERR: early_type_impls_nested_self_impls.carbon:[[@LINE+7]]:72: error: cannot convert type `C(C(C(.Self))).(Y.Y1)` into type implementing `X` [ConversionFailureTypeToFacet]
+// CHECK:STDERR: fn F(unused V:! Z where C(.Self) impls (Y where .Y1 impls X) and .Z1 = D(C(.Self).(Y.Y1))) {}
+// CHECK:STDERR:                                                                        ^~~~~~~~~~~~~~~~~~
+// CHECK:STDERR: early_type_impls_nested_self_impls.carbon:[[@LINE-11]]:9: note: initializing generic parameter `T` declared here [InitializingGenericParam]
+// CHECK:STDERR: class D(T:! X);
+// CHECK:STDERR:         ^~~~~
+// CHECK:STDERR:
 fn F(unused V:! Z where C(.Self) impls (Y where .Y1 impls X) and .Z1 = D(C(.Self).(Y.Y1))) {}

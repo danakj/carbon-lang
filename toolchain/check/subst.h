@@ -28,10 +28,10 @@ namespace Carbon::Check {
 //           const_inst_id == SemIR::ErrorInst::InstId) {
 //         return FullySubstituted;
 //       }
-//   
+//
 //       return SubstOperands;
 //     }
-//   
+//
 //     auto Rebuild(SemIR::InstId /*orig_inst_id*/, SemIR::Inst new_inst)
 //         -> SemIR::InstId override {
 //       return RebuildNewInst(loc_id_, new_inst);
@@ -39,7 +39,7 @@ namespace Carbon::Check {
 //    private:
 //     SemIR::LocId loc_id_;
 //   };
-//   
+//
 //   Callbacks callbacks(&context, loc_id);
 //   auto inst_id = context.constant_values().GetInstId(const_id);
 //   inst_id = SubstInst(context, inst_id, callbacks);
