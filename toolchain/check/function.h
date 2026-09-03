@@ -10,7 +10,9 @@
 #include "toolchain/check/decl_name_stack.h"
 #include "toolchain/check/pattern.h"
 #include "toolchain/check/subst.h"
+#include "toolchain/sem_ir/form.h"
 #include "toolchain/sem_ir/function.h"
+#include "toolchain/sem_ir/generated_function.h"
 #include "toolchain/sem_ir/ids.h"
 
 namespace Carbon::Check {
@@ -27,34 +29,18 @@ auto FindSelfPattern(Context& context,
 // Creates suitable return patterns for the given return form, and adds them to
 // the current pattern block.
 auto AddReturnPattern(Context& context, SemIR::LocId loc_id,
-                      Context::FormExpr form_expr) -> SemIR::InstId;
+                      SemIR::FormExpr form_expr) -> SemIR::InstId;
 
 // Returns whether `function` is a valid declaration of `builtin_kind`.
 auto IsValidBuiltinDeclaration(Context& context,
                                const SemIR::Function& function,
                                SemIR::BuiltinFunctionKind builtin_kind) -> bool;
 
-// Arguments for making a function declaration.
-struct FunctionDeclArgs {
-  SemIR::NameScopeId parent_scope_id;
-  SemIR::NameId name_id;
-  // The type of the leading `self` parameter, or `None` if there is none.
-  SemIR::TypeId self_type_id = SemIR::TypeId::None;
-  // The kind of the `self` parameter.
-  ParamPatternKind self_kind = ParamPatternKind::Ref;
-  // The types of the explicit parameters.
-  llvm::ArrayRef<SemIR::TypeId> param_type_ids = {};
-  // The kinds of the parameters described by `param_type_ids`.
-  llvm::ArrayRef<ParamPatternKind> param_kinds = {};
-  // The return form, or `None` if the function doesn't declare a return form.
-  Context::FormExpr return_form = Context::FormExpr::None;
-};
-
 // Generates and returns a function declaration. The caller should update the
 // function object to add a definition. The caller is responsible for ensuring
 // that the signature is non-generic.
 auto MakeGeneratedFunctionDecl(Context& context, SemIR::LocId loc_id,
-                               const FunctionDeclArgs& args)
+                               const SemIR::GeneratedFunctionDeclArgs& args)
     -> std::pair<SemIR::InstId, SemIR::FunctionId>;
 
 // Checks that `new_function` has the same return type as `prev_function`, or if

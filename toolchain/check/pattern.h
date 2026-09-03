@@ -7,6 +7,7 @@
 
 #include "toolchain/check/context.h"
 #include "toolchain/sem_ir/ids.h"
+#include "toolchain/sem_ir/pattern.h"
 
 namespace Carbon::Check {
 
@@ -85,19 +86,9 @@ auto AddBindingForPattern(Context& context, SemIR::LocId name_loc,
 auto GetOrAddVarStorage(Context& context, SemIR::InstId var_pattern_id,
                         bool is_returned_var) -> SemIR::InstId;
 
-// Kinds of parameters that can be added by `AddParamPattern`.
-enum class ParamPatternKind {
-  // A value parameter, `x: T`.
-  Value,
-  // A reference parameter, `ref x: T`.
-  Ref,
-  // A variable parameter, `var x: T`.
-  Var,
-};
-
 // Returns the `ParamPatternKind` of the parameter instruction `param_inst_id`.
 auto GetParamPatternKind(Context& context, SemIR::InstId param_inst_id)
-    -> ParamPatternKind;
+    -> SemIR::ParamPatternKind;
 
 // Adds a parameter pattern with the specified name and type information. The
 // pattern emulates `x: T`, `ref x: T`, or `var x: T` depending on the value of
@@ -108,7 +99,7 @@ auto GetParamPatternKind(Context& context, SemIR::InstId param_inst_id)
 auto AddParamPattern(Context& context, SemIR::LocId loc_id,
                      SemIR::NameId name_id,
                      SemIR::ExprRegionId type_expr_region_id,
-                     SemIR::TypeId type_id, ParamPatternKind kind)
+                     SemIR::TypeId type_id, SemIR::ParamPatternKind kind)
     -> SemIR::InstId;
 
 }  // namespace Carbon::Check

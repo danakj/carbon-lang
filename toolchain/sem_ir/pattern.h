@@ -10,6 +10,16 @@
 
 namespace Carbon::SemIR {
 
+// Kinds of parameters that can be added by `AddParamPattern`.
+enum class ParamPatternKind {
+  // A value parameter, `x: T`.
+  Value,
+  // A reference parameter, `ref x: T`.
+  Ref,
+  // A variable parameter, `var x: T`.
+  Var,
+};
+
 // Returns true if `pattern_id` is a `self` parameter pattern, such as
 // `self: Foo` or `ref self: Self`.
 auto IsSelfPattern(const File& sem_ir, InstId pattern_id) -> bool;

@@ -2426,11 +2426,11 @@ auto ExprAsType(Context& context, SemIR::LocId loc_id, SemIR::InstId value_id,
 }
 
 auto FormExprAsForm(Context& context, SemIR::LocId loc_id,
-                    SemIR::InstId value_id) -> Context::FormExpr {
+                    SemIR::InstId value_id) -> SemIR::FormExpr {
   auto form_inst_id =
       ConvertToValueOfType(context, loc_id, value_id, SemIR::FormType::TypeId);
   if (form_inst_id == SemIR::ErrorInst::InstId) {
-    return Context::FormExpr::Error;
+    return SemIR::FormExpr::Error;
   }
 
   auto form_const_id = context.constant_values().Get(form_inst_id);
@@ -2438,7 +2438,7 @@ auto FormExprAsForm(Context& context, SemIR::LocId loc_id,
     CARBON_DIAGNOSTIC(FormExprEvaluationFailure, Error,
                       "cannot evaluate form expression");
     context.emitter().Emit(loc_id, FormExprEvaluationFailure);
-    return Context::FormExpr::Error;
+    return SemIR::FormExpr::Error;
   }
 
   auto type_inst_id = context.types().GetAsTypeInstId(AddInst(
@@ -2453,19 +2453,19 @@ auto FormExprAsForm(Context& context, SemIR::LocId loc_id,
 }
 
 auto ReturnExprAsForm(Context& context, SemIR::LocId loc_id,
-                      SemIR::InstId value_id) -> Context::FormExpr {
+                      SemIR::InstId value_id) -> SemIR::FormExpr {
   auto form_inst_id = SemIR::InstId::None;
   auto type_inst_id = SemIR::InstId::None;
   if (auto ref_tag = context.insts().TryGetAs<SemIR::RefTagExpr>(value_id)) {
     type_inst_id = ConvertToValueOfType(context, loc_id, ref_tag->expr_id,
                                         SemIR::TypeType::TypeId);
     if (type_inst_id == SemIR::ErrorInst::InstId) {
-      return Context::FormExpr::Error;
+      return SemIR::FormExpr::Error;
     }
     if (!context.constant_values().Get(type_inst_id).is_constant()) {
       DiagnoseTypeExprEvaluationFailure(context,
                                         SemIR::LocId(ref_tag->expr_id));
-      return Context::FormExpr::Error;
+      return SemIR::FormExpr::Error;
     }
     form_inst_id = AddInst(
         context,
@@ -2478,11 +2478,11 @@ auto ReturnExprAsForm(Context& context, SemIR::LocId loc_id,
     type_inst_id = ConvertToValueOfType(context, loc_id, value_id,
                                         SemIR::TypeType::TypeId);
     if (type_inst_id == SemIR::ErrorInst::InstId) {
-      return Context::FormExpr::Error;
+      return SemIR::FormExpr::Error;
     }
     if (!context.constant_values().Get(type_inst_id).is_constant()) {
       DiagnoseTypeExprEvaluationFailure(context, loc_id);
-      return Context::FormExpr::Error;
+      return SemIR::FormExpr::Error;
     }
     form_inst_id = AddInst(
         context, SemIR::LocIdAndInst::RuntimeVerified(

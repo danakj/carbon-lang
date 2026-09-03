@@ -212,16 +212,16 @@ auto GetOrAddVarStorage(Context& context, SemIR::InstId var_pattern_id,
 }
 
 auto GetParamPatternKind(Context& context, SemIR::InstId param_inst_id)
-    -> ParamPatternKind {
+    -> SemIR::ParamPatternKind {
   auto param = context.insts().Get(
       context.constant_values().GetConstantInstId(param_inst_id));
   CARBON_KIND_SWITCH(param) {
     case SemIR::RefParamPattern::Kind:
-      return ParamPatternKind::Ref;
+      return SemIR::ParamPatternKind::Ref;
     case SemIR::VarParamPattern::Kind:
-      return ParamPatternKind::Var;
+      return SemIR::ParamPatternKind::Var;
     case SemIR::ValueParamPattern::Kind:
-      return ParamPatternKind::Value;
+      return SemIR::ParamPatternKind::Value;
     default:
       CARBON_FATAL("Unexpected pattern kind: {0}", param);
   }
@@ -230,15 +230,15 @@ auto GetParamPatternKind(Context& context, SemIR::InstId param_inst_id)
 auto AddParamPattern(Context& context, SemIR::LocId loc_id,
                      SemIR::NameId name_id,
                      SemIR::ExprRegionId type_expr_region_id,
-                     SemIR::TypeId type_id, ParamPatternKind kind)
+                     SemIR::TypeId type_id, SemIR::ParamPatternKind kind)
     -> SemIR::InstId {
   auto param_pattern_kind = [kind]() -> SemIR::InstKind {
     switch (kind) {
-      case ParamPatternKind::Value:
+      case SemIR::ParamPatternKind::Value:
         return SemIR::ValueParamPattern::Kind;
-      case ParamPatternKind::Ref:
+      case SemIR::ParamPatternKind::Ref:
         return SemIR::RefParamPattern::Kind;
-      case ParamPatternKind::Var:
+      case SemIR::ParamPatternKind::Var:
         return SemIR::VarParamPattern::Kind;
     }
   }();
@@ -249,7 +249,7 @@ auto AddParamPattern(Context& context, SemIR::LocId loc_id,
                                              /*phase=*/BindingPhase::Runtime);
 
   auto pattern_type_id = GetPatternType(context, type_id);
-  if (kind == ParamPatternKind::Var) {
+  if (kind == SemIR::ParamPatternKind::Var) {
     auto pattern_id =
         AddBindingPattern(context, loc_id, type_expr_region_id, type_id,
                           {.kind = SemIR::RefBindingPattern::Kind,

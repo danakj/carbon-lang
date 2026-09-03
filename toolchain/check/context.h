@@ -33,6 +33,7 @@
 #include "toolchain/parse/tree_and_subtrees.h"
 #include "toolchain/sem_ir/declared_facet_type.h"
 #include "toolchain/sem_ir/file.h"
+#include "toolchain/sem_ir/form.h"
 #include "toolchain/sem_ir/identified_facet_type.h"
 #include "toolchain/sem_ir/ids.h"
 #include "toolchain/sem_ir/import_ir.h"
@@ -315,29 +316,13 @@ class Context {
     return declaring_impl_decls_;
   }
 
-  // Data about a form expression.
-  //
-  // TODO: consider moving this out of Context.
-  struct FormExpr {
-    static const FormExpr Error;
-    static const FormExpr None;
-
-    // The inst ID of the form expression itself. This is always an inst in the
-    // AnyPrimitiveForm category.
-    SemIR::InstId form_inst_id;
-    // The inst ID of the form expression's type component.
-    SemIR::TypeInstId type_component_inst_id;
-    // The type ID corresponding to type_component_id.
-    SemIR::TypeId type_component_id;
-  };
-
   // Pushes form_expr onto the stack of return form declarations for in-progress
   // function declarations.
   //
   // Note: the "stack" currently can only have one element, but that restriction
   // can be relaxed if it becomes possible to have multiple pending return type
   // declarations.
-  auto PushReturnForm(FormExpr form_expr) -> void {
+  auto PushReturnForm(SemIR::FormExpr form_expr) -> void {
     CARBON_CHECK(return_form_expr_ == std::nullopt,
                  "TODO: make form_expr_ a stack if necessary");
     return_form_expr_ = form_expr;
@@ -345,7 +330,7 @@ class Context {
 
   // Pops a FormExpr off the stack of return form declarations for in-progress
   // function declarations.
-  auto PopReturnForm() -> FormExpr {
+  auto PopReturnForm() -> SemIR::FormExpr {
     CARBON_CHECK(return_form_expr_ != std::nullopt);
     return *std::exchange(return_form_expr_, std::nullopt);
   }
@@ -617,23 +602,13 @@ class Context {
   llvm::SmallVector<DeclaringImplDecl> declaring_impl_decls_;
 
   // Declared return form for the in-progress function declaration, if any.
-  std::optional<FormExpr> return_form_expr_;
+  std::optional<SemIR::FormExpr> return_form_expr_;
 
   // See `CoreIdentifierCache` for details.
   CoreIdentifierCache core_identifiers_;
 
   bool mangle_string_fingerprint_;
 };
-
-inline constexpr Context::FormExpr Context::FormExpr::Error = {
-    .form_inst_id = SemIR::ErrorInst::InstId,
-    .type_component_inst_id = SemIR::ErrorInst::TypeInstId,
-    .type_component_id = SemIR::ErrorInst::TypeId};
-
-inline constexpr Context::FormExpr Context::FormExpr::None = {
-    .form_inst_id = SemIR::InstId::None,
-    .type_component_inst_id = SemIR::TypeInstId::None,
-    .type_component_id = SemIR::TypeId::None};
 
 }  // namespace Carbon::Check
 

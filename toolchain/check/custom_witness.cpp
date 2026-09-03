@@ -57,14 +57,14 @@ auto MakeBuiltinOperatorFunction(Context& context,
   auto self_type_id = param_types.front();
   auto name_id = context.core_identifiers().AddNameId(op_name);
 
-  llvm::SmallVector<ParamPatternKind> param_kinds(param_types.size() - 1,
-                                                  ParamPatternKind::Value);
+  llvm::SmallVector<SemIR::ParamPatternKind> param_kinds(
+      param_types.size() - 1, SemIR::ParamPatternKind::Value);
   auto [decl_id, function_id] = MakeGeneratedFunctionDecl(
       context, SemIR::LocId::None,
       {.parent_scope_id = parent_scope_id,
        .name_id = name_id,
        .self_type_id = self_type_id,
-       .self_kind = ParamPatternKind::Value,
+       .self_kind = SemIR::ParamPatternKind::Value,
        .param_type_ids = param_types.drop_front(),
        .param_kinds = param_kinds,
        .return_form =
@@ -354,7 +354,7 @@ static auto MakeDestroyOpFunction(Context& context, SemIR::LocId loc_id,
                                 {.parent_scope_id = parent_scope_id,
                                  .name_id = name_id,
                                  .self_type_id = self_type_id,
-                                 .self_kind = ParamPatternKind::Ref});
+                                 .self_kind = SemIR::ParamPatternKind::Ref});
 
   auto& function = context.functions().Get(function_id);
 

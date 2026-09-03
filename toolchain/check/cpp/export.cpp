@@ -631,7 +631,7 @@ struct FunctionInfo {
     SemIR::TypeId type_id;
 
     // Kind of the parameter pattern.
-    ParamPatternKind kind;
+    SemIR::ParamPatternKind kind;
   };
 
   explicit FunctionInfo(Context& context, SemIR::FunctionId function_id,
@@ -963,7 +963,8 @@ static auto PassAsConstRef(Context& /*context*/,
   // Use pass-by-const-ref for value parameters of array type.
   // TODO: Should we do this for value parameters of any type that uses a
   // pointer value representation?
-  return param.kind == ParamPatternKind::Value && cpp_type->isArrayType();
+  return param.kind == SemIR::ParamPatternKind::Value &&
+         cpp_type->isArrayType();
 }
 
 // Converts a Carbon parameter type to the parameter type that should be exposed
@@ -975,7 +976,7 @@ static auto MapToCppParamType(Context& context, SemIR::LocId loc_id,
   if (cpp_type.isNull()) {
     return clang::QualType();
   }
-  if (param.kind == Check::ParamPatternKind::Ref) {
+  if (param.kind == SemIR::ParamPatternKind::Ref) {
     cpp_type = context.ast_context().getLValueReferenceType(cpp_type);
   } else if (PassAsConstRef(context, param, cpp_type)) {
     cpp_type = context.ast_context().getLValueReferenceType(
@@ -1024,7 +1025,7 @@ static auto BuildCppToCarbonThunkFunctionType(Context& context,
 
   auto ext_proto_info = clang::FunctionProtoType::ExtProtoInfo();
   if (target.self_param) {
-    if (target.self_param->kind == ParamPatternKind::Ref) {
+    if (target.self_param->kind == SemIR::ParamPatternKind::Ref) {
       ext_proto_info.RefQualifier = clang::RQ_LValue;
     } else {
       // A method with `self` doesn't modify the object, so export it as
@@ -1295,8 +1296,8 @@ static auto BuildCarbonToCarbonThunk(Context& context, SemIR::LocId loc_id,
                 thunk_param_type_ids.end());
   }
 
-  llvm::SmallVector<ParamPatternKind> thunk_param_kinds(
-      thunk_param_type_ids.size(), ParamPatternKind::Ref);
+  llvm::SmallVector<SemIR::ParamPatternKind> thunk_param_kinds(
+      thunk_param_type_ids.size(), SemIR::ParamPatternKind::Ref);
   auto carbon_thunk_function_id =
       MakeGeneratedFunctionDecl(
           context, loc_id,

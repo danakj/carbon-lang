@@ -8,6 +8,7 @@
 #include "toolchain/check/context.h"
 #include "toolchain/check/pending_block.h"
 #include "toolchain/sem_ir/entity_with_params_base.h"
+#include "toolchain/sem_ir/form.h"
 #include "toolchain/sem_ir/ids.h"
 
 namespace Carbon::Check {
@@ -253,13 +254,13 @@ auto ExprAsType(Context& context, SemIR::LocId loc_id, SemIR::InstId value_id,
 //
 // `diagnose` has the same effect as in `ExprAsType`.
 auto FormExprAsForm(Context& context, SemIR::LocId loc_id,
-                    SemIR::InstId value_id) -> Context::FormExpr;
+                    SemIR::InstId value_id) -> SemIR::FormExpr;
 
 // Evaluates an expression in the return-type position (following `->`, not
 // `->?`) for use as a form, following the special-case language rules for
 // evaluating an expression in that position.
 auto ReturnExprAsForm(Context& context, SemIR::LocId loc_id,
-                      SemIR::InstId value_id) -> Context::FormExpr;
+                      SemIR::InstId value_id) -> SemIR::FormExpr;
 
 // Handles an expression whose result value is unused.
 auto DiscardExpr(Context& context, SemIR::InstId expr_id) -> void;

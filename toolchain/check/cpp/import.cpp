@@ -1488,20 +1488,20 @@ namespace {
 struct ParameterTypeInfo {
   // The type to use for the Carbon parameter.
   TypeExpr type;
-  ParamPatternKind kind;
+  SemIR::ParamPatternKind kind;
 };
 }  // namespace
 
 // Maps a C++ parameter passing mode to a Carbon pattern kind.
 static auto GetParamPatternKindForPassingMode(
-    SemIR::ClangDeclSignature::PassingMode mode) -> ParamPatternKind {
+    SemIR::ClangDeclSignature::PassingMode mode) -> SemIR::ParamPatternKind {
   switch (mode) {
     case SemIR::ClangDeclSignature::PassingMode::ByValue:
-      return ParamPatternKind::Value;
+      return SemIR::ParamPatternKind::Value;
     case SemIR::ClangDeclSignature::PassingMode::ByVar:
-      return ParamPatternKind::Var;
+      return SemIR::ParamPatternKind::Var;
     case SemIR::ClangDeclSignature::PassingMode::ByRef:
-      return ParamPatternKind::Ref;
+      return SemIR::ParamPatternKind::Ref;
   }
 }
 
@@ -1673,7 +1673,7 @@ static auto MakeParamPatternsBlockId(Context& context, SemIR::LocId loc_id,
 // TODO: Support more return types.
 static auto GetReturnTypeExpr(Context& context, SemIR::LocId loc_id,
                               clang::FunctionDecl* clang_decl)
-    -> Context::FormExpr {
+    -> SemIR::FormExpr {
   auto make_init_form = [&](SemIR::TypeInstId type_component_inst_id) {
     SemIR::InitForm inst = {.type_id = SemIR::FormType::TypeId,
                             .type_component_inst_id = type_component_inst_id};
@@ -1697,9 +1697,9 @@ static auto GetReturnTypeExpr(Context& context, SemIR::LocId loc_id,
     if (!orig_type_inst_id.has_value()) {
       context.TODO(loc_id, llvm::formatv("Unsupported: return type: {0}",
                                          orig_ret_type.getAsString()));
-      return Context::FormExpr::Error;
+      return SemIR::FormExpr::Error;
     }
-    Context::FormExpr result = {
+    SemIR::FormExpr result = {
         .form_inst_id = is_reference ? make_ref_form(orig_type_inst_id)
                                      : make_init_form(orig_type_inst_id),
         .type_component_inst_id = orig_type_inst_id,

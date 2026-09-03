@@ -43,7 +43,7 @@ auto FindSelfPattern(Context& context,
 }
 
 auto AddReturnPattern(Context& context, SemIR::LocId loc_id,
-                      Context::FormExpr form_expr) -> SemIR::InstId {
+                      SemIR::FormExpr form_expr) -> SemIR::InstId {
   auto result_type_id = GetPatternType(context, form_expr.type_component_id);
   auto result_type_inst_id = context.types().GetTypeInstId(result_type_id);
   auto result_id = HandleAction<SemIR::OutFormParamPatternAction>(
@@ -102,7 +102,7 @@ struct FunctionSignatureInsts {
 
 // Handles construction of the signature's parameter and return types.
 static auto MakeFunctionSignature(Context& context, SemIR::LocId loc_id,
-                                  const FunctionDeclArgs& args)
+                                  const SemIR::GeneratedFunctionDeclArgs& args)
     -> FunctionSignatureInsts {
   FunctionSignatureInsts insts;
 
@@ -163,7 +163,7 @@ static auto MakeFunctionSignature(Context& context, SemIR::LocId loc_id,
 }
 
 auto MakeGeneratedFunctionDecl(Context& context, SemIR::LocId loc_id,
-                               const FunctionDeclArgs& args)
+                               const SemIR::GeneratedFunctionDeclArgs& args)
     -> std::pair<SemIR::InstId, SemIR::FunctionId> {
   auto insts = MakeFunctionSignature(context, loc_id, args);
 

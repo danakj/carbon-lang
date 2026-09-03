@@ -266,14 +266,14 @@ static auto MakeCppStdInitializerListMake(Context& context, SemIR::LocId loc_id,
   // constructor of std::initializer_list.
   // TODO: Find a better way to handle this. Ideally we should stop using this
   // function entirely and declare the necessary builtin in the prelude.
-  auto [decl_id, function_id] =
-      MakeGeneratedFunctionDecl(context, loc_id,
-                                {.parent_scope_id = init_list_class.scope_id,
-                                 .name_id = init_list_class.name_id,
-                                 .param_type_ids = {array_type_id},
-                                 .param_kinds = {ParamPatternKind::Value},
-                                 .return_form = ReturnExprAsForm(
-                                     context, loc_id, init_list_type_inst_id)});
+  auto [decl_id, function_id] = MakeGeneratedFunctionDecl(
+      context, loc_id,
+      {.parent_scope_id = init_list_class.scope_id,
+       .name_id = init_list_class.name_id,
+       .param_type_ids = {array_type_id},
+       .param_kinds = {SemIR::ParamPatternKind::Value},
+       .return_form =
+           ReturnExprAsForm(context, loc_id, init_list_type_inst_id)});
 
   auto& function = context.functions().Get(function_id);
   CARBON_CHECK(IsValidBuiltinDeclaration(
