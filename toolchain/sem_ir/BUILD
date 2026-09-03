@@ -104,6 +104,7 @@ cc_library(
         "field.cpp",
         "file.cpp",
         "function.cpp",
+        "generated_function.cpp",
         "generic.cpp",
         "identified_facet_type.cpp",
         "impl.cpp",

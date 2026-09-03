@@ -5,6 +5,7 @@
 #include "toolchain/sem_ir/pattern.h"
 
 #include "toolchain/base/kind_switch.h"
+#include "toolchain/sem_ir/file.h"
 #include "toolchain/sem_ir/ids.h"
 #include "toolchain/sem_ir/typed_insts.h"
 

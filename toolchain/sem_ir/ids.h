@@ -1020,6 +1020,14 @@ struct ImportIRInstId : public IdBase<ImportIRInstId> {
   }
 };
 
+// The ID of a `GeneratedFunctionDeclArgs`.
+struct GeneratedFunctionDeclArgsId
+    : public IdBase<GeneratedFunctionDeclArgsId> {
+  static constexpr llvm::StringLiteral Label = "generated_function_decl_args";
+
+  using IdBase::IdBase;
+};
+
 // The ID of a `RequireImpls`.
 struct RequireImplsId : public IdBase<RequireImplsId> {
   static constexpr llvm::StringLiteral Label = "require";

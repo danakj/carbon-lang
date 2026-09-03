@@ -5,10 +5,11 @@
 #ifndef CARBON_TOOLCHAIN_SEM_IR_PATTERN_H_
 #define CARBON_TOOLCHAIN_SEM_IR_PATTERN_H_
 
-#include "toolchain/sem_ir/file.h"
 #include "toolchain/sem_ir/ids.h"
 
 namespace Carbon::SemIR {
+
+class File;
 
 // Kinds of parameters that can be added by `AddParamPattern`.
 enum class ParamPatternKind {

@@ -18,6 +18,7 @@
 #include "toolchain/check/type_completion.h"
 #include "toolchain/diagnostics/format_providers.h"
 #include "toolchain/sem_ir/builtin_function_kind.h"
+#include "toolchain/sem_ir/generated_function.h"
 #include "toolchain/sem_ir/ids.h"
 #include "toolchain/sem_ir/pattern.h"
 
@@ -165,6 +166,12 @@ static auto MakeFunctionSignature(Context& context, SemIR::LocId loc_id,
 auto MakeGeneratedFunctionDecl(Context& context, SemIR::LocId loc_id,
                                const SemIR::GeneratedFunctionDeclArgs& args)
     -> std::pair<SemIR::InstId, SemIR::FunctionId> {
+  if (auto id = context.generated_function_decls().Lookup(args);
+      id.has_value()) {
+    const auto& value = context.generated_function_decls().Get(id);
+    return {value.decl_id, value.function_id};
+  }
+
   auto insts = MakeFunctionSignature(context, loc_id, args);
 
   // Add the function declaration.
@@ -199,6 +206,9 @@ auto MakeGeneratedFunctionDecl(Context& context, SemIR::LocId loc_id,
               .self_param_id = insts.self_param_id,
           }});
   context.generated().push_back(decl_id);
+  context.generated_function_decls().Add(
+      SemIR::GeneratedFunctionDeclArgsStorage::FromArgs(args, decl_id,
+                                                        function_id));
 
   return {decl_id, function_id};
 }

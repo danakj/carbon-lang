@@ -28,6 +28,7 @@
 #include "toolchain/sem_ir/entity_name.h"
 #include "toolchain/sem_ir/field.h"
 #include "toolchain/sem_ir/function.h"
+#include "toolchain/sem_ir/generated_function.h"
 #include "toolchain/sem_ir/generic.h"
 #include "toolchain/sem_ir/identified_facet_type.h"
 #include "toolchain/sem_ir/ids.h"
@@ -168,6 +169,13 @@ class File : public Printable<File> {
   auto entity_names() const -> const EntityNameStore& { return entity_names_; }
   auto functions() -> FunctionStore& { return functions_; }
   auto functions() const -> const FunctionStore& { return functions_; }
+  auto generated_function_decls() -> GeneratedFunctionDeclArgsStore& {
+    return generated_function_decls_;
+  }
+  auto generated_function_decls() const
+      -> const GeneratedFunctionDeclArgsStore& {
+    return generated_function_decls_;
+  }
   auto cpp_overload_sets() -> CppOverloadSetStore& {
     return cpp_overload_sets_;
   }
@@ -361,6 +369,9 @@ class File : public Printable<File> {
 
   // Storage for callable objects.
   FunctionStore functions_;
+
+  // Storage for deduplicating generated function declarations.
+  GeneratedFunctionDeclArgsStore generated_function_decls_;
 
   // Storage for CppOverloadSet.
   CppOverloadSetStore cpp_overload_sets_;

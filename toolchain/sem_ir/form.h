@@ -22,6 +22,9 @@ struct FormExpr {
   TypeInstId type_component_inst_id;
   // The type ID corresponding to type_component_id.
   TypeId type_component_id;
+
+  friend auto operator==(const FormExpr& lhs, const FormExpr& rhs)
+      -> bool = default;
 };
 
 inline constexpr FormExpr FormExpr::Error = {
