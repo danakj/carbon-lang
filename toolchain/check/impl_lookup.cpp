@@ -983,8 +983,7 @@ auto LookupImplWitness(Context& context, SemIR::LocId loc_id,
         context.insts()
             .Get(context.constant_values().GetInstId(query_self_const_id))
             .type_id();
-    CARBON_CHECK((context.types().IsOneOf<SemIR::TypeType, SemIR::FacetType>(
-        query_self_type_id)));
+    CARBON_CHECK(context.types().Is<SemIR::FacetType>(query_self_type_id));
     // The query facet type value is indeed a facet type.
     CARBON_CHECK(context.constant_values().InstIs<SemIR::FacetType>(
         query_facet_type_const_id));
@@ -1171,7 +1170,7 @@ auto EvalLookupSingleFinalWitness(Context& context, SemIR::LocId loc_id,
       context.specific_interfaces().Get(eval_query.query_specific_interface_id);
 
   // Ensure specifics don't substitute in weird things for the query self.
-  CARBON_CHECK(context.types().IsFacetType(
+  CARBON_CHECK(context.types().Is<SemIR::FacetType>(
       context.insts().Get(eval_query.query_self_inst_id).type_id()));
   SemIR::ConstantId query_self_const_id =
       context.constant_values().Get(eval_query.query_self_inst_id);

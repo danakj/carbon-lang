@@ -301,8 +301,8 @@ class B {
 // CHECK:STDOUT:   %pattern_type.f70: type = pattern_type %Circle [concrete]
 // CHECK:STDOUT:   %self.param_patt.769: %pattern_type.f70 = value_param_pattern [concrete]
 // CHECK:STDOUT:   %self.patt.cc7: %pattern_type.f70 = wrapper_binding_pattern self, %self.param_patt.769 [concrete]
-// CHECK:STDOUT:   %tuple.type.24b: type = tuple_type (type, type) [concrete]
-// CHECK:STDOUT:   %tuple.b59: %tuple.type.24b = tuple_value (%i32, %i32) [concrete]
+// CHECK:STDOUT:   %tuple.type.693: type = tuple_type (type, type) [concrete]
+// CHECK:STDOUT:   %tuple.94e: %tuple.type.693 = tuple_value (%i32, %i32) [concrete]
 // CHECK:STDOUT:   %tuple.type.e55: type = tuple_type (%i32, %i32) [concrete]
 // CHECK:STDOUT:   %.c11: Core.Form = init_form %tuple.type.e55 [concrete]
 // CHECK:STDOUT:   %pattern_type.394: type = pattern_type %tuple.type.e55 [concrete]
@@ -375,7 +375,7 @@ class B {
 // CHECK:STDOUT:   } {
 // CHECK:STDOUT:     %i32.loc12_28: type = type_literal constants.%i32 [concrete = constants.%i32]
 // CHECK:STDOUT:     %i32.loc12_33: type = type_literal constants.%i32 [concrete = constants.%i32]
-// CHECK:STDOUT:     %.loc12_36.1: %tuple.type.24b = tuple_literal (%i32.loc12_28, %i32.loc12_33) [concrete = constants.%tuple.b59]
+// CHECK:STDOUT:     %.loc12_36.1: %tuple.type.693 = tuple_literal (%i32.loc12_28, %i32.loc12_33) [concrete = constants.%tuple.94e]
 // CHECK:STDOUT:     %.loc12_36.2: type = converted %.loc12_36.1, constants.%tuple.type.e55 [concrete = constants.%tuple.type.e55]
 // CHECK:STDOUT:     %.loc12_36.3: Core.Form = init_form %.loc12_36.2 [concrete = constants.%.c11]
 // CHECK:STDOUT:     %self.param: %Circle = value_param call_param0

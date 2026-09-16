@@ -373,8 +373,15 @@ struct DeclaredFacetTypeId : public IdBase<DeclaredFacetTypeId> {
   static constexpr llvm::StringLiteral Label = "declared_facet_type";
   using DiagnosticType = Diagnostics::TypeInfo<std::string>;
 
+  // The canonical empty DeclaredFacetType, reused to avoid allocating empty
+  // vectors. Always the 0-index.
+  static const DeclaredFacetTypeId Empty;
+
   using IdBase::IdBase;
 };
+
+inline constexpr DeclaredFacetTypeId DeclaredFacetTypeId::Empty =
+    DeclaredFacetTypeId(0);
 
 // The ID of an resolved facet type value.
 struct IdentifiedFacetTypeId : public IdBase<IdentifiedFacetTypeId> {

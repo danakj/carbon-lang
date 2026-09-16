@@ -122,7 +122,7 @@ class SubstPeriodSelfCallbacks : public SubstInstCallbacks {
         context().constant_values().GetInstId(period_self_replacement_id_);
     auto replacement_type_id =
         context().insts().Get(replacement_self_inst_id).type_id();
-    CARBON_CHECK(context().types().IsFacetType(replacement_type_id));
+    CARBON_CHECK(context().types().Is<SemIR::FacetType>(replacement_type_id));
 
     // If the replacement has the same type as `.Self`, use it directly.
     if (replacement_type_id == period_self_type_id) {
@@ -147,8 +147,7 @@ class SubstPeriodSelfCallbacks : public SubstInstCallbacks {
                           SemIR::TypeId replacement_type_id,
                           SemIR::InstId period_self_inst_id,
                           SemIR::TypeId period_self_type_id) -> SemIR::InstId {
-    // TODO: Replace all empty facet types with TypeType.
-    if (period_self_type_id == GetEmptyFacetType(context())) {
+    if (period_self_type_id == SemIR::TypeType::TypeId) {
       // Convert to an empty facet type (representing TypeType); we don't need
       // any witnesses.
       return ConvertToValueOfType(context(), loc_id_, replacement_self_inst_id,
@@ -164,7 +163,7 @@ class SubstPeriodSelfCallbacks : public SubstInstCallbacks {
     // type, so we know that it is valid to construct these witnesses.
 
     // Make the replacement into a type, which we will need for the FacetValue.
-    if (context().types().Is<SemIR::FacetType>(replacement_type_id)) {
+    if (context().types().IsConstrainedFacetType(replacement_type_id)) {
       replacement_self_inst_id = context().constant_values().GetInstId(
           EvalOrAddInst<SemIR::FacetAccessType>(
               context(), loc_id_,

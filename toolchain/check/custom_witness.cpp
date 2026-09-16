@@ -38,7 +38,7 @@ static auto GetFacetAsType(Context& context,
   auto type_type_id = context.insts().Get(facet_or_type_id).type_id();
   CARBON_CHECK(context.types().IsFacetTypeOrError(type_type_id));
 
-  if (context.types().Is<SemIR::FacetType>(type_type_id)) {
+  if (context.types().IsConstrainedFacetType(type_type_id)) {
     // It's a facet; access its type.
     facet_or_type_id = context.types().GetTypeInstId(
         GetFacetAccessType(context, facet_or_type_id));
@@ -245,7 +245,7 @@ static auto CanDestroyType(Context& context, SemIR::LocId loc_id,
       GetCanonicalFacetOrTypeValue(context, query_self_const_id));
   auto inst = context.insts().Get(inst_id);
 
-  if (context.types().Is<SemIR::FacetType>(inst.type_id())) {
+  if (context.types().IsConstrainedFacetType(inst.type_id())) {
     // The value's type is a facet (whose type is a facet type). We don't
     // provide a custom witness for symbolic values of type facet. The witness
     // will be found from impl lookup.
@@ -360,7 +360,6 @@ static auto CanDestroyType(Context& context, SemIR::LocId loc_id,
     case SemIR::IntLiteralType::Kind:
     case SemIR::IntType::Kind:
     case SemIR::PointerType::Kind:
-    case SemIR::TypeType::Kind:
       // Trivially destructible.
       return DestroyFormat::Trivial;
 

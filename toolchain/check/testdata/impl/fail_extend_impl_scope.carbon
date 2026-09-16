@@ -210,10 +210,8 @@ fn F() {
 // CHECK:STDOUT:   %empty_struct: %empty_struct_type = struct_value () [concrete]
 // CHECK:STDOUT:   %Point.val: %Point = struct_value () [concrete]
 // CHECK:STDOUT:   %.e6b: ref %Point = temporary invalid, %Point.val [concrete]
-// CHECK:STDOUT:   %type: type = facet_type <type> [concrete]
-// CHECK:STDOUT:   %Point.type.facet: %type = facet_value %Point, () [concrete]
-// CHECK:STDOUT:   %Z.WithSelf.Zero.type.356: type = fn_type @Z.WithSelf.Zero, @Z.WithSelf(%Point.type.facet) [concrete]
-// CHECK:STDOUT:   %Z.WithSelf.Zero.237: %Z.WithSelf.Zero.type.356 = struct_value () [concrete]
+// CHECK:STDOUT:   %Z.WithSelf.Zero.type.7b8: type = fn_type @Z.WithSelf.Zero, @Z.WithSelf(%Point) [concrete]
+// CHECK:STDOUT:   %Z.WithSelf.Zero.3cb: %Z.WithSelf.Zero.type.7b8 = struct_value () [concrete]
 // CHECK:STDOUT:   %.dfa: type = fn_type_with_self_type %Z.WithSelf.Zero.type.896, %Z.facet [concrete]
 // CHECK:STDOUT:   %Destroy.type: type = facet_type <@Destroy> [concrete]
 // CHECK:STDOUT:   %Destroy.WithSelf.Op.type.ef016f.2: type = fn_type @Destroy.WithSelf.Op.loc25_7.2 [concrete]
@@ -375,10 +373,10 @@ fn F() {
 // CHECK:STDOUT:
 // CHECK:STDOUT: specific @Z.WithSelf.Zero(constants.%Z.facet) {}
 // CHECK:STDOUT:
-// CHECK:STDOUT: specific @Z.WithSelf(constants.%Point.type.facet) {
+// CHECK:STDOUT: specific @Z.WithSelf(constants.%Point) {
 // CHECK:STDOUT: !definition:
-// CHECK:STDOUT:   %Self => constants.%Point.type.facet
-// CHECK:STDOUT:   %Z.WithSelf.Zero.type => constants.%Z.WithSelf.Zero.type.356
-// CHECK:STDOUT:   %Z.WithSelf.Zero => constants.%Z.WithSelf.Zero.237
+// CHECK:STDOUT:   %Self => constants.%Point
+// CHECK:STDOUT:   %Z.WithSelf.Zero.type => constants.%Z.WithSelf.Zero.type.7b8
+// CHECK:STDOUT:   %Z.WithSelf.Zero => constants.%Z.WithSelf.Zero.3cb
 // CHECK:STDOUT: }
 // CHECK:STDOUT:

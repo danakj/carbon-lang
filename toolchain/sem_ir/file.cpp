@@ -55,7 +55,8 @@ File::File(const Parse::Tree* parse_tree, CheckIRId check_ir_id,
       // 1 reserved id for `ObserveBlockId::Empty`.
       observe_blocks_(allocator_, check_ir_id, 1),
       associated_constants_(check_ir_id),
-      declared_facet_types_(check_ir_id),
+      // 1 reserved id for `DeclaredFacetTypeId::Empty`.
+      declared_facet_types_(check_ir_id, 1),
       identified_facet_types_(check_ir_id),
       impls_(*this),
       specific_interfaces_(check_ir_id),
@@ -102,11 +103,22 @@ File::File(const Parse::Tree* parse_tree, CheckIRId check_ir_id,
       {.value_repr = {.kind = ValueRepr::Copy, .type_id = InstType::TypeId},
        .object_layout = SemIR::ObjectLayout::Empty()});
 
+  auto empty_declared_facet_type_id =
+      declared_facet_types_.Add(DeclaredFacetType{});
+  CARBON_CHECK(empty_declared_facet_type_id == DeclaredFacetTypeId::Empty);
+
   insts_.Reserve(SingletonInstKinds.size());
   for (auto kind : SingletonInstKinds) {
-    auto inst_id =
-        insts_.AddInNoBlock(LocIdAndInst::NoLoc(Inst::MakeSingleton(kind)));
+    auto inst =
+        kind == InstKind::FacetType
+            ? Inst::MakeSingleton(kind, DeclaredFacetTypeId::Empty.index)
+            : Inst::MakeSingleton(kind);
+    auto inst_id = insts_.AddInNoBlock(LocIdAndInst::NoLoc(inst));
     constant_values_.Set(inst_id, ConstantId::ForConcreteConstant(inst_id));
+    if (kind == InstKind::FacetType) {
+      constants_.InsertSingleton(inst,
+                                 ConstantId::ForConcreteConstant(inst_id));
+    }
   }
 }
 

@@ -650,8 +650,7 @@ fn G() {
 // CHECK:STDOUT: --- form_generic_return.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
-// CHECK:STDOUT:   %type: type = facet_type <type> [concrete]
-// CHECK:STDOUT:   %.Self.frozen: %type = symbolic_binding .Self [symbolic_self]
+// CHECK:STDOUT:   %.Self.frozen: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %pattern_type.13f: type = pattern_type Core.Form [concrete]
 // CHECK:STDOUT:   %Fm.patt: %pattern_type.13f = symbolic_binding_pattern Fm, 0 [symbolic]
 // CHECK:STDOUT:   %Fm: Core.Form = symbolic_binding Fm, 0 [symbolic]
@@ -815,7 +814,7 @@ fn G() {
 // CHECK:STDOUT:     %Fm.ref.loc4_41: Core.Form = name_ref Fm, %Fm.loc4_16.2 [symbolic = %Fm.loc4_16.1 (constants.%Fm)]
 // CHECK:STDOUT:     %.loc4_41: type = type_component_of %Fm.ref.loc4_41 [symbolic = %.loc4_33.1 (constants.%.42f)]
 // CHECK:STDOUT:     %.loc4_22: type = splice_block %Form.ref [concrete = Core.Form] {
-// CHECK:STDOUT:       %.Self.frozen: %type = symbolic_binding .Self [symbolic_self = constants.%.Self.frozen]
+// CHECK:STDOUT:       %.Self.frozen: type = symbolic_binding .Self [symbolic_self = constants.%.Self.frozen]
 // CHECK:STDOUT:       %Core.ref: <namespace> = name_ref Core, imports.%Core [concrete = imports.%Core]
 // CHECK:STDOUT:       %Form.ref: type = name_ref Form, imports.%Core.Form [concrete = Core.Form]
 // CHECK:STDOUT:     }

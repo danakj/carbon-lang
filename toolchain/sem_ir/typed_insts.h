@@ -2299,12 +2299,15 @@ struct TypeOfInst {
   InstId inst_id;
 };
 
-// Tracks expressions which are valid as types. This has a deliberately
-// self-referential type.
-struct TypeType : public SingletonTypeInst<InstKind::TypeType, "type"> {
+// Represents the empty facet type `type`.
+struct TypeType {
+  static constexpr auto TypeInstId =
+      MakeSingletonTypeInstId<InstKind::FacetType>();
+  static constexpr auto ConstantId =
+      ConstantId::ForConcreteConstant(TypeInstId);
+
   // `TypeType` is always set complete in file.cpp.
-  static constexpr auto TypeId =
-      TypeId::ForTypeConstant(ConstantId::ForConcreteConstant(TypeInstId));
+  static constexpr auto TypeId = TypeId::ForTypeConstant(ConstantId);
 };
 
 // The `not` operator, such as `not operand`.

@@ -58,11 +58,7 @@ auto ResolveFacetTypeRewriteConstraints(
     llvm::SmallVector<SemIR::DeclaredFacetType::RewriteConstraint>& rewrites)
     -> bool;
 
-// Get a FacetType instruction for an empty FacetType. This is the facet
-// equivalent to TypeType.
-//
-// TODO: We vaguely plan to replace TypeType with this FacetType in the future,
-// though that's a big change.
+// Returns the singleton empty FacetType, which represents `type`.
 auto GetEmptyFacetType(Context& context) -> SemIR::TypeId;
 
 // Make a facet value for a type value, which has an empty FacetType as its

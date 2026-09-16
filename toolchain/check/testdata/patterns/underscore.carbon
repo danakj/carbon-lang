@@ -284,8 +284,7 @@ fn F() -> {} {
 // CHECK:STDOUT: --- function_generic.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
-// CHECK:STDOUT:   %type: type = facet_type <type> [concrete]
-// CHECK:STDOUT:   %.Self.frozen: %type = symbolic_binding .Self [symbolic_self]
+// CHECK:STDOUT:   %.Self.frozen: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %pattern_type: type = pattern_type type [concrete]
 // CHECK:STDOUT:   %_.patt: %pattern_type = symbolic_binding_pattern _, 0 [symbolic]
 // CHECK:STDOUT:   %_: type = symbolic_binding _, 0 [symbolic]
@@ -317,7 +316,7 @@ fn F() -> {} {
 // CHECK:STDOUT:     %_.patt.loc4_15.1: %pattern_type = symbolic_binding_pattern _, 0 [symbolic = %_.patt.loc4_15.2 (constants.%_.patt)]
 // CHECK:STDOUT:   } {
 // CHECK:STDOUT:     %.loc4_17.1: type = splice_block %.loc4_17.2 [concrete = type] {
-// CHECK:STDOUT:       %.Self.frozen: %type = symbolic_binding .Self [symbolic_self = constants.%.Self.frozen]
+// CHECK:STDOUT:       %.Self.frozen: type = symbolic_binding .Self [symbolic_self = constants.%.Self.frozen]
 // CHECK:STDOUT:       %.loc4_17.2: type = type_literal type [concrete = type]
 // CHECK:STDOUT:     }
 // CHECK:STDOUT:     %_.loc4_15.2: type = symbolic_binding _, 0 [symbolic = %_.loc4_15.1 (constants.%_)]
@@ -362,8 +361,7 @@ fn F() -> {} {
 // CHECK:STDOUT: --- fail_function_generic_undefined.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
-// CHECK:STDOUT:   %type: type = facet_type <type> [concrete]
-// CHECK:STDOUT:   %.Self.frozen: %type = symbolic_binding .Self [symbolic_self]
+// CHECK:STDOUT:   %.Self.frozen: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %pattern_type: type = pattern_type type [concrete]
 // CHECK:STDOUT:   %_.patt: %pattern_type = symbolic_binding_pattern _, 0 [symbolic]
 // CHECK:STDOUT:   %_: type = symbolic_binding _, 0 [symbolic]
@@ -395,7 +393,7 @@ fn F() -> {} {
 // CHECK:STDOUT:     %_.patt.loc4_15.1: %pattern_type = symbolic_binding_pattern _, 0 [symbolic = %_.patt.loc4_15.2 (constants.%_.patt)]
 // CHECK:STDOUT:   } {
 // CHECK:STDOUT:     %.loc4_17.1: type = splice_block %.loc4_17.2 [concrete = type] {
-// CHECK:STDOUT:       %.Self.frozen: %type = symbolic_binding .Self [symbolic_self = constants.%.Self.frozen]
+// CHECK:STDOUT:       %.Self.frozen: type = symbolic_binding .Self [symbolic_self = constants.%.Self.frozen]
 // CHECK:STDOUT:       %.loc4_17.2: type = type_literal type [concrete = type]
 // CHECK:STDOUT:     }
 // CHECK:STDOUT:     %_.loc4_15.2: type = symbolic_binding _, 0 [symbolic = %_.loc4_15.1 (constants.%_)]
@@ -433,8 +431,7 @@ fn F() -> {} {
 // CHECK:STDOUT: --- function_implict.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
-// CHECK:STDOUT:   %type: type = facet_type <type> [concrete]
-// CHECK:STDOUT:   %.Self.frozen: %type = symbolic_binding .Self [symbolic_self]
+// CHECK:STDOUT:   %.Self.frozen: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %pattern_type: type = pattern_type type [concrete]
 // CHECK:STDOUT:   %_.patt: %pattern_type = symbolic_binding_pattern _, 0 [symbolic]
 // CHECK:STDOUT:   %_: type = symbolic_binding _, 0 [symbolic]
@@ -462,7 +459,7 @@ fn F() -> {} {
 // CHECK:STDOUT:     %_.patt.loc4_7.1: %pattern_type = symbolic_binding_pattern _, 0 [symbolic = %_.patt.loc4_7.2 (constants.%_.patt)]
 // CHECK:STDOUT:   } {
 // CHECK:STDOUT:     %.loc4_9.1: type = splice_block %.loc4_9.2 [concrete = type] {
-// CHECK:STDOUT:       %.Self.frozen: %type = symbolic_binding .Self [symbolic_self = constants.%.Self.frozen]
+// CHECK:STDOUT:       %.Self.frozen: type = symbolic_binding .Self [symbolic_self = constants.%.Self.frozen]
 // CHECK:STDOUT:       %.loc4_9.2: type = type_literal type [concrete = type]
 // CHECK:STDOUT:     }
 // CHECK:STDOUT:     %_.loc4_7.2: type = symbolic_binding _, 0 [symbolic = %_.loc4_7.1 (constants.%_)]
@@ -471,7 +468,7 @@ fn F() -> {} {
 // CHECK:STDOUT:     %_.patt.loc6_7.1: %pattern_type = symbolic_binding_pattern _, 0 [symbolic = %_.patt.loc6_7.2 (constants.%_.patt)]
 // CHECK:STDOUT:   } {
 // CHECK:STDOUT:     %.loc6_9.1: type = splice_block %.loc6_9.2 [concrete = type] {
-// CHECK:STDOUT:       %.Self.frozen: %type = symbolic_binding .Self [symbolic_self = constants.%.Self.frozen]
+// CHECK:STDOUT:       %.Self.frozen: type = symbolic_binding .Self [symbolic_self = constants.%.Self.frozen]
 // CHECK:STDOUT:       %.loc6_9.2: type = type_literal type [concrete = type]
 // CHECK:STDOUT:     }
 // CHECK:STDOUT:     %_.loc6_7.2: type = symbolic_binding _, 0 [symbolic = %_.loc6_7.1 (constants.%_)]

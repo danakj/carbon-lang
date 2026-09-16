@@ -152,10 +152,8 @@ fn G(c: C) {
 // CHECK:STDOUT:   %Self: %I.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %I.WithSelf.F.type.418: type = fn_type @I.WithSelf.F, @I.WithSelf(%Self) [symbolic]
 // CHECK:STDOUT:   %I.WithSelf.F.ca5: %I.WithSelf.F.type.418 = struct_value () [symbolic]
-// CHECK:STDOUT:   %type: type = facet_type <type> [concrete]
-// CHECK:STDOUT:   %C.type.facet: %type = facet_value %C, () [concrete]
-// CHECK:STDOUT:   %I.WithSelf.F.type.b04: type = fn_type @I.WithSelf.F, @I.WithSelf(%C.type.facet) [concrete]
-// CHECK:STDOUT:   %I.WithSelf.F.cef: %I.WithSelf.F.type.b04 = struct_value () [concrete]
+// CHECK:STDOUT:   %I.WithSelf.F.type.a90: type = fn_type @I.WithSelf.F, @I.WithSelf(%C) [concrete]
+// CHECK:STDOUT:   %I.WithSelf.F.040: %I.WithSelf.F.type.a90 = struct_value () [concrete]
 // CHECK:STDOUT:   %I.assoc_type: type = assoc_entity_type @I [concrete]
 // CHECK:STDOUT:   %assoc0: %I.assoc_type = assoc_entity element0, imports.%Main.import_ref.9f7 [concrete]
 // CHECK:STDOUT:   %I.impl_witness: <witness> = impl_witness imports.%I.impl_witness_table [concrete]
@@ -253,11 +251,11 @@ fn G(c: C) {
 // CHECK:STDOUT:
 // CHECK:STDOUT: specific @I.WithSelf.F(constants.%Self) {}
 // CHECK:STDOUT:
-// CHECK:STDOUT: specific @I.WithSelf(constants.%C.type.facet) {
+// CHECK:STDOUT: specific @I.WithSelf(constants.%C) {
 // CHECK:STDOUT: !definition:
-// CHECK:STDOUT:   %Self => constants.%C.type.facet
-// CHECK:STDOUT:   %I.WithSelf.F.type => constants.%I.WithSelf.F.type.b04
-// CHECK:STDOUT:   %I.WithSelf.F => constants.%I.WithSelf.F.cef
+// CHECK:STDOUT:   %Self => constants.%C
+// CHECK:STDOUT:   %I.WithSelf.F.type => constants.%I.WithSelf.F.type.a90
+// CHECK:STDOUT:   %I.WithSelf.F => constants.%I.WithSelf.F.040
 // CHECK:STDOUT: }
 // CHECK:STDOUT:
 // CHECK:STDOUT: specific @I.WithSelf(constants.%I.facet) {

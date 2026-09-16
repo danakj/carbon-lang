@@ -245,8 +245,7 @@ interface C {
 // CHECK:STDOUT:   %DefaultMethod.assoc_type: type = assoc_entity_type @DefaultMethod [concrete]
 // CHECK:STDOUT:   %assoc0.a0f: %DefaultMethod.assoc_type = assoc_entity element0, @DefaultMethod.WithSelf.%DefaultMethod.WithSelf.M.decl [concrete]
 // CHECK:STDOUT:   %require_complete.09c: <witness> = require_complete_type %Self.as_type [symbolic]
-// CHECK:STDOUT:   %type: type = facet_type <type> [concrete]
-// CHECK:STDOUT:   %.Self.frozen: %type = symbolic_binding .Self [symbolic_self]
+// CHECK:STDOUT:   %.Self.frozen: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %pattern_type.8dc: type = pattern_type %DefaultFn.type [concrete]
 // CHECK:STDOUT:   %d.patt: %pattern_type.8dc = symbolic_binding_pattern d, 0 [symbolic]
 // CHECK:STDOUT:   %d: %DefaultFn.type = symbolic_binding d, 0 [symbolic]
@@ -286,7 +285,7 @@ interface C {
 // CHECK:STDOUT:     %d.patt.loc13_20.1: %pattern_type.8dc = symbolic_binding_pattern d, 0 [symbolic = %d.patt.loc13_20.2 (constants.%d.patt)]
 // CHECK:STDOUT:   } {
 // CHECK:STDOUT:     %.loc13: type = splice_block %DefaultFn.ref [concrete = constants.%DefaultFn.type] {
-// CHECK:STDOUT:       %.Self.frozen: %type = symbolic_binding .Self [symbolic_self = constants.%.Self.frozen]
+// CHECK:STDOUT:       %.Self.frozen: type = symbolic_binding .Self [symbolic_self = constants.%.Self.frozen]
 // CHECK:STDOUT:       %DefaultFn.ref: type = name_ref DefaultFn, file.%DefaultFn.decl [concrete = constants.%DefaultFn.type]
 // CHECK:STDOUT:     }
 // CHECK:STDOUT:     %d.loc13_20.2: %DefaultFn.type = symbolic_binding d, 0 [symbolic = %d.loc13_20.1 (constants.%d)]
@@ -297,7 +296,7 @@ interface C {
 // CHECK:STDOUT:     %t.patt.loc17_34.1: @CallMethod.%pattern_type (%pattern_type.70f) = wrapper_binding_pattern t, %t.param_patt.loc17_34.1 [symbolic = %t.patt.loc17_34.2 (constants.%t.patt)]
 // CHECK:STDOUT:   } {
 // CHECK:STDOUT:     %.loc17_18: type = splice_block %DefaultMethod.ref [concrete = constants.%DefaultMethod.type] {
-// CHECK:STDOUT:       %.Self.frozen: %type = symbolic_binding .Self [symbolic_self = constants.%.Self.frozen]
+// CHECK:STDOUT:       %.Self.frozen: type = symbolic_binding .Self [symbolic_self = constants.%.Self.frozen]
 // CHECK:STDOUT:       %DefaultMethod.ref: type = name_ref DefaultMethod, file.%DefaultMethod.decl [concrete = constants.%DefaultMethod.type]
 // CHECK:STDOUT:     }
 // CHECK:STDOUT:     %T.loc17_16.2: %DefaultMethod.type = symbolic_binding T, 0 [symbolic = %T.loc17_16.1 (constants.%T)]
@@ -518,8 +517,7 @@ interface C {
 // CHECK:STDOUT:   %FinalMethod.assoc_type: type = assoc_entity_type @FinalMethod [concrete]
 // CHECK:STDOUT:   %assoc0.e67: %FinalMethod.assoc_type = assoc_entity element0, @FinalMethod.WithSelf.%FinalMethod.WithSelf.M.decl [concrete]
 // CHECK:STDOUT:   %require_complete.e87: <witness> = require_complete_type %Self.as_type [symbolic]
-// CHECK:STDOUT:   %type: type = facet_type <type> [concrete]
-// CHECK:STDOUT:   %.Self.frozen: %type = symbolic_binding .Self [symbolic_self]
+// CHECK:STDOUT:   %.Self.frozen: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %pattern_type.778: type = pattern_type %FinalFn.type [concrete]
 // CHECK:STDOUT:   %d.patt: %pattern_type.778 = symbolic_binding_pattern d, 0 [symbolic]
 // CHECK:STDOUT:   %d: %FinalFn.type = symbolic_binding d, 0 [symbolic]
@@ -559,7 +557,7 @@ interface C {
 // CHECK:STDOUT:     %d.patt.loc13_20.1: %pattern_type.778 = symbolic_binding_pattern d, 0 [symbolic = %d.patt.loc13_20.2 (constants.%d.patt)]
 // CHECK:STDOUT:   } {
 // CHECK:STDOUT:     %.loc13: type = splice_block %FinalFn.ref [concrete = constants.%FinalFn.type] {
-// CHECK:STDOUT:       %.Self.frozen: %type = symbolic_binding .Self [symbolic_self = constants.%.Self.frozen]
+// CHECK:STDOUT:       %.Self.frozen: type = symbolic_binding .Self [symbolic_self = constants.%.Self.frozen]
 // CHECK:STDOUT:       %FinalFn.ref: type = name_ref FinalFn, file.%FinalFn.decl [concrete = constants.%FinalFn.type]
 // CHECK:STDOUT:     }
 // CHECK:STDOUT:     %d.loc13_20.2: %FinalFn.type = symbolic_binding d, 0 [symbolic = %d.loc13_20.1 (constants.%d)]
@@ -570,7 +568,7 @@ interface C {
 // CHECK:STDOUT:     %t.patt.loc17_32.1: @CallMethod.%pattern_type (%pattern_type.ab8) = wrapper_binding_pattern t, %t.param_patt.loc17_32.1 [symbolic = %t.patt.loc17_32.2 (constants.%t.patt)]
 // CHECK:STDOUT:   } {
 // CHECK:STDOUT:     %.loc17_18: type = splice_block %FinalMethod.ref [concrete = constants.%FinalMethod.type] {
-// CHECK:STDOUT:       %.Self.frozen: %type = symbolic_binding .Self [symbolic_self = constants.%.Self.frozen]
+// CHECK:STDOUT:       %.Self.frozen: type = symbolic_binding .Self [symbolic_self = constants.%.Self.frozen]
 // CHECK:STDOUT:       %FinalMethod.ref: type = name_ref FinalMethod, file.%FinalMethod.decl [concrete = constants.%FinalMethod.type]
 // CHECK:STDOUT:     }
 // CHECK:STDOUT:     %T.loc17_16.2: %FinalMethod.type = symbolic_binding T, 0 [symbolic = %T.loc17_16.1 (constants.%T)]

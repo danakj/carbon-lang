@@ -72,7 +72,8 @@
 // CHECK:STDOUT:       object_layout:
 // CHECK:STDOUT:         size:            0
 // CHECK:STDOUT:         alignment:       1
-// CHECK:STDOUT:   declared_facet_types: {}
+// CHECK:STDOUT:   declared_facet_types:
+// CHECK:STDOUT:     declared_facet_type0: {}
 // CHECK:STDOUT:   insts:
 // CHECK:STDOUT:     inst10:          {kind: Namespace, arg0: name_scope0, type: type(inst(NamespaceType))}
 // CHECK:STDOUT:   bundles:         {}

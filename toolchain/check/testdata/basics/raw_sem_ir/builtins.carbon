@@ -60,9 +60,10 @@
 // CHECK:STDOUT:       object_layout:
 // CHECK:STDOUT:         size:            0
 // CHECK:STDOUT:         alignment:       1
-// CHECK:STDOUT:   declared_facet_types: {}
+// CHECK:STDOUT:   declared_facet_types:
+// CHECK:STDOUT:     declared_facet_type0: {}
 // CHECK:STDOUT:   insts:
-// CHECK:STDOUT:     'inst(TypeType)':  {kind: TypeType, type: type(TypeType)}
+// CHECK:STDOUT:     'inst(FacetType)': {kind: FacetType, arg0: declared_facet_type0, type: type(TypeType)}
 // CHECK:STDOUT:     'inst(AutoType)':  {kind: AutoType, type: type(TypeType)}
 // CHECK:STDOUT:     'inst(BoolType)':  {kind: BoolType, type: type(TypeType)}
 // CHECK:STDOUT:     'inst(BoundMethodType)': {kind: BoundMethodType, type: type(TypeType)}
@@ -82,7 +83,7 @@
 // CHECK:STDOUT:   bundles:         {}
 // CHECK:STDOUT:   constant_values:
 // CHECK:STDOUT:     values:
-// CHECK:STDOUT:       'inst(TypeType)':  concrete_constant(inst(TypeType))
+// CHECK:STDOUT:       'inst(FacetType)': concrete_constant(inst(FacetType))
 // CHECK:STDOUT:       'inst(AutoType)':  concrete_constant(inst(AutoType))
 // CHECK:STDOUT:       'inst(BoolType)':  concrete_constant(inst(BoolType))
 // CHECK:STDOUT:       'inst(BoundMethodType)': concrete_constant(inst(BoundMethodType))

@@ -220,6 +220,14 @@ auto EvalConstantInst(Context& context, SemIR::FacetAccessType inst)
         context.constant_values().Get(facet_value->type_inst_id));
   }
 
+  // If the facet value was an empty facet value, it already evaluated to the
+  // type itself.
+  if (context.insts().Get(inst.facet_value_inst_id).type_id() ==
+      SemIR::TypeType::TypeId) {
+    return ConstantEvalResult::Existing(
+        context.constant_values().Get(inst.facet_value_inst_id));
+  }
+
   // The `facet_value_inst_id` is always a facet value (has type facet type).
   CARBON_CHECK(context.types().Is<SemIR::FacetType>(
       context.insts().Get(inst.facet_value_inst_id).type_id()));
@@ -232,6 +240,13 @@ auto EvalConstantInst(Context& context, SemIR::FacetAccessType inst)
 
 auto EvalConstantInst(Context& context, SemIR::FacetValue inst)
     -> ConstantEvalResult {
+  // If the FacetValue is of type `type` (its type_id is TypeType::TypeId), then
+  // it evaluates to the type inst inside it.
+  if (inst.type_id == SemIR::TypeType::TypeId) {
+    return ConstantEvalResult::Existing(
+        context.constant_values().Get(inst.type_inst_id));
+  }
+
   // A FacetValue that just wraps a facet without adding/removing any witnesses
   // (which means they have the same type) is evaluated to the facet itself.
   if (auto access =
@@ -296,7 +311,7 @@ static auto TryFindValueInRewriteConstraints(
     SemIR::ElementIndex interface_index, SemIR::InstId search_facet)
     -> SemIR::ConstantId {
   auto access_self_type_id = context.insts().Get(search_facet).type_id();
-  if (context.types().Is<SemIR::TypeType>(access_self_type_id)) {
+  if (access_self_type_id == SemIR::TypeType::TypeId) {
     // A self facet of type `type` has no rewrite constraints to look in.
     return SemIR::ConstantId::None;
   }

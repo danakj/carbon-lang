@@ -10,10 +10,12 @@
 
 namespace Carbon::SemIR {
 
-// The canonical list of singleton kinds. The order of `TypeType` is
+class Inst;
+
+// The canonical list of singleton kinds. The order of `FacetType` is
 // significant because other singletons use it as a type.
 static constexpr std::array SingletonInstKinds = {
-    InstKind::TypeType,
+    InstKind::FacetType,
     InstKind::AutoType,
     InstKind::BoolType,
     InstKind::BoundMethodType,
@@ -32,7 +34,15 @@ static constexpr std::array SingletonInstKinds = {
 };
 
 // Returns true if the InstKind is a singleton.
+//
+// This reports that insts of the kind may be a singleton. For most singleton
+// kinds, there is only one inst. But for `FacetType` there is a singleton inst
+// as well as non-singleton insts, and `IsSingletonInst` can be used to
+// distinguish them.
 constexpr auto IsSingletonInstKind(InstKind kind) -> bool;
+
+// Returns true if the inst is a singleton inst.
+auto IsSingletonInst(Inst inst) -> bool;
 
 // Provides the TypeInstId for singleton instructions. These are exposed as
 // `InstT::TypeInstId` in `typed_insts.h`.

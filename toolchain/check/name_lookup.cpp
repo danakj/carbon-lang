@@ -308,7 +308,8 @@ static auto GetSelfFacetForInterfaceFromLookupSelfType(
     return context.constant_values().Get(self_specific_args.back());
   }
 
-  if (context.constant_values().InstIs<SemIR::FacetType>(self_type_const_id)) {
+  if (context.constant_values().InstIs<SemIR::FacetType>(self_type_const_id) &&
+      self_type_const_id != SemIR::TypeType::ConstantId) {
     // We are looking directly in a facet type, like `I.F` for an interface `I`,
     // which means there is no self-type from the lookup for the
     // interface-with-self specific. So the self-type we use is the abstract

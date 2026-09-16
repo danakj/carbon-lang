@@ -25,8 +25,7 @@ interface I {
 // CHECK:STDOUT: constants {
 // CHECK:STDOUT:   %I.type: type = facet_type <@I> [concrete]
 // CHECK:STDOUT:   %Self: %I.type = symbolic_binding Self, 0 [symbolic]
-// CHECK:STDOUT:   %type: type = facet_type <type> [concrete]
-// CHECK:STDOUT:   %.Self.frozen: %type = symbolic_binding .Self [symbolic_self]
+// CHECK:STDOUT:   %.Self.frozen: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %pattern_type: type = pattern_type type [concrete]
 // CHECK:STDOUT:   %T.patt: %pattern_type = symbolic_binding_pattern T, 1 [symbolic]
 // CHECK:STDOUT:   %T: type = symbolic_binding T, 1 [symbolic]
@@ -56,7 +55,7 @@ interface I {
 // CHECK:STDOUT:     %T.patt.loc16_17.1: %pattern_type = symbolic_binding_pattern T, 1 [symbolic = %T.patt.loc16_17.2 (constants.%T.patt)]
 // CHECK:STDOUT:   } {
 // CHECK:STDOUT:     %.loc16_19.1: type = splice_block %.loc16_19.2 [concrete = type] {
-// CHECK:STDOUT:       %.Self.frozen: %type = symbolic_binding .Self [symbolic_self = constants.%.Self.frozen]
+// CHECK:STDOUT:       %.Self.frozen: type = symbolic_binding .Self [symbolic_self = constants.%.Self.frozen]
 // CHECK:STDOUT:       %.loc16_19.2: type = type_literal type [concrete = type]
 // CHECK:STDOUT:     }
 // CHECK:STDOUT:     %T.loc16_17.2: type = symbolic_binding T, 1 [symbolic = %T.loc16_17.1 (constants.%T)]
@@ -69,7 +68,7 @@ interface I {
 // CHECK:STDOUT:     %T.patt.loc20_17.1: %pattern_type = symbolic_binding_pattern T, 1 [symbolic = %T.patt.loc20_17.2 (constants.%T.patt)]
 // CHECK:STDOUT:   } {
 // CHECK:STDOUT:     %.loc20_19.1: type = splice_block %.loc20_19.2 [concrete = type] {
-// CHECK:STDOUT:       %.Self.frozen: %type = symbolic_binding .Self [symbolic_self = constants.%.Self.frozen]
+// CHECK:STDOUT:       %.Self.frozen: type = symbolic_binding .Self [symbolic_self = constants.%.Self.frozen]
 // CHECK:STDOUT:       %.loc20_19.2: type = type_literal type [concrete = type]
 // CHECK:STDOUT:     }
 // CHECK:STDOUT:     %T.loc20_17.2: type = symbolic_binding T, 1 [symbolic = %T.loc20_17.1 (constants.%T)]

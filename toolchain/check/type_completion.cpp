@@ -258,9 +258,8 @@ class TypeCompleter {
              SemIR::ErrorInst, SemIR::FacetType, SemIR::FloatLiteralType,
              SemIR::FormType, SemIR::IntLiteralType, SemIR::NamespaceType,
              SemIR::PatternType, SemIR::RequireSpecificDefinitionType,
-             SemIR::SpecificFunctionType, SemIR::TypeType,
-             SemIR::UnspecifiedValueType, SemIR::VtableType,
-             SemIR::WitnessType>())
+             SemIR::SpecificFunctionType, SemIR::UnspecifiedValueType,
+             SemIR::VtableType, SemIR::WitnessType>())
   auto BuildInfoForInst(SemIR::TypeId type_id, InstT /*inst*/) const
       -> SemIR::CompleteTypeInfo {
     // These types are empty at runtime but have values to copy at compile time.
@@ -957,9 +956,9 @@ static auto GetSelfFacetValue(Context& context, SemIR::ConstantId self_const_id)
 
   auto self_inst_id = context.constant_values().GetInstId(self_const_id);
   auto type_id = context.insts().Get(self_inst_id).type_id();
-  CARBON_CHECK(context.types().IsFacetType(type_id));
+  CARBON_CHECK(context.types().Is<SemIR::FacetType>(type_id));
 
-  if (context.types().Is<SemIR::FacetType>(type_id)) {
+  if (type_id != SemIR::TypeType::TypeId) {
     return self_const_id;
   }
 

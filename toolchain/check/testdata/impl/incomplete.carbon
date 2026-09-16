@@ -974,8 +974,7 @@ interface B {
 // CHECK:STDOUT:   %X.assoc_type: type = assoc_entity_type @X [concrete]
 // CHECK:STDOUT:   %assoc0: %X.assoc_type = assoc_entity element0, @X.WithSelf.%X1 [concrete]
 // CHECK:STDOUT:   %Self.as_type.ace: type = facet_access_type %Self.b43 [symbolic]
-// CHECK:STDOUT:   %type: type = facet_type <type> [concrete]
-// CHECK:STDOUT:   %.Self.frozen.197: %type = symbolic_binding .Self [symbolic_self]
+// CHECK:STDOUT:   %.Self.frozen.e58: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %.Self.frozen.5e5: %X.type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %.Self.frozen.as_type: type = facet_access_type %.Self.frozen.5e5 [symbolic_self]
 // CHECK:STDOUT:   %X.lookup_impl_witness.de0: <witness> = lookup_impl_witness %.Self.frozen.5e5, @X [symbolic_self]
@@ -1007,7 +1006,7 @@ interface B {
 // CHECK:STDOUT:     %T.patt.loc16_22.1: %pattern_type = symbolic_binding_pattern T, 0 [symbolic = %T.patt.loc16_22.2 (constants.%T.patt)]
 // CHECK:STDOUT:   } {
 // CHECK:STDOUT:     %.loc16_26.1: type = splice_block %.loc16_26.2 [concrete = constants.%X_where.type] {
-// CHECK:STDOUT:       %.Self.frozen.loc16_22: %type = symbolic_binding .Self [symbolic_self = constants.%.Self.frozen.197]
+// CHECK:STDOUT:       %.Self.frozen.loc16_22: type = symbolic_binding .Self [symbolic_self = constants.%.Self.frozen.e58]
 // CHECK:STDOUT:       %X.ref: type = name_ref X, file.%X.decl [concrete = constants.%X.type]
 // CHECK:STDOUT:       %.Self.frozen.loc16_26: %X.type = symbolic_binding .Self [symbolic_self = constants.%.Self.frozen.5e5]
 // CHECK:STDOUT:       %base_facet_type = requirement_base_facet_type %X.ref [concrete]

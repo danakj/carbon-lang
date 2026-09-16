@@ -467,14 +467,8 @@ auto ResolveFacetTypeRewriteConstraints(
   return true;
 }
 
-auto GetEmptyFacetType(Context& context) -> SemIR::TypeId {
-  SemIR::DeclaredFacetTypeId declared_facet_type_id =
-      context.declared_facet_types().Add(SemIR::DeclaredFacetType{});
-  auto const_id = EvalOrAddInst<SemIR::FacetType>(
-      context, SemIR::LocId::None,
-      {.type_id = SemIR::TypeType::TypeId,
-       .declared_facet_type_id = declared_facet_type_id});
-  return context.types().GetTypeIdForTypeConstantId(const_id);
+auto GetEmptyFacetType(Context& /*context*/) -> SemIR::TypeId {
+  return SemIR::TypeType::TypeId;
 }
 
 auto GetConstantFacetValueForType(Context& context,

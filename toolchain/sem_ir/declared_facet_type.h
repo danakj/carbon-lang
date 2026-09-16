@@ -121,8 +121,8 @@ struct DeclaredFacetType : Printable<DeclaredFacetType> {
   // has any other requirements.
   auto TryAsSingleExtend() const -> std::optional<SingleExtendFacetType>;
 
-  // Returns whether the facet type has no constraints, making it the facet type
-  // version of `TypeType`.
+  // Returns whether the facet type has no constraints, making it an
+  // unconstrained facet type (`type`).
   auto HasNoConstraints() const -> bool;
 
   // Returns whether the facet type only contains constraints that are extended
