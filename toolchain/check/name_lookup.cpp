@@ -9,7 +9,6 @@
 #include "common/raw_string_ostream.h"
 #include "toolchain/check/control_flow.h"
 #include "toolchain/check/cpp/import.h"
-#include "toolchain/check/facet_type.h"
 #include "toolchain/check/generic.h"
 #include "toolchain/check/import.h"
 #include "toolchain/check/import_ref.h"
@@ -320,28 +319,14 @@ static auto GetSelfFacetForInterfaceFromLookupSelfType(
     return context.constant_values().Get(self_specific_args.back());
   }
 
-  // Extended name lookup into a type, like `x.F`, can find a facet
-  // type extended scope from the type of `x`. The type of `x` maybe a
-  // facet converted to a type, so drop the `as type` conversion if
-  // so.
-  auto canonical_facet_or_type =
-      GetCanonicalFacetOrTypeValue(context, self_type_const_id);
-
-  auto type_of_canonical_facet_or_type =
-      context.insts()
-          .Get(context.constant_values().GetInstId(canonical_facet_or_type))
-          .type_id();
-  if (type_of_canonical_facet_or_type == SemIR::TypeType::TypeId) {
-    // If we still have a type, turn it into a facet for use in the
-    // interface-with-self specific.
-    return GetConstantFacetValueForType(
-        context, context.types().GetAsTypeInstId(
-                     context.constant_values().GetInstId(self_type_const_id)));
-  }
-
-  // We have a facet for the self-type (or perhaps an ErrorInst), which we can
-  // use directly in the interface-with-self specific.
-  return canonical_facet_or_type;
+  // Extended name lookup into a type, like `x.F`, can find a facet type
+  // extended scope from the type of `x`. The type of `x` may be a facet
+  // converted to a type, so drop the `as type` conversion if so.
+  //
+  // The result is a facet value, a type value (which is also a facet value,
+  // since `type` is a facet type), or an ErrorInst. Any of these can be used
+  // directly in the interface-with-self specific.
+  return GetCanonicalFacetOrTypeValue(context, self_type_const_id);
 }
 
 auto AppendLookupScopesForConstant(Context& context, SemIR::LocId loc_id,

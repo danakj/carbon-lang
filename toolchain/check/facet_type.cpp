@@ -467,18 +467,6 @@ auto ResolveFacetTypeRewriteConstraints(
   return true;
 }
 
-auto GetConstantFacetValueForType(Context& context,
-                                  SemIR::TypeInstId type_inst_id)
-    -> SemIR::ConstantId {
-  // We use an empty facet type because values of type `type` do not provide any
-  // witnesses of their own.
-  return EvalOrAddInst<SemIR::FacetValue>(
-      context, SemIR::LocId::None,
-      {.type_id = SemIR::TypeType::TypeId,
-       .type_inst_id = type_inst_id,
-       .witnesses_block_id = SemIR::InstBlockId::Empty});
-}
-
 auto GetConstantFacetValueForTypeAndInterface(
     Context& context, SemIR::TypeInstId type_inst_id,
     SemIR::SpecificInterface specific_interface, SemIR::InstId witness_id)

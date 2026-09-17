@@ -528,7 +528,7 @@ auto AddImplWitnessForDeclaration(Context& context, SemIR::LocId loc_id,
     // value to that type now we know the value of `Self`.
     SemIR::TypeId assoc_const_type_id = assoc_constant_decl->type_id;
     if (assoc_const_type_id.is_symbolic()) {
-      auto self_facet = GetConstantFacetValueForType(context, impl.self_id);
+      auto self_facet = context.constant_values().Get(impl.self_id);
       auto interface_with_self_specific_id = MakeSpecificWithInnerSelf(
           context, loc_id, interface.generic_id, interface.generic_with_self_id,
           impl.interface.specific_id, self_facet);
@@ -932,8 +932,8 @@ auto CheckRequireDeclsSatisfied(Context& context, SemIR::LocId loc_id,
     return;
   }
 
-  // Make a facet value for the self type.
-  auto self_facet = GetConstantFacetValueForType(context, impl.self_id);
+  // The self type is itself a facet value, as `type` is a facet type.
+  auto self_facet = context.constant_values().Get(impl.self_id);
   auto interface_with_self_specific_id = MakeSpecificWithInnerSelf(
       context, loc_id, interface.generic_id, interface.generic_with_self_id,
       impl.interface.specific_id, self_facet);
