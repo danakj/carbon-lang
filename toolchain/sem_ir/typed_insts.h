@@ -1482,7 +1482,7 @@ struct Namespace {
            .constant_kind = InstConstantKind::AlwaysUnique});
   // The file's package namespace is a well-known instruction to help `package.`
   // qualified names.
-  static constexpr InstId PackageInstId = MakeSingletonNamespacePackageInstId();
+  static constexpr InstId PackageInstId = MakeFixedNamespacePackageInstId();
 
   TypeId type_id;
   NameScopeId name_scope_id;
@@ -2301,7 +2301,7 @@ struct TypeOfInst {
 
 // Represents the empty facet type `type`.
 struct TypeType {
-  static constexpr auto TypeInstId = MakeSingletonTypeTypeInstId();
+  static constexpr auto TypeInstId = MakeFixedTypeTypeInstId();
   static constexpr auto ConstantId =
       ConstantId::ForConcreteConstant(TypeInstId);
 

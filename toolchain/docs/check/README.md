@@ -123,10 +123,10 @@ instructions needs to be closely associated, such as a parameter list.
 
 A number of instruction types in
 [sem_ir/typed_insts.h](/toolchain/sem_ir/typed_insts.h) are builtin
-instructions, such as `SemIR::FacetType` that represents constraints on a type.
-There's a singleton `FacetType` we call `TypeType` to represent the
-unconstrained facet type `type`. Builtins have stable ids in the
-`SemIR::InstStore` across `SemIR` instances.
+instructions, which are called singletons. We also have a builtin `FacetType`
+instruction we call `TypeType` to represent the unconstrained facet type
+`type`. Builtins have stable ids in the `SemIR::InstStore` across `SemIR`
+instances.
 
 ### Instruction operands
 

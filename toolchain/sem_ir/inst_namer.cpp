@@ -247,9 +247,6 @@ auto InstNamer::GetUnscopedNameFor(InstId inst_id) const -> llvm::StringRef {
     return "";
   }
   if (IsSingletonInstId(inst_id)) {
-    if (inst_id == TypeType::TypeInstId) {
-      return "type";
-    }
     return sem_ir_->insts().Get(inst_id).kind().ir_name();
   }
   auto index = sem_ir_->insts().GetRawIndex(inst_id);
@@ -694,9 +691,7 @@ auto InstNamer::PushEntity(RequireImplsId require_impls_id, ScopeId scope_id,
       sem_ir_->constant_values().GetConstantInstId(require.self_id);
   auto self_index = sem_ir_->insts().GetRawIndex(self_const_id);
   if (IsSingletonInstId(self_const_id)) {
-    self_name = self_const_id == TypeType::TypeInstId
-                    ? "type"
-                    : sem_ir_->insts().Get(self_const_id).kind().ir_name();
+    self_name = sem_ir_->insts().Get(self_const_id).kind().ir_name();
   } else if (const auto& inst_name = insts_[self_index].second) {
     self_name = inst_name.GetBaseName();
   } else {
@@ -709,9 +704,7 @@ auto InstNamer::PushEntity(RequireImplsId require_impls_id, ScopeId scope_id,
   auto facet_type_index = sem_ir_->insts().GetRawIndex(facet_type_const_id);
   if (IsSingletonInstId(facet_type_const_id)) {
     facet_type_name =
-        facet_type_const_id == TypeType::TypeInstId
-            ? "type"
-            : sem_ir_->insts().Get(facet_type_const_id).kind().ir_name();
+        sem_ir_->insts().Get(facet_type_const_id).kind().ir_name();
   } else if (const auto& inst_name = insts_[facet_type_index].second) {
     facet_type_name = inst_name.GetBaseName();
   } else {
@@ -756,9 +749,7 @@ auto InstNamer::PushEntity(ImplId impl_id, ScopeId scope_id, Scope& scope)
       sem_ir_->constant_values().GetConstantInstId(impl.self_id);
   auto index = sem_ir_->insts().GetRawIndex(self_const_id);
   if (IsSingletonInstId(self_const_id)) {
-    self_name = self_const_id == TypeType::TypeInstId
-                    ? "type"
-                    : sem_ir_->insts().Get(self_const_id).kind().ir_name();
+    self_name = sem_ir_->insts().Get(self_const_id).kind().ir_name();
   } else if (const auto& inst_name = insts_[index].second) {
     self_name = inst_name.GetBaseName();
   } else {

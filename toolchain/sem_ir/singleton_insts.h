@@ -10,8 +10,6 @@
 
 namespace Carbon::SemIR {
 
-class Inst;
-
 // The canonical list of singleton kinds. The index of each in the array acts as
 // a means to determine the InstId of the singleton inst for the kind.
 static constexpr std::array SingletonInstKinds = {
@@ -58,15 +56,13 @@ constexpr auto MakeSingletonTypeInstId() -> TypeInstId;
 // Provides the TypeInstId for the `TypeType` inst. This is exposed as
 // `TypeType::TypeInstId` in `typed_insts.h`. Its index is the very first index,
 // before the singletons, so that they can refer to it.
-constexpr auto MakeSingletonTypeTypeInstId() -> TypeInstId {
-  return TypeInstId(0);
-}
+constexpr auto MakeFixedTypeTypeInstId() -> TypeInstId { return TypeInstId(0); }
 
 // Provides the InstId for the `PackageInstId` inst. This is exposed as
 // `Namespace::PackageInstId` in `typed_insts.h`. Its index is the first
 // instruction after the singletons.
-constexpr auto MakeSingletonNamespacePackageInstId() -> TypeInstId {
-  return TypeInstId(NumInstsBeforeSingletons + SingletonInstKinds.size());
+constexpr auto MakeFixedNamespacePackageInstId() -> InstId {
+  return InstId(NumInstsBeforeSingletons + SingletonInstKinds.size());
 }
 
 // Returns true if the InstId corresponds to a singleton inst.
@@ -86,7 +82,8 @@ constexpr auto GetSingletonInstKind(InstId id) -> InstKind {
 
 namespace Internal {
 
-// Returns the index for a singleton instruction, or -1 if it's not a singleton.
+// Returns the InstId index for a singleton instruction, or -1 if it's not a
+// singleton.
 constexpr auto GetSingletonInstIndex(InstKind kind) -> int32_t {
   for (int32_t i = 0; i < static_cast<int32_t>(SingletonInstKinds.size());
        ++i) {
