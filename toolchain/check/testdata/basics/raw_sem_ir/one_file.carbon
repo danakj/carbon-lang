@@ -340,7 +340,7 @@ fn Foo[T: type](p: T*) -> (T*, ()) {
 // CHECK:STDOUT:   clang_decls:     {}
 // CHECK:STDOUT:   clang_decl_signatures: {}
 // CHECK:STDOUT:   name_scopes:
-// CHECK:STDOUT:     name_scope0:     {inst: inst10, parent_scope: name_scope<none>, has_error: false, extended_scopes: [], names: {name(Core): inst78000012, name0: inst78000048}}
+// CHECK:STDOUT:     name_scope0:     {inst: inst(Package), parent_scope: name_scope<none>, has_error: false, extended_scopes: [], names: {name(Core): inst78000012, name0: inst78000048}}
 // CHECK:STDOUT:     name_scope78000001: {inst: inst78000012, parent_scope: name_scope0, has_error: false, extended_scopes: [], names: {name3: inst78000058}}
 // CHECK:STDOUT:     name_scope78000002: {inst: inst78000059, parent_scope: name_scope78000001, has_error: false, extended_scopes: [], names: {name(SelfType): inst78000083}}
 // CHECK:STDOUT:     name_scope78000003: {inst: inst7800005B, parent_scope: name_scope78000002, has_error: false, extended_scopes: [], names: {name4: inst7800005D}}
@@ -610,16 +610,17 @@ fn Foo[T: type](p: T*) -> (T*, ()) {
 // CHECK:STDOUT:         size:            0
 // CHECK:STDOUT:         alignment:       1
 // CHECK:STDOUT:   declared_facet_types:
-// CHECK:STDOUT:     declared_facet_type0: {}
+// CHECK:STDOUT:     'declared_facet_type(Empty)': {}
 // CHECK:STDOUT:     declared_facet_type78000001: {extends interface: interface78000000}
 // CHECK:STDOUT:   insts:
-// CHECK:STDOUT:     inst10:          {kind: Namespace, arg0: name_scope0, type: type(inst(NamespaceType))}
+// CHECK:STDOUT:     'inst(TypeType)':  {kind: FacetType, arg0: declared_facet_type(Empty), type: type(TypeType)}
+// CHECK:STDOUT:     'inst(Package)':   {kind: Namespace, arg0: name_scope0, type: type(inst(NamespaceType))}
 // CHECK:STDOUT:     inst78000011:    {kind: ImportDecl, arg0: name(Core)}
 // CHECK:STDOUT:     inst78000012:    {kind: Namespace, arg0: name_scope78000001, type: type(inst(NamespaceType))}
 // CHECK:STDOUT:     inst78000013:    {kind: SymbolicBinding, arg0: entity_name78000000, arg1: inst<none>, type: type(TypeType)}
 // CHECK:STDOUT:     inst78000014:    {kind: SymbolicBinding, arg0: entity_name78000000, arg1: inst<none>, type: type(TypeType)}
-// CHECK:STDOUT:     inst78000015:    {kind: TypeLiteral, arg0: inst(FacetType), type: type(TypeType)}
-// CHECK:STDOUT:     inst78000016:    {kind: PatternType, arg0: inst(FacetType), type: type(TypeType)}
+// CHECK:STDOUT:     inst78000015:    {kind: TypeLiteral, arg0: inst(TypeType), type: type(TypeType)}
+// CHECK:STDOUT:     inst78000016:    {kind: PatternType, arg0: inst(TypeType), type: type(TypeType)}
 // CHECK:STDOUT:     inst78000017:    {kind: SymbolicBindingPattern, arg0: entity_name78000001, type: type(inst78000016)}
 // CHECK:STDOUT:     inst78000018:    {kind: SymbolicBindingPattern, arg0: entity_name78000001, type: type(inst78000016)}
 // CHECK:STDOUT:     inst78000019:    {kind: SymbolicBindingPattern, arg0: entity_name78000001, type: type(inst78000016)}
@@ -887,7 +888,7 @@ fn Foo[T: type](p: T*) -> (T*, ()) {
 // CHECK:STDOUT:     inst7800011F:    {kind: RequireCompleteType, arg0: inst780000FC, type: type(inst(WitnessType))}
 // CHECK:STDOUT:     inst78000120:    {kind: ImportRefUnloaded, arg0: import_ir_inst90, arg1: entity_name<none>}
 // CHECK:STDOUT:     inst78000121:    {kind: ImplDecl, arg0: impl78000006, arg1: inst_block_empty}
-// CHECK:STDOUT:     inst78000122:    {kind: ImplSelfWitness, arg0: inst(FacetType), arg1: specific_interface78000000, type: type(inst(WitnessType))}
+// CHECK:STDOUT:     inst78000122:    {kind: ImplSelfWitness, arg0: inst(TypeType), arg1: specific_interface78000000, type: type(inst(WitnessType))}
 // CHECK:STDOUT:     inst78000123:    {kind: ImportRefLoaded, arg0: import_ir_inst92, arg1: entity_name<none>, type: type(TypeType)}
 // CHECK:STDOUT:     inst78000124:    {kind: ImportRefLoaded, arg0: import_ir_inst93, arg1: entity_name<none>, type: type(TypeType)}
 // CHECK:STDOUT:     inst78000125:    {kind: ImportRefLoaded, arg0: import_ir_inst94, arg1: entity_name<none>, type: type(inst(WitnessType))}
@@ -1141,11 +1142,12 @@ fn Foo[T: type](p: T*) -> (T*, ()) {
 // CHECK:STDOUT:   bundles:         {}
 // CHECK:STDOUT:   constant_values:
 // CHECK:STDOUT:     values:
-// CHECK:STDOUT:       inst10:          concrete_constant(inst10)
+// CHECK:STDOUT:       'inst(TypeType)':  concrete_constant(inst(TypeType))
+// CHECK:STDOUT:       'inst(Package)':   concrete_constant(inst(Package))
 // CHECK:STDOUT:       inst78000012:    concrete_constant(inst78000012)
 // CHECK:STDOUT:       inst78000013:    symbolic_constant78000000
 // CHECK:STDOUT:       inst78000014:    symbolic_constant78000000
-// CHECK:STDOUT:       inst78000015:    concrete_constant(inst(FacetType))
+// CHECK:STDOUT:       inst78000015:    concrete_constant(inst(TypeType))
 // CHECK:STDOUT:       inst78000016:    concrete_constant(inst78000016)
 // CHECK:STDOUT:       inst78000017:    symbolic_constant78000002
 // CHECK:STDOUT:       inst78000018:    symbolic_constant78000001
@@ -1190,7 +1192,7 @@ fn Foo[T: type](p: T*) -> (T*, ()) {
 // CHECK:STDOUT:       inst78000040:    symbolic_constant78000018
 // CHECK:STDOUT:       inst78000041:    symbolic_constant78000017
 // CHECK:STDOUT:       inst78000042:    symbolic_constant78000018
-// CHECK:STDOUT:       inst78000043:    concrete_constant(inst(FacetType))
+// CHECK:STDOUT:       inst78000043:    concrete_constant(inst(TypeType))
 // CHECK:STDOUT:       inst78000045:    symbolic_constant78000006
 // CHECK:STDOUT:       inst78000048:    concrete_constant(inst7800004A)
 // CHECK:STDOUT:       inst78000049:    concrete_constant(inst78000049)
@@ -1407,7 +1409,7 @@ fn Foo[T: type](p: T*) -> (T*, ()) {
 // CHECK:STDOUT:       inst78000120:    constant<none>
 // CHECK:STDOUT:       inst78000121:    concrete_constant(inst78000121)
 // CHECK:STDOUT:       inst78000122:    concrete_constant(inst78000122)
-// CHECK:STDOUT:       inst78000123:    concrete_constant(inst(FacetType))
+// CHECK:STDOUT:       inst78000123:    concrete_constant(inst(TypeType))
 // CHECK:STDOUT:       inst78000124:    concrete_constant(inst7800005A)
 // CHECK:STDOUT:       inst78000125:    concrete_constant(inst78000122)
 // CHECK:STDOUT:       inst78000126:    constant<none>
@@ -2310,7 +2312,7 @@ fn Foo[T: type](p: T*) -> (T*, ()) {
 // CHECK:STDOUT:       0:               inst7800002B
 // CHECK:STDOUT:       1:               inst7800002D
 // CHECK:STDOUT:     inst_block7800000A:
-// CHECK:STDOUT:       0:               inst(FacetType)
+// CHECK:STDOUT:       0:               inst(TypeType)
 // CHECK:STDOUT:       1:               inst7800002C
 // CHECK:STDOUT:     inst_block7800000B:
 // CHECK:STDOUT:       0:               inst7800001F
@@ -2919,7 +2921,7 @@ fn Foo[T: type](p: T*) -> (T*, ()) {
 // CHECK:STDOUT:       7:               inst78000206
 // CHECK:STDOUT:       8:               inst78000212
 // CHECK:STDOUT:     inst_block7800008C:
-// CHECK:STDOUT:       0:               inst10
+// CHECK:STDOUT:       0:               inst(Package)
 // CHECK:STDOUT:       1:               inst78000011
 // CHECK:STDOUT:       2:               inst78000048
 // CHECK:STDOUT:   value_stores:

@@ -227,6 +227,7 @@ fn Test(c: HasExtraInterfaces.C(type)) {
 // CHECK:STDOUT: --- package_a.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %HasF.type: type = facet_type <@HasF> [concrete]
 // CHECK:STDOUT:   %Self: %HasF.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %Self.as_type: type = facet_access_type %Self [symbolic]
@@ -376,6 +377,7 @@ fn Test(c: HasExtraInterfaces.C(type)) {
 // CHECK:STDOUT: --- package_b.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %HasG.type: type = facet_type <@HasG> [concrete]
 // CHECK:STDOUT:   %Self.150: %HasG.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %Self.as_type.dd3: type = facet_access_type %Self.150 [symbolic]
@@ -695,6 +697,7 @@ fn Test(c: HasExtraInterfaces.C(type)) {
 // CHECK:STDOUT: --- use_cf.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %C: type = class_type @C [concrete]
 // CHECK:STDOUT:   %empty_struct_type: type = struct_type {} [concrete]
 // CHECK:STDOUT:   %complete_type: <witness> = complete_type_witness %empty_struct_type [concrete]
@@ -840,6 +843,7 @@ fn Test(c: HasExtraInterfaces.C(type)) {
 // CHECK:STDOUT: --- use_df.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %D: type = class_type @D [concrete]
 // CHECK:STDOUT:   %empty_struct_type: type = struct_type {} [concrete]
 // CHECK:STDOUT:   %complete_type: <witness> = complete_type_witness %empty_struct_type [concrete]
@@ -1008,6 +1012,7 @@ fn Test(c: HasExtraInterfaces.C(type)) {
 // CHECK:STDOUT: --- use_cg.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %C: type = class_type @C [concrete]
 // CHECK:STDOUT:   %empty_struct_type: type = struct_type {} [concrete]
 // CHECK:STDOUT:   %complete_type: <witness> = complete_type_witness %empty_struct_type [concrete]
@@ -1176,6 +1181,7 @@ fn Test(c: HasExtraInterfaces.C(type)) {
 // CHECK:STDOUT: --- use_dg.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %D: type = class_type @D [concrete]
 // CHECK:STDOUT:   %empty_struct_type: type = struct_type {} [concrete]
 // CHECK:STDOUT:   %complete_type: <witness> = complete_type_witness %empty_struct_type [concrete]
@@ -1339,6 +1345,7 @@ fn Test(c: HasExtraInterfaces.C(type)) {
 // CHECK:STDOUT: --- associated_interface.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %Z.type: type = facet_type <@Z> [concrete]
 // CHECK:STDOUT:   %Self: %Z.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %Self.as_type: type = facet_access_type %Self [symbolic]
@@ -1478,6 +1485,7 @@ fn Test(c: HasExtraInterfaces.C(type)) {
 // CHECK:STDOUT: --- import_associated_interface.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %J.type: type = fn_type @J [concrete]
 // CHECK:STDOUT:   %empty_tuple.type: type = tuple_type () [concrete]
 // CHECK:STDOUT:   %J: %J.type = struct_value () [concrete]
@@ -1600,6 +1608,7 @@ fn Test(c: HasExtraInterfaces.C(type)) {
 // CHECK:STDOUT: --- has_param.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %.Self.frozen: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %pattern_type.9a5: type = pattern_type type [concrete]
 // CHECK:STDOUT:   %T.patt: %pattern_type.9a5 = symbolic_binding_pattern T, 0 [symbolic]
@@ -1744,6 +1753,7 @@ fn Test(c: HasExtraInterfaces.C(type)) {
 // CHECK:STDOUT: --- has_generic_interface.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %.Self.frozen: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %pattern_type.9a5: type = pattern_type type [concrete]
 // CHECK:STDOUT:   %U.patt: %pattern_type.9a5 = symbolic_binding_pattern U, 0 [symbolic]
@@ -2031,6 +2041,7 @@ fn Test(c: HasExtraInterfaces.C(type)) {
 // CHECK:STDOUT: --- use_generic_interface_as_param.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %M.type: type = fn_type @M [concrete]
 // CHECK:STDOUT:   %empty_tuple.type: type = tuple_type () [concrete]
 // CHECK:STDOUT:   %M: %M.type = struct_value () [concrete]
@@ -2283,6 +2294,7 @@ fn Test(c: HasExtraInterfaces.C(type)) {
 // CHECK:STDOUT: --- has_generic_class.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %.Self.frozen: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %pattern_type.9a5: type = pattern_type type [concrete]
 // CHECK:STDOUT:   %U.patt: %pattern_type.9a5 = symbolic_binding_pattern U, 0 [symbolic]
@@ -2562,6 +2574,7 @@ fn Test(c: HasExtraInterfaces.C(type)) {
 // CHECK:STDOUT: --- use_generic_class_as_param.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %M.type: type = fn_type @M [concrete]
 // CHECK:STDOUT:   %empty_tuple.type: type = tuple_type () [concrete]
 // CHECK:STDOUT:   %M: %M.type = struct_value () [concrete]
@@ -2808,6 +2821,7 @@ fn Test(c: HasExtraInterfaces.C(type)) {
 // CHECK:STDOUT: --- has_extra_interfaces.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %Extra1.type: type = facet_type <@Extra1> [concrete]
 // CHECK:STDOUT:   %Self.f48: %Extra1.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %Extra2.type: type = facet_type <@Extra2> [concrete]
@@ -3141,6 +3155,7 @@ fn Test(c: HasExtraInterfaces.C(type)) {
 // CHECK:STDOUT: --- fail_use_has_extra_interfaces.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %C.type: type = generic_class_type @C [concrete]
 // CHECK:STDOUT:   %C.generic: %C.type = struct_value () [concrete]
 // CHECK:STDOUT:   %empty_struct_type: type = struct_type {} [concrete]

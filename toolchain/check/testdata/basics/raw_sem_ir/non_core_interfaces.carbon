@@ -48,7 +48,7 @@ fn UseLocalCopy[T: Copy](_: T.T1, _: T.T2) {}
 // CHECK:STDOUT:   clang_decls:     {}
 // CHECK:STDOUT:   clang_decl_signatures: {}
 // CHECK:STDOUT:   name_scopes:
-// CHECK:STDOUT:     name_scope0:     {inst: inst10, parent_scope: name_scope<none>, has_error: false, extended_scopes: [], names: {name1: inst60000011}}
+// CHECK:STDOUT:     name_scope0:     {inst: inst(Package), parent_scope: name_scope<none>, has_error: false, extended_scopes: [], names: {name1: inst60000011}}
 // CHECK:STDOUT:     name_scope60000001: {inst: inst60000011, parent_scope: name_scope0, has_error: false, extended_scopes: [], names: {name(SelfType): inst60000013}}
 // CHECK:STDOUT:     name_scope60000002: {inst: inst60000016, parent_scope: name_scope60000001, has_error: false, extended_scopes: [], names: {name2: inst6000001A, name3: inst6000001E}}
 // CHECK:STDOUT:   entity_names:
@@ -96,41 +96,43 @@ fn UseLocalCopy[T: Copy](_: T.T1, _: T.T2) {}
 // CHECK:STDOUT:         size:            0
 // CHECK:STDOUT:         alignment:       1
 // CHECK:STDOUT:   declared_facet_types:
-// CHECK:STDOUT:     declared_facet_type0: {}
+// CHECK:STDOUT:     'declared_facet_type(Empty)': {}
 // CHECK:STDOUT:     declared_facet_type60000001: {extends interface: interface60000000}
 // CHECK:STDOUT:   insts:
-// CHECK:STDOUT:     inst10:          {kind: Namespace, arg0: name_scope0, type: type(inst(NamespaceType))}
+// CHECK:STDOUT:     'inst(TypeType)':  {kind: FacetType, arg0: declared_facet_type(Empty), type: type(TypeType)}
+// CHECK:STDOUT:     'inst(Package)':   {kind: Namespace, arg0: name_scope0, type: type(inst(NamespaceType))}
 // CHECK:STDOUT:     inst60000011:    {kind: InterfaceDecl, arg0: interface60000000, arg1: inst_block_empty, type: type(TypeType)}
 // CHECK:STDOUT:     inst60000012:    {kind: FacetType, arg0: declared_facet_type60000001, type: type(TypeType)}
 // CHECK:STDOUT:     inst60000013:    {kind: SymbolicBinding, arg0: entity_name60000000, arg1: inst<none>, type: type(inst60000012)}
 // CHECK:STDOUT:     inst60000014:    {kind: SymbolicBinding, arg0: entity_name60000000, arg1: inst<none>, type: type(inst60000012)}
 // CHECK:STDOUT:     inst60000015:    {kind: SymbolicBinding, arg0: entity_name60000000, arg1: inst<none>, type: type(inst60000012)}
 // CHECK:STDOUT:     inst60000016:    {kind: InterfaceWithSelfDecl, arg0: interface60000000}
-// CHECK:STDOUT:     inst60000017:    {kind: TypeLiteral, arg0: inst(FacetType), type: type(TypeType)}
+// CHECK:STDOUT:     inst60000017:    {kind: TypeLiteral, arg0: inst(TypeType), type: type(TypeType)}
 // CHECK:STDOUT:     inst60000018:    {kind: AssociatedConstantDecl, arg0: assoc_const60000000, arg1: inst_block6000000A, type: type(TypeType)}
 // CHECK:STDOUT:     inst60000019:    {kind: AssociatedEntityType, arg0: interface60000000, arg1: specific<none>, type: type(TypeType)}
 // CHECK:STDOUT:     inst6000001A:    {kind: AssociatedEntity, arg0: element0, arg1: inst60000018, type: type(inst60000019)}
 // CHECK:STDOUT:     inst6000001B:    {kind: AssociatedEntity, arg0: element0, arg1: inst60000018, type: type(inst60000019)}
-// CHECK:STDOUT:     inst6000001C:    {kind: TypeLiteral, arg0: inst(FacetType), type: type(TypeType)}
+// CHECK:STDOUT:     inst6000001C:    {kind: TypeLiteral, arg0: inst(TypeType), type: type(TypeType)}
 // CHECK:STDOUT:     inst6000001D:    {kind: AssociatedConstantDecl, arg0: assoc_const60000001, arg1: inst_block6000000C, type: type(TypeType)}
 // CHECK:STDOUT:     inst6000001E:    {kind: AssociatedEntity, arg0: element1, arg1: inst6000001D, type: type(inst60000019)}
 // CHECK:STDOUT:     inst6000001F:    {kind: AssociatedEntity, arg0: element1, arg1: inst6000001D, type: type(inst60000019)}
 // CHECK:STDOUT:   bundles:         {}
 // CHECK:STDOUT:   constant_values:
 // CHECK:STDOUT:     values:
-// CHECK:STDOUT:       inst10:          concrete_constant(inst10)
+// CHECK:STDOUT:       'inst(TypeType)':  concrete_constant(inst(TypeType))
+// CHECK:STDOUT:       'inst(Package)':   concrete_constant(inst(Package))
 // CHECK:STDOUT:       inst60000011:    concrete_constant(inst60000012)
 // CHECK:STDOUT:       inst60000012:    concrete_constant(inst60000012)
 // CHECK:STDOUT:       inst60000013:    symbolic_constant60000000
 // CHECK:STDOUT:       inst60000014:    symbolic_constant60000000
 // CHECK:STDOUT:       inst60000015:    symbolic_constant60000001
 // CHECK:STDOUT:       inst60000016:    concrete_constant(inst60000016)
-// CHECK:STDOUT:       inst60000017:    concrete_constant(inst(FacetType))
+// CHECK:STDOUT:       inst60000017:    concrete_constant(inst(TypeType))
 // CHECK:STDOUT:       inst60000018:    concrete_constant(inst60000018)
 // CHECK:STDOUT:       inst60000019:    concrete_constant(inst60000019)
 // CHECK:STDOUT:       inst6000001A:    concrete_constant(inst6000001B)
 // CHECK:STDOUT:       inst6000001B:    concrete_constant(inst6000001B)
-// CHECK:STDOUT:       inst6000001C:    concrete_constant(inst(FacetType))
+// CHECK:STDOUT:       inst6000001C:    concrete_constant(inst(TypeType))
 // CHECK:STDOUT:       inst6000001D:    concrete_constant(inst6000001D)
 // CHECK:STDOUT:       inst6000001E:    concrete_constant(inst6000001F)
 // CHECK:STDOUT:       inst6000001F:    concrete_constant(inst6000001F)
@@ -166,7 +168,7 @@ fn UseLocalCopy[T: Copy](_: T.T1, _: T.T2) {}
 // CHECK:STDOUT:       0:               inst60000018
 // CHECK:STDOUT:       1:               inst6000001D
 // CHECK:STDOUT:     inst_block6000000E:
-// CHECK:STDOUT:       0:               inst10
+// CHECK:STDOUT:       0:               inst(Package)
 // CHECK:STDOUT:       1:               inst60000011
 // CHECK:STDOUT:   value_stores:
 // CHECK:STDOUT:     shared_values:
@@ -213,7 +215,7 @@ fn UseLocalCopy[T: Copy](_: T.T1, _: T.T2) {}
 // CHECK:STDOUT:   clang_decls:     {}
 // CHECK:STDOUT:   clang_decl_signatures: {}
 // CHECK:STDOUT:   name_scopes:
-// CHECK:STDOUT:     name_scope0:     {inst: inst10, parent_scope: name_scope<none>, has_error: false, extended_scopes: [], names: {name0: inst50000012, name1: inst50000013, name4: inst5000006A, name7: inst500000A9}}
+// CHECK:STDOUT:     name_scope0:     {inst: inst(Package), parent_scope: name_scope<none>, has_error: false, extended_scopes: [], names: {name0: inst50000012, name1: inst50000013, name4: inst5000006A, name7: inst500000A9}}
 // CHECK:STDOUT:     name_scope50000001: {inst: inst50000012, parent_scope: name_scope0, has_error: false, extended_scopes: [], names: {name6: inst50000025}}
 // CHECK:STDOUT:     name_scope50000002: {inst: inst50000013, parent_scope: name_scope0, has_error: false, extended_scopes: [], names: {name(SelfType): inst50000015}}
 // CHECK:STDOUT:     name_scope50000003: {inst: inst50000018, parent_scope: name_scope50000002, has_error: false, extended_scopes: [], names: {name2: inst5000001C, name3: inst50000020}}
@@ -341,11 +343,12 @@ fn UseLocalCopy[T: Copy](_: T.T1, _: T.T2) {}
 // CHECK:STDOUT:         size:            0
 // CHECK:STDOUT:         alignment:       0
 // CHECK:STDOUT:   declared_facet_types:
-// CHECK:STDOUT:     declared_facet_type0: {}
+// CHECK:STDOUT:     'declared_facet_type(Empty)': {}
 // CHECK:STDOUT:     declared_facet_type50000001: {extends interface: interface50000000}
 // CHECK:STDOUT:     declared_facet_type50000002: {extends interface: interface50000001}
 // CHECK:STDOUT:   insts:
-// CHECK:STDOUT:     inst10:          {kind: Namespace, arg0: name_scope0, type: type(inst(NamespaceType))}
+// CHECK:STDOUT:     'inst(TypeType)':  {kind: FacetType, arg0: declared_facet_type(Empty), type: type(TypeType)}
+// CHECK:STDOUT:     'inst(Package)':   {kind: Namespace, arg0: name_scope0, type: type(inst(NamespaceType))}
 // CHECK:STDOUT:     inst50000011:    {kind: ImportDecl, arg0: name0}
 // CHECK:STDOUT:     inst50000012:    {kind: Namespace, arg0: name_scope50000001, type: type(inst(NamespaceType))}
 // CHECK:STDOUT:     inst50000013:    {kind: InterfaceDecl, arg0: interface50000000, arg1: inst_block_empty, type: type(TypeType)}
@@ -354,12 +357,12 @@ fn UseLocalCopy[T: Copy](_: T.T1, _: T.T2) {}
 // CHECK:STDOUT:     inst50000016:    {kind: SymbolicBinding, arg0: entity_name50000000, arg1: inst<none>, type: type(inst50000014)}
 // CHECK:STDOUT:     inst50000017:    {kind: SymbolicBinding, arg0: entity_name50000000, arg1: inst<none>, type: type(inst50000014)}
 // CHECK:STDOUT:     inst50000018:    {kind: InterfaceWithSelfDecl, arg0: interface50000000}
-// CHECK:STDOUT:     inst50000019:    {kind: TypeLiteral, arg0: inst(FacetType), type: type(TypeType)}
+// CHECK:STDOUT:     inst50000019:    {kind: TypeLiteral, arg0: inst(TypeType), type: type(TypeType)}
 // CHECK:STDOUT:     inst5000001A:    {kind: AssociatedConstantDecl, arg0: assoc_const50000000, arg1: inst_block5000000A, type: type(TypeType)}
 // CHECK:STDOUT:     inst5000001B:    {kind: AssociatedEntityType, arg0: interface50000000, arg1: specific<none>, type: type(TypeType)}
 // CHECK:STDOUT:     inst5000001C:    {kind: AssociatedEntity, arg0: element0, arg1: inst5000001A, type: type(inst5000001B)}
 // CHECK:STDOUT:     inst5000001D:    {kind: AssociatedEntity, arg0: element0, arg1: inst5000001A, type: type(inst5000001B)}
-// CHECK:STDOUT:     inst5000001E:    {kind: TypeLiteral, arg0: inst(FacetType), type: type(TypeType)}
+// CHECK:STDOUT:     inst5000001E:    {kind: TypeLiteral, arg0: inst(TypeType), type: type(TypeType)}
 // CHECK:STDOUT:     inst5000001F:    {kind: AssociatedConstantDecl, arg0: assoc_const50000001, arg1: inst_block5000000C, type: type(TypeType)}
 // CHECK:STDOUT:     inst50000020:    {kind: AssociatedEntity, arg0: element1, arg1: inst5000001F, type: type(inst5000001B)}
 // CHECK:STDOUT:     inst50000021:    {kind: AssociatedEntity, arg0: element1, arg1: inst5000001F, type: type(inst5000001B)}
@@ -511,7 +514,8 @@ fn UseLocalCopy[T: Copy](_: T.T1, _: T.T2) {}
 // CHECK:STDOUT:   bundles:         {}
 // CHECK:STDOUT:   constant_values:
 // CHECK:STDOUT:     values:
-// CHECK:STDOUT:       inst10:          concrete_constant(inst10)
+// CHECK:STDOUT:       'inst(TypeType)':  concrete_constant(inst(TypeType))
+// CHECK:STDOUT:       'inst(Package)':   concrete_constant(inst(Package))
 // CHECK:STDOUT:       inst50000012:    concrete_constant(inst50000012)
 // CHECK:STDOUT:       inst50000013:    concrete_constant(inst50000014)
 // CHECK:STDOUT:       inst50000014:    concrete_constant(inst50000014)
@@ -519,12 +523,12 @@ fn UseLocalCopy[T: Copy](_: T.T1, _: T.T2) {}
 // CHECK:STDOUT:       inst50000016:    symbolic_constant50000000
 // CHECK:STDOUT:       inst50000017:    symbolic_constant50000001
 // CHECK:STDOUT:       inst50000018:    concrete_constant(inst50000018)
-// CHECK:STDOUT:       inst50000019:    concrete_constant(inst(FacetType))
+// CHECK:STDOUT:       inst50000019:    concrete_constant(inst(TypeType))
 // CHECK:STDOUT:       inst5000001A:    concrete_constant(inst5000001A)
 // CHECK:STDOUT:       inst5000001B:    concrete_constant(inst5000001B)
 // CHECK:STDOUT:       inst5000001C:    concrete_constant(inst5000001D)
 // CHECK:STDOUT:       inst5000001D:    concrete_constant(inst5000001D)
-// CHECK:STDOUT:       inst5000001E:    concrete_constant(inst(FacetType))
+// CHECK:STDOUT:       inst5000001E:    concrete_constant(inst(TypeType))
 // CHECK:STDOUT:       inst5000001F:    concrete_constant(inst5000001F)
 // CHECK:STDOUT:       inst50000020:    concrete_constant(inst50000021)
 // CHECK:STDOUT:       inst50000021:    concrete_constant(inst50000021)
@@ -929,7 +933,7 @@ fn UseLocalCopy[T: Copy](_: T.T1, _: T.T2) {}
 // CHECK:STDOUT:       0:               inst500000AE
 // CHECK:STDOUT:       1:               inst500000B1
 // CHECK:STDOUT:     inst_block50000031:
-// CHECK:STDOUT:       0:               inst10
+// CHECK:STDOUT:       0:               inst(Package)
 // CHECK:STDOUT:       1:               inst50000011
 // CHECK:STDOUT:       2:               inst50000013
 // CHECK:STDOUT:       3:               inst5000006A

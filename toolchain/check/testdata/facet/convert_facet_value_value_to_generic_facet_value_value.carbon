@@ -38,6 +38,7 @@ fn F() {
 // CHECK:STDOUT: --- convert_facet_value_value_to_generic_facet_value_value.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %Edible.type: type = facet_type <@Edible> [concrete]
 // CHECK:STDOUT:   %Self.59b: %Edible.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %Grass: type = class_type @Grass [concrete]

@@ -116,7 +116,6 @@ cc_library(
         "observe.cpp",
         "pattern.cpp",
         "require_impls.cpp",
-        "singleton_insts.cpp",
         "specific_interface.cpp",
         "struct_type_field.cpp",
         "type.cpp",

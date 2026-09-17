@@ -48,6 +48,7 @@ fn F() {
 // CHECK:STDOUT: --- call_combined_impl_witness.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %Empty.type: type = facet_type <@Empty> [concrete]
 // CHECK:STDOUT:   %Self.d44: %Empty.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %A.type: type = facet_type <@A> [concrete]

@@ -145,6 +145,7 @@ fn F(a: IntAdapter) -> i32 {
 // CHECK:STDOUT: --- basic.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %SomeClassAdapter: type = class_type @SomeClassAdapter [concrete]
 // CHECK:STDOUT:   %SomeClass: type = class_type @SomeClass [concrete]
 // CHECK:STDOUT:   %int_32: Core.IntLiteral = int_value 32 [concrete]
@@ -275,6 +276,7 @@ fn F(a: IntAdapter) -> i32 {
 // CHECK:STDOUT: --- fail_todo_method_access.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %SomeClass: type = class_type @SomeClass [concrete]
 // CHECK:STDOUT:   %pattern_type.b5d: type = pattern_type %SomeClass [concrete]
 // CHECK:STDOUT:   %self.param_patt.1e7: %pattern_type.b5d = value_param_pattern [concrete]
@@ -368,6 +370,7 @@ fn F(a: IntAdapter) -> i32 {
 // CHECK:STDOUT: --- fail_todo_field_access.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %SomeClass: type = class_type @SomeClass [concrete]
 // CHECK:STDOUT:   %int_32: Core.IntLiteral = int_value 32 [concrete]
 // CHECK:STDOUT:   %Int.type: type = generic_class_type @Int [concrete]
@@ -468,6 +471,7 @@ fn F(a: IntAdapter) -> i32 {
 // CHECK:STDOUT: --- fail_todo_adapt_struct.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %StructAdapter: type = class_type @StructAdapter [concrete]
 // CHECK:STDOUT:   %int_32: Core.IntLiteral = int_value 32 [concrete]
 // CHECK:STDOUT:   %Int.type: type = generic_class_type @Int [concrete]
@@ -543,6 +547,7 @@ fn F(a: IntAdapter) -> i32 {
 // CHECK:STDOUT: --- fail_todo_adapt_tuple.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %TupleAdapter: type = class_type @TupleAdapter [concrete]
 // CHECK:STDOUT:   %int_32: Core.IntLiteral = int_value 32 [concrete]
 // CHECK:STDOUT:   %Int.type: type = generic_class_type @Int [concrete]
@@ -621,6 +626,7 @@ fn F(a: IntAdapter) -> i32 {
 // CHECK:STDOUT: --- fail_adapt_builtin.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %pattern_type.dc0: type = pattern_type Core.IntLiteral [concrete]
 // CHECK:STDOUT:   %N.param_patt: %pattern_type.dc0 = value_param_pattern [concrete]
 // CHECK:STDOUT:   %N.patt.4a4: %pattern_type.dc0 = wrapper_binding_pattern N, %N.param_patt [concrete]

@@ -40,6 +40,7 @@ fn F() {
 // CHECK:STDOUT: --- deduce_nested_facet_value.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %Y.type: type = facet_type <@Y> [concrete]
 // CHECK:STDOUT:   %Self.765: %Y.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %W.type: type = facet_type <@W> [concrete]

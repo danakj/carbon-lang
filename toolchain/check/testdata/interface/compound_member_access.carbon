@@ -193,6 +193,7 @@ fn Works() {
 // CHECK:STDOUT: --- associated_constant.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %J.type: type = facet_type <@J> [concrete]
 // CHECK:STDOUT:   %Self: %J.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %J.assoc_type: type = assoc_entity_type @J [concrete]
@@ -363,6 +364,7 @@ fn Works() {
 // CHECK:STDOUT: --- non_instance.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %K1.type: type = facet_type <@K1> [concrete]
 // CHECK:STDOUT:   %Self: %K1.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %K1.WithSelf.Q1.type.497: type = fn_type @K1.WithSelf.Q1, @K1.WithSelf(%Self) [symbolic]
@@ -539,6 +541,7 @@ fn Works() {
 // CHECK:STDOUT: --- fail_caller_instance_interface_not.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %K2.type: type = facet_type <@K2> [concrete]
 // CHECK:STDOUT:   %Self.b0c: %K2.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %K2.WithSelf.Q2.type.ace: type = fn_type @K2.WithSelf.Q2, @K2.WithSelf(%Self.b0c) [symbolic]
@@ -739,6 +742,7 @@ fn Works() {
 // CHECK:STDOUT: --- instance.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %L1.type: type = facet_type <@L1> [concrete]
 // CHECK:STDOUT:   %Self: %L1.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %Self.as_type: type = facet_access_type %Self [symbolic]
@@ -1158,6 +1162,7 @@ fn Works() {
 // CHECK:STDOUT: --- fail_interface_instance_caller_not.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %L2.type: type = facet_type <@L2> [concrete]
 // CHECK:STDOUT:   %Self: %L2.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %Self.as_type: type = facet_access_type %Self [symbolic]
@@ -1387,6 +1392,7 @@ fn Works() {
 // CHECK:STDOUT: --- fail_combine_non_instance.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %A.type: type = facet_type <@A> [concrete]
 // CHECK:STDOUT:   %Self.d0c: %A.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %A.WithSelf.G.type.9da: type = fn_type @A.WithSelf.G, @A.WithSelf(%Self.d0c) [symbolic]
@@ -1578,6 +1584,7 @@ fn Works() {
 // CHECK:STDOUT: --- allowed_combine_non_instance.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %A.type: type = facet_type <@A> [concrete]
 // CHECK:STDOUT:   %Self.d0c: %A.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %A.WithSelf.G.type.9da: type = fn_type @A.WithSelf.G, @A.WithSelf(%Self.d0c) [symbolic]

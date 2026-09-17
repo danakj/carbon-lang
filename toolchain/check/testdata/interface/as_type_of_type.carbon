@@ -26,6 +26,7 @@ fn F(generic T: Empty) {
 // CHECK:STDOUT: --- as_type_of_type.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %Empty.type: type = facet_type <@Empty> [concrete]
 // CHECK:STDOUT:   %Self.d44: %Empty.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %C: type = class_type @C [concrete]

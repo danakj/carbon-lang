@@ -1481,8 +1481,8 @@ struct Namespace {
            // namespace redeclarations.
            .constant_kind = InstConstantKind::AlwaysUnique});
   // The file's package namespace is a well-known instruction to help `package.`
-  // qualified names. It will always be immediately after singletons.
-  static constexpr InstId PackageInstId = InstId(SingletonInstKinds.size());
+  // qualified names.
+  static constexpr InstId PackageInstId = MakeSingletonNamespacePackageInstId();
 
   TypeId type_id;
   NameScopeId name_scope_id;
@@ -2301,8 +2301,7 @@ struct TypeOfInst {
 
 // Represents the empty facet type `type`.
 struct TypeType {
-  static constexpr auto TypeInstId =
-      MakeSingletonTypeInstId<InstKind::FacetType>();
+  static constexpr auto TypeInstId = MakeSingletonTypeTypeInstId();
   static constexpr auto ConstantId =
       ConstantId::ForConcreteConstant(TypeInstId);
 

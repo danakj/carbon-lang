@@ -102,6 +102,7 @@ fn G() {
 // CHECK:STDOUT: --- tuple_access.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %.Self.frozen: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %tuple.type: type = tuple_type (type) [concrete]
 // CHECK:STDOUT:   %tuple.ad8: %tuple.type = tuple_value (type) [concrete]
@@ -346,6 +347,7 @@ fn G() {
 // CHECK:STDOUT: --- struct_access.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %.Self.frozen: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %struct_type.t: type = struct_type {.t: type} [concrete]
 // CHECK:STDOUT:   %pattern_type.136: type = pattern_type %struct_type.t [concrete]
@@ -585,6 +587,7 @@ fn G() {
 // CHECK:STDOUT: --- fail_todo_class_access.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %Class: type = class_type @Class [concrete]
 // CHECK:STDOUT:   %Class.elem: type = unbound_element_type %Class, type [concrete]
 // CHECK:STDOUT:   %struct_type.t: type = struct_type {.t: type} [concrete]
@@ -871,6 +874,7 @@ fn G() {
 // CHECK:STDOUT: --- fail_todo_array_index.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %.Self.frozen: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %int_1: Core.IntLiteral = int_value 1 [concrete]
 // CHECK:STDOUT:   %array_type: type = array_type %int_1, type [concrete]

@@ -394,6 +394,7 @@ fn F[T: I(C)](t: T) {
 // CHECK:STDOUT: --- transitive.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %Transitive.type: type = facet_type <@Transitive> [concrete]
 // CHECK:STDOUT:   %Self.77c: %Transitive.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %facet_type.b1b: type = facet_type <@P & @Destroy> [concrete]
@@ -598,6 +599,7 @@ fn F[T: I(C)](t: T) {
 // CHECK:STDOUT: --- blanket_impls.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %A.type: type = facet_type <@A> [concrete]
 // CHECK:STDOUT:   %B.type: type = facet_type <@B> [concrete]
 // CHECK:STDOUT:   %C.type: type = facet_type <@C> [concrete]
@@ -728,6 +730,7 @@ fn F[T: I(C)](t: T) {
 // CHECK:STDOUT: --- fail_todo_nested_functions_in_outer.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %A.type: type = facet_type <@A> [concrete]
 // CHECK:STDOUT:   %B.type: type = facet_type <@B> [concrete]
 // CHECK:STDOUT:   %.Self.frozen.e58: type = symbolic_binding .Self [symbolic_self]
@@ -913,6 +916,7 @@ fn F[T: I(C)](t: T) {
 // CHECK:STDOUT: --- generic_observe.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %A.type: type = facet_type <@A> [concrete]
 // CHECK:STDOUT:   %.Self.frozen.e58: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %Destroy.type: type = facet_type <@Destroy> [concrete]

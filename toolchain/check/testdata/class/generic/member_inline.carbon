@@ -49,6 +49,7 @@ class C(T: Core.Copy) {
 // CHECK:STDOUT: --- member_inline.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %.Self.frozen: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %Copy.type: type = facet_type <@Copy> [concrete]
 // CHECK:STDOUT:   %pattern_type.e81: type = pattern_type %Copy.type [concrete]
@@ -295,6 +296,7 @@ class C(T: Core.Copy) {
 // CHECK:STDOUT: --- fail_member_inline_missing_self_dot.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %.Self.frozen: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %Copy.type: type = facet_type <@Copy> [concrete]
 // CHECK:STDOUT:   %pattern_type.e81: type = pattern_type %Copy.type [concrete]

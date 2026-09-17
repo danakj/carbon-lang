@@ -34,6 +34,7 @@ fn G(generic T: Z, generic U: type, generic V: Empty) {
 // CHECK:STDOUT: --- empty.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %Empty.type: type = facet_type <@Empty> [concrete]
 // CHECK:STDOUT:   %.Self.frozen: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %pattern_type.9a587c.1: type = pattern_type %Empty.type [concrete]

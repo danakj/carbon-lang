@@ -12,10 +12,9 @@ namespace Carbon::SemIR {
 
 class Inst;
 
-// The canonical list of singleton kinds. The order of `FacetType` is
-// significant because other singletons use it as a type.
+// The canonical list of singleton kinds. The index of each in the array acts as
+// a means to determine the InstId of the singleton inst for the kind.
 static constexpr std::array SingletonInstKinds = {
-    InstKind::FacetType,
     InstKind::AutoType,
     InstKind::BoolType,
     InstKind::BoundMethodType,
@@ -33,16 +32,22 @@ static constexpr std::array SingletonInstKinds = {
     InstKind::WitnessType,
 };
 
-// Returns true if the InstKind is a singleton.
-//
-// This reports that insts of the kind may be a singleton. For most singleton
-// kinds, there is only one inst. But for `FacetType` there is a singleton inst
-// as well as non-singleton insts, and `IsSingletonInst` can be used to
-// distinguish them.
-constexpr auto IsSingletonInstKind(InstKind kind) -> bool;
+// We have some insts with unique fixed InstIds that are determined relative to
+// the singletons InstIds.
+// - TypeType::TypeInstId
+// - Namespace::PackageInstId
+constexpr auto NumInstsBeforeSingletons = 1;
+constexpr auto NumInstsAfterSingletons = 1;
 
-// Returns true if the inst is a singleton inst.
-auto IsSingletonInst(Inst inst) -> bool;
+// The total number of InstIds that are fixed values. These are always the
+// first InstIds in the file, and since they are fixed at compile-time of the
+// toolchain, they are not tagged IDs.
+constexpr auto NumFixedInsts = NumInstsBeforeSingletons +
+                               SingletonInstKinds.size() +
+                               NumInstsAfterSingletons;
+
+// Returns true if the InstKind is a singleton.
+constexpr auto IsSingletonInstKind(InstKind kind) -> bool;
 
 // Provides the TypeInstId for singleton instructions. These are exposed as
 // `InstT::TypeInstId` in `typed_insts.h`.
@@ -50,10 +55,31 @@ template <InstKind::RawEnumType Kind>
   requires(IsSingletonInstKind(InstKind::Make(Kind)))
 constexpr auto MakeSingletonTypeInstId() -> TypeInstId;
 
+// Provides the TypeInstId for the `TypeType` inst. This is exposed as
+// `TypeType::TypeInstId` in `typed_insts.h`. Its index is the very first index,
+// before the singletons, so that they can refer to it.
+constexpr auto MakeSingletonTypeTypeInstId() -> TypeInstId {
+  return TypeInstId(0);
+}
+
+// Provides the InstId for the `PackageInstId` inst. This is exposed as
+// `Namespace::PackageInstId` in `typed_insts.h`. Its index is the first
+// instruction after the singletons.
+constexpr auto MakeSingletonNamespacePackageInstId() -> TypeInstId {
+  return TypeInstId(NumInstsBeforeSingletons + SingletonInstKinds.size());
+}
+
 // Returns true if the InstId corresponds to a singleton inst.
 constexpr auto IsSingletonInstId(InstId id) -> bool {
-  return id.index >= 0 &&
-         id.index < static_cast<int32_t>(SingletonInstKinds.size());
+  auto index = id.index - NumInstsBeforeSingletons;
+  return index >= 0 && index < static_cast<int32_t>(SingletonInstKinds.size());
+}
+
+// Returns the InstKind for a singleton InstId.
+constexpr auto GetSingletonInstKind(InstId id) -> InstKind {
+  CARBON_CHECK(IsSingletonInstId(id));
+  auto index = id.index - NumInstsBeforeSingletons;
+  return SingletonInstKinds[index];
 }
 
 // Only implementation details are below.
@@ -65,7 +91,7 @@ constexpr auto GetSingletonInstIndex(InstKind kind) -> int32_t {
   for (int32_t i = 0; i < static_cast<int32_t>(SingletonInstKinds.size());
        ++i) {
     if (SingletonInstKinds[i] == kind) {
-      return i;
+      return i + NumInstsBeforeSingletons;
     }
   }
   return -1;

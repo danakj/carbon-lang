@@ -292,6 +292,7 @@ var test_str: str = ();
 // CHECK:STDOUT: --- iN.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %int_8: Core.IntLiteral = int_value 8 [concrete]
 // CHECK:STDOUT:   %i8: type = class_type @Int, @Int(%int_8) [concrete]
 // CHECK:STDOUT:   %pattern_type.0cf: type = pattern_type %i8 [concrete]
@@ -398,6 +399,7 @@ var test_str: str = ();
 // CHECK:STDOUT: --- uN.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %int_8: Core.IntLiteral = int_value 8 [concrete]
 // CHECK:STDOUT:   %u8: type = class_type @UInt, @UInt(%int_8) [concrete]
 // CHECK:STDOUT:   %pattern_type.186: type = pattern_type %u8 [concrete]
@@ -504,6 +506,7 @@ var test_str: str = ();
 // CHECK:STDOUT: --- fN.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %int_16: Core.IntLiteral = int_value 16 [concrete]
 // CHECK:STDOUT:   %f16.907: type = class_type @Float, @Float(%int_16) [concrete]
 // CHECK:STDOUT:   %pattern_type.7cc: type = pattern_type %f16.907 [concrete]
@@ -610,6 +613,7 @@ var test_str: str = ();
 // CHECK:STDOUT: --- char.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %char: type = class_type @Char [concrete]
 // CHECK:STDOUT:   %pattern_type.2ff: type = pattern_type %char [concrete]
 // CHECK:STDOUT:   %test_char.patt: %pattern_type.2ff = value_binding_pattern test_char [concrete]
@@ -652,6 +656,7 @@ var test_str: str = ();
 // CHECK:STDOUT: --- string.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %str.3d4: type = class_type @String [concrete]
 // CHECK:STDOUT:   %int_64: Core.IntLiteral = int_value 64 [concrete]
 // CHECK:STDOUT:   %u64: type = class_type @UInt, @UInt(%int_64) [concrete]
@@ -684,6 +689,7 @@ var test_str: str = ();
 // CHECK:STDOUT: --- type.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %pattern_type.9a5: type = pattern_type type [concrete]
 // CHECK:STDOUT:   %test_type.patt: %pattern_type.9a5 = ref_binding_pattern test_type [concrete]
 // CHECK:STDOUT:   %test_type.var_patt: %pattern_type.9a5 = var_pattern %test_type.patt [concrete]

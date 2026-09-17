@@ -332,14 +332,6 @@ class ConstantStore {
   // constant is new.
   auto GetOrAdd(Inst inst, ConstantDependence dependence) -> ConstantId;
 
-  // Inserts a pre-existing singleton instruction into the constant map.
-  // Singletons are not added to constants_ so they are never printed in
-  // constants { ... }.
-  auto InsertSingleton(Inst inst, ConstantId const_id) -> void {
-    auto result = map_.Insert(inst, const_id);
-    CARBON_CHECK(result.is_inserted());
-  }
-
   // Collects memory usage of members.
   auto CollectMemUsage(MemUsage& mem_usage, llvm::StringRef label) const
       -> void {

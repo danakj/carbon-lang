@@ -224,6 +224,7 @@ let K: (E where .F = .Self.G) = bool;
 // CHECK:STDOUT: --- equal_constraint.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %N.type: type = facet_type <@N> [concrete]
 // CHECK:STDOUT:   %N.assoc_type: type = assoc_entity_type @N [concrete]
 // CHECK:STDOUT:   %assoc0: %N.assoc_type = assoc_entity element0, @N.WithSelf.%P [concrete]
@@ -288,6 +289,7 @@ let K: (E where .F = .Self.G) = bool;
 // CHECK:STDOUT: --- nested_rewrites.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %A.type: type = facet_type <@A> [concrete]
 // CHECK:STDOUT:   %A.assoc_type: type = assoc_entity_type @A [concrete]
 // CHECK:STDOUT:   %assoc0: %A.assoc_type = assoc_entity element0, @A.WithSelf.%B [concrete]
@@ -371,6 +373,7 @@ let K: (E where .F = .Self.G) = bool;
 // CHECK:STDOUT: --- repeated_rewrite.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %E.type: type = facet_type <@E> [concrete]
 // CHECK:STDOUT:   %E.assoc_type: type = assoc_entity_type @E [concrete]
 // CHECK:STDOUT:   %assoc0: %E.assoc_type = assoc_entity element0, @E.WithSelf.%F [concrete]
@@ -521,6 +524,7 @@ let K: (E where .F = .Self.G) = bool;
 // CHECK:STDOUT: --- rewrites_reordered.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %J.type: type = facet_type <@J> [concrete]
 // CHECK:STDOUT:   %J.assoc_type: type = assoc_entity_type @J [concrete]
 // CHECK:STDOUT:   %assoc0: %J.assoc_type = assoc_entity element0, @J.WithSelf.%K [concrete]

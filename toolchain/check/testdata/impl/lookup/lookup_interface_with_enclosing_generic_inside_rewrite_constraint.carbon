@@ -103,6 +103,7 @@ fn F() {
 // CHECK:STDOUT: --- lookup_interface_with_encenclosing_specific_is_concrete_type.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %.Self.frozen.e58: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %pattern_type.9a5: type = pattern_type type [concrete]
 // CHECK:STDOUT:   %OuterParam.patt: %pattern_type.9a5 = symbolic_binding_pattern OuterParam, 0 [symbolic]
@@ -458,6 +459,7 @@ fn F() {
 // CHECK:STDOUT: --- enclosing_specific_is_facet_value.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %Z1.type: type = facet_type <@Z1> [concrete]
 // CHECK:STDOUT:   %Self.bc4: %Z1.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %Z2.type: type = facet_type <@Z2> [concrete]

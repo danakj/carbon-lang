@@ -62,6 +62,7 @@ fn G(generic T: Z) {
 // CHECK:STDOUT: --- type_and_with_named_constraint_self.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %E.type: type = facet_type <@E> [concrete]
 // CHECK:STDOUT:   %.Self.frozen: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %pattern_type.9a587c.1: type = pattern_type %E.type [concrete]
@@ -131,6 +132,7 @@ fn G(generic T: Z) {
 // CHECK:STDOUT: --- compatible_constraints.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %E1.type: type = facet_type <@E1> [concrete]
 // CHECK:STDOUT:   %E2.type: type = facet_type <@E2> [concrete]
 // CHECK:STDOUT:   %.Self.frozen: type = symbolic_binding .Self [symbolic_self]

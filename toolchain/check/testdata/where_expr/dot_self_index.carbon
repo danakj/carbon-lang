@@ -28,6 +28,7 @@ fn G(U: Empty(i32) where .A = i32*) {
 // CHECK:STDOUT: --- dot_self_index.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %.Self.frozen.e58: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %pattern_type.9a5: type = pattern_type type [concrete]
 // CHECK:STDOUT:   %Empty.type.c52: type = generic_interface_type @Empty [concrete]

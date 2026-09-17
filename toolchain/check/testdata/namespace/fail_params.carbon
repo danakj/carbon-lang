@@ -48,6 +48,7 @@ fn D(unused T: type).F() {}
 // CHECK:STDOUT: --- fail_params.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %F.type.14e: type = fn_type @F.loc22 [concrete]
 // CHECK:STDOUT:   %F.19f: %F.type.14e = struct_value () [concrete]
 // CHECK:STDOUT:   %.Self.frozen: type = symbolic_binding .Self [symbolic_self]

@@ -190,15 +190,14 @@ class Inst : public Printable<Inst> {
  public:
   // Makes an instruction for a singleton. This exists to support simple
   // construction of all singletons by File.
-  static auto MakeSingleton(InstKind kind, int32_t arg0 = InstId::NoneIndex,
-                            int32_t arg1 = InstId::NoneIndex) -> Inst {
+  static auto MakeSingleton(InstKind kind) -> Inst {
     CARBON_CHECK(IsSingletonInstKind(kind));
     // Error uses a self-referential type so that it's not accidentally treated
     // as a normal type. Every other builtin is a type, including the
     // self-referential TypeType.
     auto type_id =
         kind == InstKind::ErrorInst ? ErrorInst::TypeId : TypeType::TypeId;
-    return Inst(kind.AsInt(), type_id, arg0, arg1);
+    return Inst(kind, type_id, InstId::NoneIndex, InstId::NoneIndex);
   }
 
   template <typename TypedInst>

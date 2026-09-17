@@ -31,7 +31,7 @@ fn F(generic Form: Core.Form) ->? Form;
 // CHECK:STDOUT:   clang_decls:     {}
 // CHECK:STDOUT:   clang_decl_signatures: {}
 // CHECK:STDOUT:   name_scopes:
-// CHECK:STDOUT:     name_scope0:     {inst: inst10, parent_scope: name_scope<none>, has_error: false, extended_scopes: [], names: {name(Core): inst70000012, name0: inst70000032}}
+// CHECK:STDOUT:     name_scope0:     {inst: inst(Package), parent_scope: name_scope<none>, has_error: false, extended_scopes: [], names: {name(Core): inst70000012, name0: inst70000032}}
 // CHECK:STDOUT:     name_scope70000001: {inst: inst70000012, parent_scope: name_scope0, has_error: false, extended_scopes: [], names: {name1: inst70000016}}
 // CHECK:STDOUT:   entity_names:
 // CHECK:STDOUT:     entity_name70000000: {name: name(PeriodSelf), parent_scope: name_scope<none>, index: -1, is_template: 0, is_unused: 0, is_frozen_period_self: 1}, form: inst<none>}
@@ -87,9 +87,10 @@ fn F(generic Form: Core.Form) ->? Form;
 // CHECK:STDOUT:         size:            0
 // CHECK:STDOUT:         alignment:       1
 // CHECK:STDOUT:   declared_facet_types:
-// CHECK:STDOUT:     declared_facet_type0: {}
+// CHECK:STDOUT:     'declared_facet_type(Empty)': {}
 // CHECK:STDOUT:   insts:
-// CHECK:STDOUT:     inst10:          {kind: Namespace, arg0: name_scope0, type: type(inst(NamespaceType))}
+// CHECK:STDOUT:     'inst(TypeType)':  {kind: FacetType, arg0: declared_facet_type(Empty), type: type(TypeType)}
+// CHECK:STDOUT:     'inst(Package)':   {kind: Namespace, arg0: name_scope0, type: type(inst(NamespaceType))}
 // CHECK:STDOUT:     inst70000011:    {kind: ImportDecl, arg0: name(Core)}
 // CHECK:STDOUT:     inst70000012:    {kind: Namespace, arg0: name_scope70000001, type: type(inst(NamespaceType))}
 // CHECK:STDOUT:     inst70000013:    {kind: SymbolicBinding, arg0: entity_name70000000, arg1: inst<none>, type: type(TypeType)}
@@ -136,7 +137,8 @@ fn F(generic Form: Core.Form) ->? Form;
 // CHECK:STDOUT:     bundle70000000:  {arg0: inst70000026, arg1: call_param0}
 // CHECK:STDOUT:   constant_values:
 // CHECK:STDOUT:     values:
-// CHECK:STDOUT:       inst10:          concrete_constant(inst10)
+// CHECK:STDOUT:       'inst(TypeType)':  concrete_constant(inst(TypeType))
+// CHECK:STDOUT:       'inst(Package)':   concrete_constant(inst(Package))
 // CHECK:STDOUT:       inst70000012:    concrete_constant(inst70000012)
 // CHECK:STDOUT:       inst70000013:    symbolic_constant70000000
 // CHECK:STDOUT:       inst70000014:    symbolic_constant70000000
@@ -255,7 +257,7 @@ fn F(generic Form: Core.Form) ->? Form;
 // CHECK:STDOUT:       7:               inst70000036
 // CHECK:STDOUT:       8:               inst70000037
 // CHECK:STDOUT:     inst_block7000000F:
-// CHECK:STDOUT:       0:               inst10
+// CHECK:STDOUT:       0:               inst(Package)
 // CHECK:STDOUT:       1:               inst70000011
 // CHECK:STDOUT:       2:               inst70000032
 // CHECK:STDOUT:   value_stores:

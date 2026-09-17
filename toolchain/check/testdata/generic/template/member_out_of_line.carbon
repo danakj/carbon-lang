@@ -21,7 +21,7 @@ class Class(template T: type) {
   var n: T;
 }
 
-// CHECK:STDERR: fail_todo_basic.carbon:[[@LINE+7]]:30: error: type `<pattern for <splice of <cannot stringify inst7800007B: {kind: ConvertToValueAction, arg0: inst78000078, arg1: inst(FacetType), type: type(inst(InstType))}>>>` of parameter 1 in redeclaration differs from previous parameter type `<pattern for T>` [RedeclParamDiffersType]
+// CHECK:STDERR: fail_todo_basic.carbon:[[@LINE+7]]:30: error: type `<pattern for <splice of <cannot stringify inst7800007B: {kind: ConvertToValueAction, arg0: inst78000078, arg1: inst(TypeType), type: type(inst(InstType))}>>>` of parameter 1 in redeclaration differs from previous parameter type `<pattern for T>` [RedeclParamDiffersType]
 // CHECK:STDERR: fn Class(template T: type).F(n: T.U) -> T.U {
 // CHECK:STDERR:                              ^~~~~~
 // CHECK:STDERR: fail_todo_basic.carbon:[[@LINE-8]]:8: note: previous declaration's corresponding parameter here [RedeclParamPrevious]
@@ -32,7 +32,7 @@ fn Class(template T: type).F(n: T.U) -> T.U {
   return n;
 }
 
-// CHECK:STDERR: fail_todo_basic.carbon:[[@LINE+7]]:1: error: function redeclaration differs because return type is `<splice of <cannot stringify inst78000137: {kind: ConvertToValueAction, arg0: inst78000134, arg1: inst(FacetType), type: type(inst(InstType))}>>` [FunctionRedeclReturnTypeDiffers]
+// CHECK:STDERR: fail_todo_basic.carbon:[[@LINE+7]]:1: error: function redeclaration differs because return type is `<splice of <cannot stringify inst78000137: {kind: ConvertToValueAction, arg0: inst78000134, arg1: inst(TypeType), type: type(inst(InstType))}>>` [FunctionRedeclReturnTypeDiffers]
 // CHECK:STDERR: fn Class(template T: type).G(self) -> T.U {
 // CHECK:STDERR: ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // CHECK:STDERR: fail_todo_basic.carbon:[[@LINE-18]]:3: note: previously declared with return type `T` [FunctionRedeclReturnTypePrevious]
@@ -47,6 +47,7 @@ fn Class(template T: type).G(self) -> T.U {
 // CHECK:STDOUT: --- fail_todo_basic.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %.Self.frozen: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %pattern_type.9a5: type = pattern_type type [concrete]
 // CHECK:STDOUT:   %T.patt: %pattern_type.9a5 = symbolic_binding_pattern T, 0, template [template]

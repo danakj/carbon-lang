@@ -265,12 +265,12 @@ auto InstNamer::GetNameFor(ScopeId scope_id, InstId inst_id) const
 
   // Check for a builtin.
   if (IsSingletonInstId(inst_id)) {
-    if (inst_id == TypeType::TypeInstId) {
-      return "type";
-    }
     return sem_ir_->insts().Get(inst_id).kind().ir_name().str();
   }
 
+  if (inst_id == TypeType::TypeInstId) {
+    return "type";
+  }
   if (inst_id == SemIR::Namespace::PackageInstId) {
     return "package";
   }

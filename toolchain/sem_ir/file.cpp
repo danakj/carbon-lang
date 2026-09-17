@@ -20,6 +20,7 @@
 #include "toolchain/base/value_store_impl.h"
 #include "toolchain/base/yaml.h"
 #include "toolchain/parse/node_ids.h"
+#include "toolchain/sem_ir/constant.h"
 #include "toolchain/sem_ir/ids.h"
 #include "toolchain/sem_ir/inst.h"
 #include "toolchain/sem_ir/inst_kind.h"
@@ -67,10 +68,9 @@ File::File(const Parse::Tree* parse_tree, CheckIRId check_ir_id,
       import_irs_(check_ir_id, 2),
       clang_decls_(check_ir_id),
       clang_decl_signatures_(check_ir_id),
-      // The `+1` prevents adding a tag to the global `NameSpace::PackageInstId`
-      // instruction. It's not a "singleton" instruction, but it's a unique
-      // instruction id that comes right after the singletons.
-      insts_(this, SingletonInstKinds.size() + 1),
+      // We have some unique instructions that are untagged fixed indices like
+      // the singletons, and NumFixedInsts tracks how many.
+      insts_(this, NumFixedInsts),
       vtables_(check_ir_id),
       constant_values_(ConstantId::NotConstant, &insts_),
       inst_blocks_(allocator_, check_ir_id),
@@ -103,22 +103,24 @@ File::File(const Parse::Tree* parse_tree, CheckIRId check_ir_id,
       {.value_repr = {.kind = ValueRepr::Copy, .type_id = InstType::TypeId},
        .object_layout = SemIR::ObjectLayout::Empty()});
 
-  auto empty_declared_facet_type_id =
-      declared_facet_types_.Add(DeclaredFacetType{});
-  CARBON_CHECK(empty_declared_facet_type_id == DeclaredFacetTypeId::Empty);
+  auto empty_facet_type_id = declared_facet_types_.Add({});
+  CARBON_CHECK(empty_facet_type_id == DeclaredFacetTypeId::Empty);
 
-  insts_.Reserve(SingletonInstKinds.size());
+  insts_.Reserve(NumFixedInsts);
+  // Construct the `TypeType:TypeInstId` inst first, as it has InstId of 0. It
+  // goes in the `constants_` store so that all empty facet types dedupe to the
+  // singleton's constant value.
+  auto type_type_const_id = constants_.GetOrAdd(
+      FacetType{.type_id = TypeType::TypeId,
+                .declared_facet_type_id = DeclaredFacetTypeId::Empty},
+      ConstantDependence::None);
+  CARBON_CHECK(type_type_const_id == TypeType::ConstantId);
+  CARBON_CHECK(constant_values_.GetInstId(type_type_const_id) ==
+               TypeType::TypeInstId);
   for (auto kind : SingletonInstKinds) {
-    auto inst =
-        kind == InstKind::FacetType
-            ? Inst::MakeSingleton(kind, DeclaredFacetTypeId::Empty.index)
-            : Inst::MakeSingleton(kind);
+    auto inst = Inst::MakeSingleton(kind);
     auto inst_id = insts_.AddInNoBlock(LocIdAndInst::NoLoc(inst));
     constant_values_.Set(inst_id, ConstantId::ForConcreteConstant(inst_id));
-    if (kind == InstKind::FacetType) {
-      constants_.InsertSingleton(inst,
-                                 ConstantId::ForConcreteConstant(inst_id));
-    }
   }
 }
 

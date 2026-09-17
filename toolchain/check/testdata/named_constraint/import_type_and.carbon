@@ -32,6 +32,7 @@ fn F(generic _: N) {}
 // CHECK:STDOUT: --- import.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %Y.type: type = facet_type <@Y> [concrete]
 // CHECK:STDOUT:   %Self.765: %Y.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %Z.type: type = facet_type <@Z> [concrete]
@@ -146,6 +147,7 @@ fn F(generic _: N) {}
 // CHECK:STDOUT: --- import.impl.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %.Self.frozen: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %N.type: type = facet_type <@N> [concrete]
 // CHECK:STDOUT:   %Self.f45: %N.type = symbolic_binding Self, 0 [symbolic]

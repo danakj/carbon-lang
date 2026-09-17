@@ -97,6 +97,7 @@ fn B() {
 // CHECK:STDOUT: --- convert_class_value_to_generic_facet_value_value.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %.Self.frozen: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %pattern_type.9a5: type = pattern_type type [concrete]
 // CHECK:STDOUT:   %Scalar.patt: %pattern_type.9a5 = symbolic_binding_pattern Scalar, 0 [symbolic]
@@ -516,6 +517,7 @@ fn B() {
 // CHECK:STDOUT: --- multiple_generic_params_one_fixed_one_deduced.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %.Self.frozen: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %pattern_type.9a5: type = pattern_type type [concrete]
 // CHECK:STDOUT:   %V.patt: %pattern_type.9a5 = symbolic_binding_pattern V, 0 [symbolic]
@@ -826,6 +828,7 @@ fn B() {
 // CHECK:STDOUT: --- fail_mismatch_impl_constraint_with_fixed_specific.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %.Self.frozen: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %pattern_type.9a5: type = pattern_type type [concrete]
 // CHECK:STDOUT:   %V.patt: %pattern_type.9a5 = symbolic_binding_pattern V, 0 [symbolic]
@@ -1073,6 +1076,7 @@ fn B() {
 // CHECK:STDOUT: --- fail_mismatch_impl_self_with_fixed_specific.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %I.type: type = facet_type <@I> [concrete]
 // CHECK:STDOUT:   %Self: %I.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %.Self.frozen: type = symbolic_binding .Self [symbolic_self]

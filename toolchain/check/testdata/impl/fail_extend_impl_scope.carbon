@@ -67,6 +67,7 @@ fn F() {
 // CHECK:STDOUT: --- fail_extend_impl_file_scope.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %I.type: type = facet_type <@I> [concrete]
 // CHECK:STDOUT:   %Self: %I.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %empty_tuple.type: type = tuple_type () [concrete]
@@ -122,6 +123,7 @@ fn F() {
 // CHECK:STDOUT: --- fail_extend_impl_function_scope.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %J.type: type = facet_type <@J> [concrete]
 // CHECK:STDOUT:   %Self: %J.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %F.type: type = fn_type @F [concrete]
@@ -186,6 +188,7 @@ fn F() {
 // CHECK:STDOUT: --- fail_extend_impl_self_interface.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %Z.type: type = facet_type <@Z> [concrete]
 // CHECK:STDOUT:   %Self.cb6: %Z.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %Z.WithSelf.Zero.type.68b: type = fn_type @Z.WithSelf.Zero, @Z.WithSelf(%Self.cb6) [symbolic]

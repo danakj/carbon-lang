@@ -30,6 +30,7 @@ fn Class(F: type).Inner.G() -> i32 { return F(); }
 // CHECK:STDOUT: --- prefer_unqualified_lookup.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %.Self.frozen: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %pattern_type.9a5: type = pattern_type type [concrete]
 // CHECK:STDOUT:   %F.patt: %pattern_type.9a5 = symbolic_binding_pattern F, 0 [symbolic]

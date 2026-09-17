@@ -75,6 +75,7 @@ interface Bar[T: type] {}
 // CHECK:STDOUT: --- params.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %NotGenericNoParams.type: type = facet_type <@NotGenericNoParams> [concrete]
 // CHECK:STDOUT:   %Self.6f8: %NotGenericNoParams.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %NotGenericButParams.type.2fe: type = generic_interface_type @NotGenericButParams [concrete]
@@ -464,6 +465,7 @@ interface Bar[T: type] {}
 // CHECK:STDOUT: --- fail_non_generic_implicit_params.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %A.type.55a: type = generic_interface_type @A [concrete]
 // CHECK:STDOUT:   %A.generic: %A.type.55a = struct_value () [concrete]
 // CHECK:STDOUT:   %A.type.313: type = facet_type <@A> [concrete]
@@ -493,6 +495,7 @@ interface Bar[T: type] {}
 // CHECK:STDOUT: --- fail_non_generic_params.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %A.type.55a: type = generic_interface_type @A [concrete]
 // CHECK:STDOUT:   %A.generic: %A.type.55a = struct_value () [concrete]
 // CHECK:STDOUT:   %A.type.313: type = facet_type <@A> [concrete]
@@ -522,6 +525,7 @@ interface Bar[T: type] {}
 // CHECK:STDOUT: --- fail_implicit_params_only_empty.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %Bar.type.3f0: type = generic_interface_type @Bar [concrete]
 // CHECK:STDOUT:   %Bar.generic: %Bar.type.3f0 = struct_value () [concrete]
 // CHECK:STDOUT:   %Bar.type.131: type = facet_type <@Bar> [concrete]
@@ -551,6 +555,7 @@ interface Bar[T: type] {}
 // CHECK:STDOUT: --- fail_implicit_params_only.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %.Self.frozen: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %pattern_type: type = pattern_type type [concrete]
 // CHECK:STDOUT:   %T.patt: %pattern_type = symbolic_binding_pattern T, 0 [symbolic]

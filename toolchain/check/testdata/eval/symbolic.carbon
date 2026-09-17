@@ -71,6 +71,7 @@ fn F() {
 // CHECK:STDOUT: --- dependent_symbolic_instruction.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %Z.type: type = facet_type <@Z> [concrete]
 // CHECK:STDOUT:   %empty_struct_type: type = struct_type {} [concrete]
 // CHECK:STDOUT:   %Z.impl_witness: <witness> = impl_witness @empty_struct_type.as.Z.impl.%Z.impl_witness_table [concrete]

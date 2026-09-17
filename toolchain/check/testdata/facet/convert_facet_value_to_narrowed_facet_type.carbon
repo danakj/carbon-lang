@@ -92,6 +92,7 @@ fn CallsWithTypeExplicit(generic U: type) {
 // CHECK:STDOUT: --- convert_to_narrowed_facet_type.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %Eats.type: type = facet_type <@Eats> [concrete]
 // CHECK:STDOUT:   %Self.23e: %Eats.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %Animal.type: type = facet_type <@Animal> [concrete]
@@ -306,6 +307,7 @@ fn CallsWithTypeExplicit(generic U: type) {
 // CHECK:STDOUT: --- bigger.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %Eats.type: type = facet_type <@Eats> [concrete]
 // CHECK:STDOUT:   %Self.23e: %Eats.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %Animal.type: type = facet_type <@Animal> [concrete]
@@ -555,6 +557,7 @@ fn CallsWithTypeExplicit(generic U: type) {
 // CHECK:STDOUT: --- with_blanket.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %Eats.type: type = facet_type <@Eats> [concrete]
 // CHECK:STDOUT:   %Self.23e: %Eats.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %Animal.type: type = facet_type <@Animal> [concrete]
@@ -868,6 +871,7 @@ fn CallsWithTypeExplicit(generic U: type) {
 // CHECK:STDOUT: --- equivalent.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %A.type: type = facet_type <@A> [concrete]
 // CHECK:STDOUT:   %Self: %A.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %.Self.frozen.e58: type = symbolic_binding .Self [symbolic_self]
@@ -1057,6 +1061,7 @@ fn CallsWithTypeExplicit(generic U: type) {
 // CHECK:STDOUT: --- no_interfaces_success.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %.Self.frozen: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %pattern_type.9a5: type = pattern_type type [concrete]
 // CHECK:STDOUT:   %T.patt: %pattern_type.9a5 = symbolic_binding_pattern T, 0 [symbolic]
@@ -1292,6 +1297,7 @@ fn CallsWithTypeExplicit(generic U: type) {
 // CHECK:STDOUT: --- no_interfaces.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %.Self.frozen: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %.Self: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %pattern_type.9a5: type = pattern_type type [concrete]

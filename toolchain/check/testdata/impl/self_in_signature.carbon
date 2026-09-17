@@ -44,6 +44,7 @@ impl D as SelfNested {
 // CHECK:STDOUT: --- self_in_signature.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %UseSelf.type: type = facet_type <@UseSelf> [concrete]
 // CHECK:STDOUT:   %Self.bde: %UseSelf.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %Self.as_type.968: type = facet_access_type %Self.bde [symbolic]

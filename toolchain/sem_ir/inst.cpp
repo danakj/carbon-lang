@@ -120,7 +120,7 @@ auto LocIdAndInst::RuntimeVerified(const File& file, LocId loc_id, Inst inst)
     -> LocIdAndInst {
   switch (loc_id.kind()) {
     case LocId::Kind::ImportIRInstId: {
-      CARBON_CHECK(!IsSingletonInst(inst),
+      CARBON_CHECK(!IsSingletonInstKind(inst.kind()),
                    "Should never import builtins/singletons: {0}", inst);
       if (inst.IsOneOf<ImportRefLoaded, ImportRefUnloaded>()) {
         // These don't represent the in-use `InstKind`, so should not be

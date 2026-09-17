@@ -65,6 +65,7 @@ fn G() {
 // CHECK:STDOUT: --- generic_facet_type.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %.Self.frozen: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %pattern_type.9a5: type = pattern_type type [concrete]
 // CHECK:STDOUT:   %Scalar.patt: %pattern_type.9a5 = symbolic_binding_pattern Scalar, 0 [symbolic]
@@ -419,6 +420,7 @@ fn G() {
 // CHECK:STDOUT: --- generic_facet_type_from_implicit_param.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %.Self.frozen: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %pattern_type.9a5: type = pattern_type type [concrete]
 // CHECK:STDOUT:   %Scalar.patt: %pattern_type.9a5 = symbolic_binding_pattern Scalar, 0 [symbolic]

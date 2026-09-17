@@ -46,6 +46,7 @@ fn FirstPerfectNumber() -> z { return 6; }
 // CHECK:STDOUT: --- fail_let_in_type.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %pattern_type.9a5: type = pattern_type type [concrete]
 // CHECK:STDOUT:   %x.patt: %pattern_type.9a5 = value_binding_pattern x [concrete]
 // CHECK:STDOUT:   %int_32: Core.IntLiteral = int_value 32 [concrete]

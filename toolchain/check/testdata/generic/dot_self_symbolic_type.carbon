@@ -77,6 +77,7 @@ fn H(generic T: type) {
 // CHECK:STDOUT: --- fail_dot_self_symbolic_type.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %.Self.frozen.e58: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %pattern_type.9a5: type = pattern_type type [concrete]
 // CHECK:STDOUT:   %A.type.55a: type = generic_interface_type @A [concrete]
@@ -320,6 +321,7 @@ fn H(generic T: type) {
 // CHECK:STDOUT: --- dot_self_symbolic_in_impl_lookup.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %.Self.frozen.e58: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %pattern_type.9a5: type = pattern_type type [concrete]
 // CHECK:STDOUT:   %AA.patt: %pattern_type.9a5 = symbolic_binding_pattern AA, 0 [symbolic]

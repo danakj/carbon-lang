@@ -227,6 +227,7 @@ interface C {
 // CHECK:STDOUT: --- default_interfaces.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %DefaultFn.type: type = facet_type <@DefaultFn> [concrete]
 // CHECK:STDOUT:   %Self.4f0: %DefaultFn.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %DefaultFn.WithSelf.F.type.99d: type = fn_type @DefaultFn.WithSelf.F, @DefaultFn.WithSelf(%Self.4f0) [symbolic]
@@ -499,6 +500,7 @@ interface C {
 // CHECK:STDOUT: --- final_interfaces.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %FinalFn.type: type = facet_type <@FinalFn> [concrete]
 // CHECK:STDOUT:   %Self.49e: %FinalFn.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %FinalFn.WithSelf.F.type.2c0: type = fn_type @FinalFn.WithSelf.F, @FinalFn.WithSelf(%Self.49e) [symbolic]
@@ -771,6 +773,7 @@ interface C {
 // CHECK:STDOUT: --- default_function.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %C: type = class_type @C [concrete]
 // CHECK:STDOUT:   %DefaultFn.type: type = facet_type <@DefaultFn> [concrete]
 // CHECK:STDOUT:   %.1d8: <witness> = impl_self_witness %C, @DefaultFn [concrete]
@@ -836,6 +839,7 @@ interface C {
 // CHECK:STDOUT: --- default_method.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %C: type = class_type @C [concrete]
 // CHECK:STDOUT:   %DefaultMethod.type: type = facet_type <@DefaultMethod> [concrete]
 // CHECK:STDOUT:   %.3e0: <witness> = impl_self_witness %C, @DefaultMethod [concrete]
@@ -930,6 +934,7 @@ interface C {
 // CHECK:STDOUT: --- default_function_overridden.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %C: type = class_type @C [concrete]
 // CHECK:STDOUT:   %C.G.type: type = fn_type @C.G [concrete]
 // CHECK:STDOUT:   %empty_tuple.type: type = tuple_type () [concrete]
@@ -1015,6 +1020,7 @@ interface C {
 // CHECK:STDOUT: --- default_method_overridden.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %C: type = class_type @C [concrete]
 // CHECK:STDOUT:   %pattern_type.98b: type = pattern_type %C [concrete]
 // CHECK:STDOUT:   %self.param_patt.303: %pattern_type.98b = value_param_pattern [concrete]
@@ -1145,6 +1151,7 @@ interface C {
 // CHECK:STDOUT: --- final_function.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %C: type = class_type @C [concrete]
 // CHECK:STDOUT:   %FinalFn.type: type = facet_type <@FinalFn> [concrete]
 // CHECK:STDOUT:   %.55e: <witness> = impl_self_witness %C, @FinalFn [concrete]
@@ -1210,6 +1217,7 @@ interface C {
 // CHECK:STDOUT: --- final_method.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %C: type = class_type @C [concrete]
 // CHECK:STDOUT:   %FinalMethod.type: type = facet_type <@FinalMethod> [concrete]
 // CHECK:STDOUT:   %.864: <witness> = impl_self_witness %C, @FinalMethod [concrete]

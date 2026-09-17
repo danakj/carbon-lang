@@ -167,6 +167,7 @@ fn P(o: O) {
 // CHECK:STDOUT: --- different_impl_member_names.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %HasF.type: type = facet_type <@HasF> [concrete]
 // CHECK:STDOUT:   %Self.c62: %HasF.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %HasF.WithSelf.F.type.a73: type = fn_type @HasF.WithSelf.F, @HasF.WithSelf(%Self.c62) [symbolic]
@@ -403,6 +404,7 @@ fn P(o: O) {
 // CHECK:STDOUT: --- fail_ambiguous_impls.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %HasA1.type: type = facet_type <@HasA1> [concrete]
 // CHECK:STDOUT:   %Self.1db: %HasA1.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %HasA1.WithSelf.A.type.b62: type = fn_type @HasA1.WithSelf.A, @HasA1.WithSelf(%Self.1db) [symbolic]
@@ -621,6 +623,7 @@ fn P(o: O) {
 // CHECK:STDOUT: --- different_impl_and_base.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %HasI.type: type = facet_type <@HasI> [concrete]
 // CHECK:STDOUT:   %Self: %HasI.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %HasI.WithSelf.I.type.a8e: type = fn_type @HasI.WithSelf.I, @HasI.WithSelf(%Self) [symbolic]
@@ -797,6 +800,7 @@ fn P(o: O) {
 // CHECK:STDOUT: --- fail_ambiguous_impl_and_base.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %Base: type = class_type @Base [concrete]
 // CHECK:STDOUT:   %Base.K.type: type = fn_type @Base.K [concrete]
 // CHECK:STDOUT:   %Base.K: %Base.K.type = struct_value () [concrete]
@@ -958,6 +962,7 @@ fn P(o: O) {
 // CHECK:STDOUT: --- ambiguity_hidden.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %NBase: type = class_type @NBase [concrete]
 // CHECK:STDOUT:   %NBase.N.type: type = fn_type @NBase.N [concrete]
 // CHECK:STDOUT:   %empty_tuple.type: type = tuple_type () [concrete]

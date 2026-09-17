@@ -23,6 +23,7 @@ impl forall [T: type] T as Simple {
 // CHECK:STDOUT: --- impl_forall.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %Simple.type: type = facet_type <@Simple> [concrete]
 // CHECK:STDOUT:   %Self: %Simple.type = symbolic_binding Self, 0 [symbolic]
 // CHECK:STDOUT:   %Simple.WithSelf.F.type.49c: type = fn_type @Simple.WithSelf.F, @Simple.WithSelf(%Self) [symbolic]

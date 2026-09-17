@@ -178,6 +178,7 @@ fn F[T: type](p: partial T*);
 // CHECK:STDOUT: --- base.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %C: type = class_type @C [concrete]
 // CHECK:STDOUT:   %.331: type = partial_type %C [concrete]
 // CHECK:STDOUT:   %pattern_type: type = pattern_type %.331 [concrete]
@@ -206,6 +207,7 @@ fn F[T: type](p: partial T*);
 // CHECK:STDOUT: --- abstract.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %C: type = class_type @C [concrete]
 // CHECK:STDOUT:   %.331: type = partial_type %C [concrete]
 // CHECK:STDOUT:   %pattern_type: type = pattern_type %.331 [concrete]
@@ -234,6 +236,7 @@ fn F[T: type](p: partial T*);
 // CHECK:STDOUT: --- abstract_var.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %C: type = class_type @C [concrete]
 // CHECK:STDOUT:   %.331: type = partial_type %C [concrete]
 // CHECK:STDOUT:   %pattern_type: type = pattern_type %.331 [concrete]
@@ -262,6 +265,7 @@ fn F[T: type](p: partial T*);
 // CHECK:STDOUT: --- fail_partial_nondynamic.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %C: type = class_type @C [concrete]
 // CHECK:STDOUT:   %.331: type = partial_type %C [concrete]
 // CHECK:STDOUT:   %pattern_type: type = pattern_type %.331 [concrete]
@@ -290,6 +294,7 @@ fn F[T: type](p: partial T*);
 // CHECK:STDOUT: --- fail_partial_final.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %Derived: type = class_type @Derived [concrete]
 // CHECK:STDOUT:   %.546: type = partial_type %Derived [concrete]
 // CHECK:STDOUT:   %pattern_type: type = pattern_type %.546 [concrete]
@@ -318,6 +323,7 @@ fn F[T: type](p: partial T*);
 // CHECK:STDOUT: --- fail_partial_decl.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %C: type = class_type @C [concrete]
 // CHECK:STDOUT:   %.331: type = partial_type %C [concrete]
 // CHECK:STDOUT:   %pattern_type: type = pattern_type %.331 [concrete]
@@ -346,6 +352,7 @@ fn F[T: type](p: partial T*);
 // CHECK:STDOUT: --- fail_partial_tuple.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %C: type = class_type @C [concrete]
 // CHECK:STDOUT:   %tuple.type.693: type = tuple_type (type, type) [concrete]
 // CHECK:STDOUT:   %tuple: %tuple.type.693 = tuple_value (%C, %C) [concrete]
@@ -380,6 +387,7 @@ fn F[T: type](p: partial T*);
 // CHECK:STDOUT: --- fail_partial_struct.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %C: type = class_type @C [concrete]
 // CHECK:STDOUT:   %struct_type.x: type = struct_type {.x: %C} [concrete]
 // CHECK:STDOUT:   %.91f: type = partial_type %struct_type.x [concrete]
@@ -410,6 +418,7 @@ fn F[T: type](p: partial T*);
 // CHECK:STDOUT: --- fail_duplicate.carbon
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
+// CHECK:STDOUT:   type: type = facet_type <type> [concrete]
 // CHECK:STDOUT:   %C: type = class_type @C [concrete]
 // CHECK:STDOUT:   %.331: type = partial_type %C [concrete]
 // CHECK:STDOUT:   %.d52: type = partial_type %.331 [concrete]
