@@ -322,10 +322,6 @@ static auto GetSelfFacetForInterfaceFromLookupSelfType(
   // Extended name lookup into a type, like `x.F`, can find a facet type
   // extended scope from the type of `x`. The type of `x` may be a facet
   // converted to a type, so drop the `as type` conversion if so.
-  //
-  // The result is a facet value, a type value (which is also a facet value,
-  // since `type` is a facet type), or an ErrorInst. Any of these can be used
-  // directly in the interface-with-self specific.
   return GetCanonicalFacetOrTypeValue(context, self_type_const_id);
 }
 
