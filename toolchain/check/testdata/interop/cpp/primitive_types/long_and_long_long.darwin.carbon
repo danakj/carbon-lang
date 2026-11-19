@@ -2309,7 +2309,7 @@ fn CopyUnsignedLong() {
 // CHECK:STDOUT:   %T.as_type.as.OrderedWith.impl.Less.bound.621d39.2: <bound method> = bound_method %int_1.5b8, %T.as_type.as.OrderedWith.impl.Less.b8de4c.1 [concrete]
 // CHECK:STDOUT:   %T.as_type.as.OrderedWith.impl.Less.specific_fn.58f79a.2: <specific function> = specific_function %T.as_type.as.OrderedWith.impl.Less.b8de4c.1, @T.as_type.as.OrderedWith.impl.Less.4(%ImplicitAs.facet.ee1) [concrete]
 // CHECK:STDOUT:   %bound_method.c40960.2: <bound method> = bound_method %int_1.5b8, %T.as_type.as.OrderedWith.impl.Less.specific_fn.58f79a.2 [concrete]
-// CHECK:STDOUT:   %.539c: type = fn_type_with_self_type %OrderedWith.WithSelf.GreaterOrEquivalent.type.258, %OrderedWith.facet.230 [concrete]
+// CHECK:STDOUT:   %.539: type = fn_type_with_self_type %OrderedWith.WithSelf.GreaterOrEquivalent.type.258, %OrderedWith.facet.230 [concrete]
 // CHECK:STDOUT:   %T.as_type.as.OrderedWith.impl.GreaterOrEquivalent.bound.308b69.1: <bound method> = bound_method %int_1.5b8, %T.as_type.as.OrderedWith.impl.GreaterOrEquivalent.1b7ac6.2 [concrete]
 // CHECK:STDOUT:   %T.as_type.as.OrderedWith.impl.GreaterOrEquivalent.specific_fn.4391cd.1: <specific function> = specific_function %T.as_type.as.OrderedWith.impl.GreaterOrEquivalent.1b7ac6.2, @T.as_type.as.OrderedWith.impl.GreaterOrEquivalent.3(%ImplicitAs.facet.ee1) [concrete]
 // CHECK:STDOUT:   %bound_method.b1f5e5.1: <bound method> = bound_method %int_1.5b8, %T.as_type.as.OrderedWith.impl.GreaterOrEquivalent.specific_fn.4391cd.1 [concrete]
@@ -2569,7 +2569,7 @@ fn CopyUnsignedLong() {
 // CHECK:STDOUT:   %T.as_type.as.OrderedWith.impl.Less.call: init bool = call %bound_method.loc20_5.3(%.loc20_3.2, %a.ref.loc20)
 // CHECK:STDOUT:   %int_1.loc21: Core.IntLiteral = int_value 1 [concrete = constants.%int_1.5b8]
 // CHECK:STDOUT:   %a.ref.loc21: %Cpp.long = name_ref a, %a
-// CHECK:STDOUT:   %impl.elem3.loc21: %.539c = impl_witness_access constants.%OrderedWith.impl_witness.2de, element3 [concrete = constants.%T.as_type.as.OrderedWith.impl.GreaterOrEquivalent.1b7ac6.2]
+// CHECK:STDOUT:   %impl.elem3.loc21: %.539 = impl_witness_access constants.%OrderedWith.impl_witness.2de, element3 [concrete = constants.%T.as_type.as.OrderedWith.impl.GreaterOrEquivalent.1b7ac6.2]
 // CHECK:STDOUT:   %bound_method.loc21_5.1: <bound method> = bound_method %int_1.loc21, %impl.elem3.loc21 [concrete = constants.%T.as_type.as.OrderedWith.impl.GreaterOrEquivalent.bound.308b69.1]
 // CHECK:STDOUT:   %ImplicitAs.facet.loc21_5.1: %ImplicitAs.type.3c9 = facet_value Core.IntLiteral, (constants.%ImplicitAs.impl_witness.157) [concrete = constants.%ImplicitAs.facet.ee1]
 // CHECK:STDOUT:   %.loc21_5.1: %ImplicitAs.type.3c9 = converted Core.IntLiteral, %ImplicitAs.facet.loc21_5.1 [concrete = constants.%ImplicitAs.facet.ee1]

@@ -556,7 +556,7 @@ fn F(generic T: Y where .Y1 impls M and C(.Self, ()) impls M) -> C(T, ()).C1 {
   return ();
 }
 
-// --- concrete_access_witness_m_in_extend_constraint.carbon
+// --- fail_todo_concrete_access_witness_m_in_extend_constraint.carbon
 library "[[@TEST_NAME]]";
 
 interface L { let W: type; }
@@ -572,10 +572,20 @@ class C(C1: type);
 // (since the type of `.Self` contains `M`) and the `final impl`. So we can get
 // a witness for `C(())` from `T`.
 fn I(generic T: (L & M) where C(.W) impls Z(.Self)) {
+  // TODO: We prevent the identification of T's facet type from finding a final
+  // impl for `T as L` to avoid cycles, but that breaks this test. See TODO in
+  // CollectFacetWitnessSources().
+  // CHECK:STDERR:        ╭─┤ fail_todo_concrete_access_witness_m_in_extend_constraint.carbon:[[@LINE+7]]:3
+  // CHECK:STDERR: ->     │   C(()) as Z(T);
+  // CHECK:STDERR:        ·   ━━━━━━┳━━━━━━
+  // CHECK:STDERR:        ·         ┗━━┫ error: cannot convert type `C(())` into type implementing `Z(T)`
+  // CHECK:STDERR:        ·            ┃        [ConversionFailureTypeToFacet]
+  // CHECK:STDERR:        ╰────
+  // CHECK:STDERR:
   C(()) as Z(T);
 }
 
-// --- concrete_access_witness_m_in_extend_constraint_compound_access.carbon
+// --- fail_todo_concrete_access_witness_m_in_extend_constraint_compound_access.carbon
 library "[[@TEST_NAME]]";
 
 interface L { let W: type; }
@@ -591,10 +601,20 @@ class C(C1: type);
 // (since the type of `.Self` contains `M`) and the `final impl`. So we can get
 // a witness for `C(())` from `T`.
 fn I(generic T: (L & M) where C(.Self.(L.W)) impls Z(.Self)) {
+  // TODO: We prevent the identification of T's facet type from finding a final
+  // impl for `T as L` to avoid cycles, but that breaks this test. See TODO in
+  // CollectFacetWitnessSources().
+  // CHECK:STDERR:        ╭─┤ fail_todo_concrete_access_witness_m_in_extend_constraint_compound_access.carbon:[[@LINE+7]]:3
+  // CHECK:STDERR: ->     │   C(()) as Z(T);
+  // CHECK:STDERR:        ·   ━━━━━━┳━━━━━━
+  // CHECK:STDERR:        ·         ┗━━┫ error: cannot convert type `C(())` into type implementing `Z(T)`
+  // CHECK:STDERR:        ·            ┃        [ConversionFailureTypeToFacet]
+  // CHECK:STDERR:        ╰────
+  // CHECK:STDERR:
   C(()) as Z(T);
 }
 
-// --- concrete_access_witness_m_in_impls_interface.carbon
+// --- fail_todo_concrete_access_witness_m_in_impls_interface.carbon
 library "[[@TEST_NAME]]";
 
 interface L { let W: type; }
@@ -610,10 +630,20 @@ class C(C1: type);
 // (since the type of `.Self` contains `M`) and the `final impl`. So we can get
 // a witness for `C(())` from `T`.
 fn H(generic T: (L where .Self impls M) where C(.W) impls Z(.Self)) {
+  // TODO: We prevent the identification of T's facet type from finding a final
+  // impl for `T as L` to avoid cycles, but that breaks this test. See TODO in
+  // CollectFacetWitnessSources().
+  // CHECK:STDERR:        ╭─┤ fail_todo_concrete_access_witness_m_in_impls_interface.carbon:[[@LINE+7]]:3
+  // CHECK:STDERR: ->     │   C(()) as Z(T);
+  // CHECK:STDERR:        ·   ━━━━━━┳━━━━━━
+  // CHECK:STDERR:        ·         ┗━━┫ error: cannot convert type `C(())` into type implementing `Z(T)`
+  // CHECK:STDERR:        ·            ┃        [ConversionFailureTypeToFacet]
+  // CHECK:STDERR:        ╰────
+  // CHECK:STDERR:
   C(()) as Z(T);
 }
 
-// --- concrete_access_witness_m_in_impls_constraint.carbon
+// --- fail_todo_concrete_access_witness_m_in_impls_constraint.carbon
 library "[[@TEST_NAME]]";
 
 interface L { let W: type; }
@@ -630,6 +660,16 @@ class C(C1: type);
 // (since the type of `.Self` contains `M`) and the `final impl`. So we can get
 // a witness for `C(())` from `T`.
 fn H(generic T: (L where .Self impls GivesM) where C(.W) impls Z(.Self)) {
+  // TODO: We prevent the identification of T's facet type from finding a final
+  // impl for `T as L` to avoid cycles, but that breaks this test. See TODO in
+  // CollectFacetWitnessSources().
+  // CHECK:STDERR:        ╭─┤ fail_todo_concrete_access_witness_m_in_impls_constraint.carbon:[[@LINE+7]]:3
+  // CHECK:STDERR: ->     │   C(()) as Z(T);
+  // CHECK:STDERR:        ·   ━━━━━━┳━━━━━━
+  // CHECK:STDERR:        ·         ┗━━┫ error: cannot convert type `C(())` into type implementing `Z(T)`
+  // CHECK:STDERR:        ·            ┃        [ConversionFailureTypeToFacet]
+  // CHECK:STDERR:        ╰────
+  // CHECK:STDERR:
   C(()) as Z(T);
 }
 
@@ -674,7 +714,7 @@ fn H(generic T: (type where D(.Self) impls GivesM) where C(D(.Self).(L.W)) impls
   C(()) as Z(T);
 }
 
-// --- concrete_access_witness_m_in_earlier_requirement.carbon
+// --- fail_todo_concrete_access_witness_m_in_earlier_requirement.carbon
 library "[[@TEST_NAME]]";
 
 interface L { let W: type; }
@@ -690,10 +730,20 @@ class C(C1: type);
 // (since the type of `.Self` contains `M`) and the `final impl`. So we can get
 // a witness for `C(())` from `T`.
 fn G(generic T: L where .Self impls M and C(.W) impls Z(.Self)) {
+  // TODO: We prevent the identification of T's facet type from finding a final
+  // impl for `T as L` to avoid cycles, but that breaks this test. See TODO in
+  // CollectFacetWitnessSources().
+  // CHECK:STDERR:        ╭─┤ fail_todo_concrete_access_witness_m_in_earlier_requirement.carbon:[[@LINE+7]]:3
+  // CHECK:STDERR: ->     │   C(()) as Z(T);
+  // CHECK:STDERR:        ·   ━━━━━━┳━━━━━━
+  // CHECK:STDERR:        ·         ┗━━┫ error: cannot convert type `C(())` into type implementing `Z(T)`
+  // CHECK:STDERR:        ·            ┃        [ConversionFailureTypeToFacet]
+  // CHECK:STDERR:        ╰────
+  // CHECK:STDERR:
   C(()) as Z(T);
 }
 
-// --- concrete_access_witness_generic_m_in_extend_constraint.carbon
+// --- fail_todo_concrete_access_witness_generic_m_in_extend_constraint.carbon
 library "[[@TEST_NAME]]";
 
 interface L(L1: type) { let W: type; }
@@ -709,6 +759,16 @@ class C(C1: type);
 // (since the type of `.Self` contains `M`) and the `final impl`. So we can get
 // a witness for `C(())` from `T`.
 fn H(generic T: (L(.Self) & M(.Self)) where C(.W) impls Z(.Self)) {
+  // TODO: We prevent the identification of T's facet type from finding a final
+  // impl for `T as L` to avoid cycles, but that breaks this test. See TODO in
+  // CollectFacetWitnessSources().
+  // CHECK:STDERR:        ╭─┤ fail_todo_concrete_access_witness_generic_m_in_extend_constraint.carbon:[[@LINE+7]]:3
+  // CHECK:STDERR: ->     │   C(()) as Z(T);
+  // CHECK:STDERR:        ·   ━━━━━━┳━━━━━━
+  // CHECK:STDERR:        ·         ┗━━┫ error: cannot convert type `C(())` into type implementing `Z(T)`
+  // CHECK:STDERR:        ·            ┃        [ConversionFailureTypeToFacet]
+  // CHECK:STDERR:        ╰────
+  // CHECK:STDERR:
   C(()) as Z(T);
 }
 
@@ -1340,9 +1400,9 @@ fn F() {
 // CHECK:STDOUT:   %T.as_type.917: type = facet_access_type %T.95b [symbolic]
 // CHECK:STDOUT:   %.Self.frozen.7b7: %Z.type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %.Self.frozen.as_type: type = facet_access_type %.Self.frozen.7b7 [symbolic_self]
-// CHECK:STDOUT:   %.db1: <witness> = impl_self_witness %.Self.frozen.7b7, @Z [symbolic_self]
-// CHECK:STDOUT:   %impl.elem0.e1c: type = impl_witness_access %.db1, element0 [symbolic_self]
-// CHECK:STDOUT:   %rewrite.elem0.7d9: type = rewrite_target %.db1, element0 [symbolic_self]
+// CHECK:STDOUT:   %Z.lookup_impl_witness.90d: <witness> = lookup_impl_witness %.Self.frozen.7b7, @Z [symbolic_self]
+// CHECK:STDOUT:   %impl.elem0.778: type = impl_witness_access %Z.lookup_impl_witness.90d, element0 [symbolic_self]
+// CHECK:STDOUT:   %rewrite.elem0.e77: type = rewrite_target %Z.lookup_impl_witness.90d, element0 [symbolic_self]
 // CHECK:STDOUT:   %Y.WithSelf.Y1.type.27a: type = fn_type @Y.WithSelf.Y1, @Y.WithSelf(%T.95b) [symbolic]
 // CHECK:STDOUT:   %Y.lookup_impl_witness: <witness> = lookup_impl_witness %T.95b, @Y [symbolic]
 // CHECK:STDOUT:   %.604: type = fn_type_with_self_type %Y.WithSelf.Y1.type.27a, %T.95b [symbolic]
@@ -1350,14 +1410,14 @@ fn F() {
 // CHECK:STDOUT:   %specific_impl_fn.4bf: <specific function> = specific_impl_function %impl.elem0.aed, @Y.WithSelf.Y1(%T.95b, %.Self.frozen.as_type) [symbolic]
 // CHECK:STDOUT:   %Y.WithSelf.Y1.call.f9a: init type = call %specific_impl_fn.4bf() [template]
 // CHECK:STDOUT:   %.Self: %Z.type = symbolic_binding .Self [symbolic_self]
-// CHECK:STDOUT:   %.513: <witness> = impl_self_witness %.Self, @Z [symbolic_self]
-// CHECK:STDOUT:   %rewrite.elem0.8e3: type = rewrite_target %.513, element0 [symbolic_self]
+// CHECK:STDOUT:   %Z.lookup_impl_witness.b8d: <witness> = lookup_impl_witness %.Self, @Z [symbolic_self]
+// CHECK:STDOUT:   %rewrite.elem0.c63: type = rewrite_target %Z.lookup_impl_witness.b8d, element0 [symbolic_self]
 // CHECK:STDOUT:   %.Self.as_type: type = facet_access_type %.Self [symbolic_self]
 // CHECK:STDOUT:   %specific_impl_fn.85a: <specific function> = specific_impl_function %impl.elem0.aed, @Y.WithSelf.Y1(%T.95b, %.Self.as_type) [symbolic]
 // CHECK:STDOUT:   %Y.WithSelf.Y1.call.09a: init type = call %specific_impl_fn.85a() [template]
-// CHECK:STDOUT:   %Z_where.type.159: type = facet_type <@Z where %rewrite.elem0.8e3 = %Y.WithSelf.Y1.call.09a> [template]
-// CHECK:STDOUT:   %.ddc: <witness> = impl_self_witness %T.95b, @Z [symbolic]
+// CHECK:STDOUT:   %Z_where.type.b70: type = facet_type <@Z where %rewrite.elem0.c63 = %Y.WithSelf.Y1.call.09a> [template]
 // CHECK:STDOUT:   %specific_impl_fn.bac: <specific function> = specific_impl_function %impl.elem0.aed, @Y.WithSelf.Y1(%T.95b, %T.as_type.917):identified [symbolic]
+// CHECK:STDOUT:   %.e25: <witness> = impl_self_witness %T.as_type.917, @Z [symbolic]
 // CHECK:STDOUT:   %Z.impl_witness.179: <witness> = impl_witness @T.as_type.as.Z.impl.%Z.impl_witness_table, @T.as_type.as.Z.impl(%T.95b) [symbolic]
 // CHECK:STDOUT:   %specific_impl_fn.d3c: <specific function> = specific_impl_function %impl.elem0.aed, @Y.WithSelf.Y1(%T.95b, %T.as_type.917) [symbolic]
 // CHECK:STDOUT:   %Y.WithSelf.Y1.call.bea: init type = call %specific_impl_fn.d3c() [template]
@@ -1369,7 +1429,7 @@ fn F() {
 // CHECK:STDOUT:   %.0ff: type = fn_type_with_self_type %Y.WithSelf.Y1.type.67a, %Y.facet [concrete]
 // CHECK:STDOUT:   %empty_tuple.type.as.Y.impl.Y1.specific_fn.700: <specific function> = specific_function %empty_tuple.type.as.Y.impl.Y1, @empty_tuple.type.as.Y.impl.Y1(%.Self.as_type) [symbolic_self]
 // CHECK:STDOUT:   %empty_tuple.type.as.Y.impl.Y1.call: init type = call %empty_tuple.type.as.Y.impl.Y1.specific_fn.700() [symbolic_self]
-// CHECK:STDOUT:   %Z_where.type.672: type = facet_type <@Z where %rewrite.elem0.8e3 = %empty_tuple.type.as.Y.impl.Y1.call> [concrete]
+// CHECK:STDOUT:   %Z_where.type.553: type = facet_type <@Z where %rewrite.elem0.c63 = %empty_tuple.type.as.Y.impl.Y1.call> [concrete]
 // CHECK:STDOUT:   %empty_tuple.type.as.Y.impl.Y1.specific_fn.c56: <specific function> = specific_function %empty_tuple.type.as.Y.impl.Y1, @empty_tuple.type.as.Y.impl.Y1(%empty_tuple.type) [concrete]
 // CHECK:STDOUT:   %.78e: <witness> = impl_self_witness %empty_tuple.type, @Z [concrete]
 // CHECK:STDOUT:   %Z.impl_witness.a55: <witness> = impl_witness @T.as_type.as.Z.impl.%Z.impl_witness_table, @T.as_type.as.Z.impl(%Y.facet) [concrete]
@@ -1389,8 +1449,8 @@ fn F() {
 // CHECK:STDOUT:     %.Self.as_type.loc16_33: type = facet_access_type %.Self.ref.loc16_33 [symbolic_self = constants.%.Self.frozen.as_type]
 // CHECK:STDOUT:     %.loc16_33: type = converted %.Self.ref.loc16_33, %.Self.as_type.loc16_33 [symbolic_self = constants.%.Self.frozen.as_type]
 // CHECK:STDOUT:     %Z1.ref: %Z.assoc_type = name_ref Z1, @Z1.%assoc0 [concrete = constants.%assoc0.3fa]
-// CHECK:STDOUT:     %impl.elem0.loc16_33: type = impl_witness_access constants.%.db1, element0 [symbolic_self = constants.%impl.elem0.e1c]
-// CHECK:STDOUT:     %rewrite.elem0.loc16_33.1: type = rewrite_target constants.%.db1, element0 [symbolic_self = constants.%rewrite.elem0.7d9]
+// CHECK:STDOUT:     %impl.elem0.loc16_33: type = impl_witness_access constants.%Z.lookup_impl_witness.90d, element0 [symbolic_self = constants.%impl.elem0.778]
+// CHECK:STDOUT:     %rewrite.elem0.loc16_33.1: type = rewrite_target constants.%Z.lookup_impl_witness.90d, element0 [symbolic_self = constants.%rewrite.elem0.e77]
 // CHECK:STDOUT:     %T.ref.loc16_39: %Y.type = name_ref T, %T.loc16_15.1 [symbolic = constants.%T.95b]
 // CHECK:STDOUT:     %T.as_type.loc16_40: type = facet_access_type %T.ref.loc16_39 [symbolic = constants.%T.as_type.917]
 // CHECK:STDOUT:     %.loc16_40: type = converted %T.ref.loc16_39, %T.as_type.loc16_40 [symbolic = constants.%T.as_type.917]
@@ -1404,13 +1464,13 @@ fn F() {
 // CHECK:STDOUT:     %.loc16_49.2: type = value_of_initializer %Y.WithSelf.Y1.call.loc16_49.1 [template = constants.%Y.WithSelf.Y1.call.f9a]
 // CHECK:STDOUT:     %.loc16_49.3: type = converted %Y.WithSelf.Y1.call.loc16_49.1, %.loc16_49.2 [template = constants.%Y.WithSelf.Y1.call.f9a]
 // CHECK:STDOUT:     %rewrite.loc16_37.1 = requirement_rewrite %rewrite.elem0.loc16_33.1, %.loc16_49.3 [concrete]
-// CHECK:STDOUT:     %rewrite.elem0.loc16_33.2: type = rewrite_target constants.%.513, element0 [symbolic_self = constants.%rewrite.elem0.8e3]
+// CHECK:STDOUT:     %rewrite.elem0.loc16_33.2: type = rewrite_target constants.%Z.lookup_impl_witness.b8d, element0 [symbolic_self = constants.%rewrite.elem0.c63]
 // CHECK:STDOUT:     %specific_impl_fn.loc16_40.2: <specific function> = specific_impl_function %impl.elem0.loc16_40, @Y.WithSelf.Y1(constants.%T.95b, constants.%.Self.as_type) [symbolic = constants.%specific_impl_fn.85a]
 // CHECK:STDOUT:     %Y.WithSelf.Y1.call.loc16_49.2: init type = call %specific_impl_fn.loc16_40.2() [template = constants.%Y.WithSelf.Y1.call.09a]
 // CHECK:STDOUT:     %.loc16_49.4: type = value_of_initializer %Y.WithSelf.Y1.call.loc16_49.2 [template = constants.%Y.WithSelf.Y1.call.09a]
 // CHECK:STDOUT:     %.loc16_49.5: type = converted %Y.WithSelf.Y1.call.loc16_49.1, %.loc16_49.4 [template = constants.%Y.WithSelf.Y1.call.09a]
 // CHECK:STDOUT:     %rewrite.loc16_37.2 = requirement_rewrite %rewrite.elem0.loc16_33.2, %.loc16_49.5 [concrete]
-// CHECK:STDOUT:     %.loc16_27.1: type = where_expr [template = %Z_where.type (constants.%Z_where.type.159)] {
+// CHECK:STDOUT:     %.loc16_27.1: type = where_expr [template = %Z_where.type (constants.%Z_where.type.b70)] {
 // CHECK:STDOUT:       %base_facet_type = requirement_base_facet_type %Z.ref [concrete]
 // CHECK:STDOUT:       %rewrite.loc16_37.2 = requirement_rewrite %rewrite.elem0.loc16_33.2, %.loc16_49.5 [concrete]
 // CHECK:STDOUT:     }
@@ -1421,7 +1481,7 @@ fn F() {
 // CHECK:STDOUT:     %T.loc16_15.1: %Y.type = symbolic_binding T, 0 [symbolic = %T.loc16_15.2 (constants.%T.95b)]
 // CHECK:STDOUT:   }
 // CHECK:STDOUT:   %specific_impl_fn: <specific function> = specific_impl_function constants.%impl.elem0.aed, @Y.WithSelf.Y1(constants.%T.95b, constants.%T.as_type.917):identified [symbolic = @T.as_type.as.Z.impl.%specific_impl_fn.loc16_27.2 (constants.%specific_impl_fn.bac)]
-// CHECK:STDOUT:   %.loc16: <witness> = impl_self_witness @T.as_type.as.Z.impl.%.loc16_20, @Z [symbolic = @T.as_type.as.Z.impl.%.loc16_51 (constants.%.ddc)]
+// CHECK:STDOUT:   %.loc16: <witness> = impl_self_witness @T.as_type.as.Z.impl.%.loc16_20, @Z [symbolic = @T.as_type.as.Z.impl.%.loc16_51 (constants.%.e25)]
 // CHECK:STDOUT: }
 // CHECK:STDOUT:
 // CHECK:STDOUT: generic impl @T.as_type.as.Z.impl(%T.loc16_15.1: %Y.type) {
@@ -1434,9 +1494,9 @@ fn F() {
 // CHECK:STDOUT:   %impl.elem0.loc16_27: @T.as_type.as.Z.impl.%.loc16_27.2 (%.604) = impl_witness_access %Y.lookup_impl_witness, element0 [symbolic = %impl.elem0.loc16_27 (constants.%impl.elem0.aed)]
 // CHECK:STDOUT:   %specific_impl_fn.loc16_27.1: <specific function> = specific_impl_function %impl.elem0.loc16_27, @Y.WithSelf.Y1(%T.loc16_15.2, constants.%.Self.as_type) [symbolic = %specific_impl_fn.loc16_27.1 (constants.%specific_impl_fn.85a)]
 // CHECK:STDOUT:   %Y.WithSelf.Y1.call.loc16_27: init type = call %specific_impl_fn.loc16_27.1() [template = %Y.WithSelf.Y1.call.loc16_27 (constants.%Y.WithSelf.Y1.call.09a)]
-// CHECK:STDOUT:   %Z_where.type: type = facet_type <@Z where constants.%rewrite.elem0.8e3 = %Y.WithSelf.Y1.call.loc16_27> [template = %Z_where.type (constants.%Z_where.type.159)]
+// CHECK:STDOUT:   %Z_where.type: type = facet_type <@Z where constants.%rewrite.elem0.c63 = %Y.WithSelf.Y1.call.loc16_27> [template = %Z_where.type (constants.%Z_where.type.b70)]
 // CHECK:STDOUT:   %specific_impl_fn.loc16_27.2: <specific function> = specific_impl_function %impl.elem0.loc16_27, @Y.WithSelf.Y1(%T.loc16_15.2, %T.as_type.loc16_20.2):identified [symbolic = %specific_impl_fn.loc16_27.2 (constants.%specific_impl_fn.bac)]
-// CHECK:STDOUT:   %.loc16_51: <witness> = impl_self_witness %T.loc16_15.2, @Z [symbolic = %.loc16_51 (constants.%.ddc)]
+// CHECK:STDOUT:   %.loc16_51: <witness> = impl_self_witness %T.as_type.loc16_20.2, @Z [symbolic = %.loc16_51 (constants.%.e25)]
 // CHECK:STDOUT:   %Z.impl_witness.loc16_51.2: <witness> = impl_witness %Z.impl_witness_table, @T.as_type.as.Z.impl(%T.loc16_15.2) [symbolic = %Z.impl_witness.loc16_51.2 (constants.%Z.impl_witness.179)]
 // CHECK:STDOUT:   %specific_impl_fn.loc16_51.2: <specific function> = specific_impl_function %impl.elem0.loc16_27, @Y.WithSelf.Y1(%T.loc16_15.2, %T.as_type.loc16_20.2) [symbolic = %specific_impl_fn.loc16_51.2 (constants.%specific_impl_fn.d3c)]
 // CHECK:STDOUT:   %Y.WithSelf.Y1.call.loc16_51: init type = call %specific_impl_fn.loc16_51.2() [template = %Y.WithSelf.Y1.call.loc16_51 (constants.%Y.WithSelf.Y1.call.bea)]
@@ -1465,9 +1525,9 @@ fn F() {
 // CHECK:STDOUT:   %impl.elem0.loc16_27 => constants.%impl.elem0.aed
 // CHECK:STDOUT:   %specific_impl_fn.loc16_27.1 => constants.%specific_impl_fn.85a
 // CHECK:STDOUT:   %Y.WithSelf.Y1.call.loc16_27 => constants.%Y.WithSelf.Y1.call.09a
-// CHECK:STDOUT:   %Z_where.type => constants.%Z_where.type.159
+// CHECK:STDOUT:   %Z_where.type => constants.%Z_where.type.b70
 // CHECK:STDOUT:   %specific_impl_fn.loc16_27.2 => constants.%specific_impl_fn.bac
-// CHECK:STDOUT:   %.loc16_51 => constants.%.ddc
+// CHECK:STDOUT:   %.loc16_51 => constants.%.e25
 // CHECK:STDOUT:   %Z.impl_witness.loc16_51.2 => constants.%Z.impl_witness.179
 // CHECK:STDOUT:   %specific_impl_fn.loc16_51.2 => constants.%specific_impl_fn.d3c
 // CHECK:STDOUT:   %Y.WithSelf.Y1.call.loc16_51 => constants.%Y.WithSelf.Y1.call.bea
@@ -1483,7 +1543,7 @@ fn F() {
 // CHECK:STDOUT:   %impl.elem0.loc16_27 => constants.%empty_tuple.type.as.Y.impl.Y1
 // CHECK:STDOUT:   %specific_impl_fn.loc16_27.1 => constants.%empty_tuple.type.as.Y.impl.Y1.specific_fn.700
 // CHECK:STDOUT:   %Y.WithSelf.Y1.call.loc16_27 => constants.%empty_tuple.type.as.Y.impl.Y1.call
-// CHECK:STDOUT:   %Z_where.type => constants.%Z_where.type.672
+// CHECK:STDOUT:   %Z_where.type => constants.%Z_where.type.553
 // CHECK:STDOUT:   %specific_impl_fn.loc16_27.2 => constants.%empty_tuple.type.as.Y.impl.Y1.specific_fn.c56
 // CHECK:STDOUT:   %.loc16_51 => constants.%.78e
 // CHECK:STDOUT:   %Z.impl_witness.loc16_51.2 => constants.%Z.impl_witness.a55

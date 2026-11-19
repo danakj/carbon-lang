@@ -513,8 +513,8 @@ fn F() {
 // CHECK:STDOUT:   %pattern_type.506: type = pattern_type %Self.as_type.976 [symbolic]
 // CHECK:STDOUT:   %self.param_patt.091: %pattern_type.506 = value_param_pattern [symbolic]
 // CHECK:STDOUT:   %self.patt.f35: %pattern_type.506 = wrapper_binding_pattern self, %self.param_patt.091 [symbolic]
-// CHECK:STDOUT:   %J.lookup_impl_witness: <witness> = lookup_impl_witness %Self.653, @J [symbolic]
-// CHECK:STDOUT:   %impl.elem0.c15: type = impl_witness_access %J.lookup_impl_witness, element0 [symbolic]
+// CHECK:STDOUT:   %J.lookup_impl_witness.e57: <witness> = lookup_impl_witness %Self.653, @J [symbolic]
+// CHECK:STDOUT:   %impl.elem0.c15: type = impl_witness_access %J.lookup_impl_witness.e57, element0 [symbolic]
 // CHECK:STDOUT:   %pattern_type.a39: type = pattern_type %impl.elem0.c15 [symbolic]
 // CHECK:STDOUT:   %u.param_patt.81e: %pattern_type.a39 = value_param_pattern [symbolic]
 // CHECK:STDOUT:   %u.patt.54e: %pattern_type.a39 = wrapper_binding_pattern u, %u.param_patt.81e [symbolic]
@@ -613,7 +613,7 @@ fn F() {
 // CHECK:STDOUT:     %return.param_patt.loc6_23.1: @J.WithSelf.F.%pattern_type.loc6_15 (%pattern_type.a39) = out_param_pattern [symbolic = %return.param_patt.loc6_23.2 (constants.%return.param_patt.740)]
 // CHECK:STDOUT:     %return.patt.loc6_20.1: @J.WithSelf.F.%pattern_type.loc6_15 (%pattern_type.a39) = return_slot_pattern %return.param_patt.loc6_23.1, %U.ref.loc6_23 [symbolic = %return.patt.loc6_20.2 (constants.%return.patt.cdd)]
 // CHECK:STDOUT:   } {
-// CHECK:STDOUT:     %impl.elem0.loc6_23: type = impl_witness_access constants.%J.lookup_impl_witness, element0 [symbolic = %impl.elem0.loc6_17.1 (constants.%impl.elem0.c15)]
+// CHECK:STDOUT:     %impl.elem0.loc6_23: type = impl_witness_access constants.%J.lookup_impl_witness.e57, element0 [symbolic = %impl.elem0.loc6_17.1 (constants.%impl.elem0.c15)]
 // CHECK:STDOUT:     %U.ref.loc6_23: type = name_ref U, %impl.elem0.loc6_23 [symbolic = %impl.elem0.loc6_17.1 (constants.%impl.elem0.c15)]
 // CHECK:STDOUT:     %.loc6_23.2: Core.Form = init_form %U.ref.loc6_23 [symbolic = %.loc6_23.1 (constants.%.eb9)]
 // CHECK:STDOUT:     %self.param: @J.WithSelf.F.%Self.as_type.loc6_8.1 (%Self.as_type.976) = value_param call_param0
@@ -625,7 +625,7 @@ fn F() {
 // CHECK:STDOUT:     %self: @J.WithSelf.F.%Self.as_type.loc6_8.1 (%Self.as_type.976) = wrapper_binding self, %self.param
 // CHECK:STDOUT:     %u.param: @J.WithSelf.F.%impl.elem0.loc6_17.1 (%impl.elem0.c15) = value_param call_param1
 // CHECK:STDOUT:     %.loc6_17: type = splice_block %U.ref.loc6_17 [symbolic = %impl.elem0.loc6_17.1 (constants.%impl.elem0.c15)] {
-// CHECK:STDOUT:       %impl.elem0.loc6_17.2: type = impl_witness_access constants.%J.lookup_impl_witness, element0 [symbolic = %impl.elem0.loc6_17.1 (constants.%impl.elem0.c15)]
+// CHECK:STDOUT:       %impl.elem0.loc6_17.2: type = impl_witness_access constants.%J.lookup_impl_witness.e57, element0 [symbolic = %impl.elem0.loc6_17.1 (constants.%impl.elem0.c15)]
 // CHECK:STDOUT:       %U.ref.loc6_17: type = name_ref U, %impl.elem0.loc6_17.2 [symbolic = %impl.elem0.loc6_17.1 (constants.%impl.elem0.c15)]
 // CHECK:STDOUT:     }
 // CHECK:STDOUT:     %u: @J.WithSelf.F.%impl.elem0.loc6_17.1 (%impl.elem0.c15) = wrapper_binding u, %u.param
@@ -707,7 +707,7 @@ fn F() {
 // CHECK:STDOUT:   %pattern_type.loc6_8: type = pattern_type %Self.as_type.loc6_8.1 [symbolic = %pattern_type.loc6_8 (constants.%pattern_type.506)]
 // CHECK:STDOUT:   %self.param_patt.loc6_8.2: @J.WithSelf.F.%pattern_type.loc6_8 (%pattern_type.506) = value_param_pattern [symbolic = %self.param_patt.loc6_8.2 (constants.%self.param_patt.091)]
 // CHECK:STDOUT:   %self.patt.loc6_8.2: @J.WithSelf.F.%pattern_type.loc6_8 (%pattern_type.506) = wrapper_binding_pattern self, %self.param_patt.loc6_8.2 [symbolic = %self.patt.loc6_8.2 (constants.%self.patt.f35)]
-// CHECK:STDOUT:   %J.lookup_impl_witness: <witness> = lookup_impl_witness %Self, @J [symbolic = %J.lookup_impl_witness (constants.%J.lookup_impl_witness)]
+// CHECK:STDOUT:   %J.lookup_impl_witness: <witness> = lookup_impl_witness %Self, @J [symbolic = %J.lookup_impl_witness (constants.%J.lookup_impl_witness.e57)]
 // CHECK:STDOUT:   %impl.elem0.loc6_17.1: type = impl_witness_access %J.lookup_impl_witness, element0 [symbolic = %impl.elem0.loc6_17.1 (constants.%impl.elem0.c15)]
 // CHECK:STDOUT:   %pattern_type.loc6_15: type = pattern_type %impl.elem0.loc6_17.1 [symbolic = %pattern_type.loc6_15 (constants.%pattern_type.a39)]
 // CHECK:STDOUT:   %u.param_patt.loc6_15.2: @J.WithSelf.F.%pattern_type.loc6_15 (%pattern_type.a39) = value_param_pattern [symbolic = %u.param_patt.loc6_15.2 (constants.%u.param_patt.81e)]
@@ -772,7 +772,7 @@ fn F() {
 // CHECK:STDOUT:   %pattern_type.loc6_8 => constants.%pattern_type.506
 // CHECK:STDOUT:   %self.param_patt.loc6_8.2 => constants.%self.param_patt.091
 // CHECK:STDOUT:   %self.patt.loc6_8.2 => constants.%self.patt.f35
-// CHECK:STDOUT:   %J.lookup_impl_witness => constants.%J.lookup_impl_witness
+// CHECK:STDOUT:   %J.lookup_impl_witness => constants.%J.lookup_impl_witness.e57
 // CHECK:STDOUT:   %impl.elem0.loc6_17.1 => constants.%impl.elem0.c15
 // CHECK:STDOUT:   %pattern_type.loc6_15 => constants.%pattern_type.a39
 // CHECK:STDOUT:   %u.param_patt.loc6_15.2 => constants.%u.param_patt.81e

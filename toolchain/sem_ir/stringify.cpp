@@ -758,12 +758,8 @@ class Stringifier {
         sem_ir_->constant_values().GetConstantInstId(witness_inst_id);
 
     auto specific_interface = SemIR::SpecificInterface::None;
-    if (auto self_witness =
-            sem_ir_->insts().TryGetAs<ImplSelfWitness>(witness_inst_id)) {
-      specific_interface = sem_ir_->specific_interfaces().Get(
-          self_witness->specific_interface_id);
-    } else if (auto impl_witness =
-                   sem_ir_->insts().TryGetAs<ImplWitness>(witness_inst_id)) {
+    if (auto impl_witness =
+            sem_ir_->insts().TryGetAs<ImplWitness>(witness_inst_id)) {
       auto table = sem_ir_->insts().GetAs<ImplWitnessTable>(
           impl_witness->witness_table_id);
       const auto& impl = sem_ir_->impls().Get(table.impl_id);
@@ -820,18 +816,6 @@ class Stringifier {
     if (sem_ir_->insts().Is<SemIR::RewriteTarget>(inst_id)) {
       // Rewrites always target into the constrained facet. We don't stringify
       // self.
-    } else if (auto self_witness = sem_ir_->insts().TryGetAs<ImplSelfWitness>(
-                   witness_inst_id)) {
-      bool is_period_self = false;
-      if (auto sym_name = sem_ir_->insts().TryGetAs<SymbolicBinding>(
-              self_witness->period_self)) {
-        auto name_id =
-            sem_ir_->entity_names().Get(sym_name->entity_name_id).name_id;
-        is_period_self = (name_id == NameId::PeriodSelf);
-      }
-      if (!is_period_self) {
-        step_stack_->PushInstId(self_witness->period_self);
-      }
     } else if (auto identified = sem_ir_->insts().TryGetAs<IdentifiedWitness>(
                    witness_inst_id)) {
       bool is_period_self = false;

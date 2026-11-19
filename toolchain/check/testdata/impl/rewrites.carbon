@@ -61,7 +61,7 @@ interface J {}
 // CHECK:STDERR: ->     │ impl forall [T: type] T as I where .X impls J and .X = () {}
 // CHECK:STDERR:        · ┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // CHECK:STDERR:        · ┗━━┫ error: constraint `I where .(I.X) impls J and .(I.X) = ()` being
-// CHECK:STDERR:        ·    ┃        implemented requires that `()` implements `J`
+// CHECK:STDERR:        ·    ┃        implemented requires that `T.(I.X)` implements `J`
 // CHECK:STDERR:        ·    ┃        [IdentifiedRequireImplsNotImplemented]
 // CHECK:STDERR:        ╰────
 // CHECK:STDERR:
@@ -96,8 +96,8 @@ constraint GivesI {
 // CHECK:STDERR:        ╭─┤ fail_rewrite_in_named_constraint_missing_impl.carbon:[[@LINE+8]]:1
 // CHECK:STDERR: ->     │ impl forall [T: type] T as GivesI where .X impls J {}
 // CHECK:STDERR:        · ┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// CHECK:STDERR:        · ┗━━┫ error: constraint `GivesI where .(I.X) impls J` being implemented requires
-// CHECK:STDERR:        ·    ┃        that `()` implements `J`
+// CHECK:STDERR:        · ┗━━┫ error: constraint `GivesI where () impls J` being implemented requires that
+// CHECK:STDERR:        ·    ┃        `()` implements `J`
 // CHECK:STDERR:        ·    ┃        [IdentifiedRequireImplsNotImplemented]
 // CHECK:STDERR:        ╰────
 // CHECK:STDERR:

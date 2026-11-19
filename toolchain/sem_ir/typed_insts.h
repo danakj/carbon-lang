@@ -1099,7 +1099,7 @@ struct ImplDecl {
 struct ImplSelfWitness {
   static constexpr auto Kind = InstKind::ImplSelfWitness.Define<Parse::NodeId>(
       {.ir_name = "impl_self_witness",
-       .constant_kind = InstConstantKind::Conditional,
+       .constant_kind = InstConstantKind::Always,
        .is_lowered = false});
   // Always the type of the builtin `WitnessType` singleton instruction.
   TypeId type_id;
@@ -2703,9 +2703,9 @@ struct WhereExpr {
 };
 
 // The type of witness instructions: `ImplWitness`, `CustomWitness`,
-// `ImplSelfWitness`, `IdentifiedWitness`, and `LookupImplWitness`. A
-// `LookupImplWitness` can evaluate into any of the other witness inst kinds,
-// and their types should not change in the process.
+// `IdentifiedWitness`, and `LookupImplWitness`. A `LookupImplWitness` can
+// evaluate into any of the other witness inst kinds, and their types should not
+// change in the process.
 //
 // Also the type of `RequireCompleteType` instructions.
 //

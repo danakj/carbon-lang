@@ -397,8 +397,7 @@ auto AddImpl(Context& context, const SemIR::Impl& impl,
 }
 
 // Substitute the impl's ImplWitness for any IdentifiedWitness that refers to
-// the current impl's interface, as well as any ImplSelfWitness which always
-// implicitly refers to the current impl.
+// the current impl's interface.
 class SubstWithImplWitness : public SubstIdentifiedWitnessesCallbacks {
  public:
   SubstWithImplWitness(Context* context, const SemIR::Impl* impl,
@@ -425,20 +424,6 @@ class SubstWithImplWitness : public SubstIdentifiedWitnessesCallbacks {
     if (impl_->interface != witness_interface) {
       return SemIR::InstId::None;
     }
-    return impl_witness_id_;
-  }
-
-  auto ReplaceImplSelfWitness(SemIR::ImplSelfWitness witness)
-      -> SemIR::InstId override {
-    // The impl `self_id` can be a FacetAccessType in generic impls. We need the
-    // canonical facet to compare with a witness.
-    auto impl_self = context().constant_values().Get(
-        GetCanonicalFacet(context(), impl_->self_id));
-    auto witness_self = context().constant_values().Get(witness.period_self);
-    auto witness_interface =
-        context().specific_interfaces().Get(witness.specific_interface_id);
-    CARBON_CHECK(impl_self == witness_self);
-    CARBON_CHECK(impl_->interface == witness_interface);
     return impl_witness_id_;
   }
 
@@ -523,13 +508,13 @@ auto AddImplWitnessForDeclaration(Context& context, SemIR::LocId loc_id,
       continue;
     }
 
-    // The RHS of the rewrite may contain IdentifiedWitness, but also
-    // ImplSelfWitness for the current impl. Usually they are gone already, as
-    // early rewrite replacement and rewrite resolution replace any references
-    // to an associated constant with the value of that associated constant.
-    // However FacetValues using `.Self` may encode such witnesses, and it is
-    // also possible when an associated constant is used from the impl
-    // declaration but is not set in the declaration.
+    // The RHS of the rewrite may contain IdentifiedWitness for the current
+    // impl. Usually they are gone already, as early rewrite replacement and
+    // rewrite resolution replace any references to an associated constant with
+    // the value of that associated constant. However FacetValues using `.Self`
+    // may encode such witnesses, and it is also possible when an associated
+    // constant is used from the impl declaration but is not set in the
+    // declaration.
     SubstWithImplWitness callbacks(&context, &impl, witness_inst_id);
     auto rhs = rewrite.rhs.SubstIdentifiedWitnesses(context, loc_id, callbacks);
 
@@ -861,9 +846,9 @@ auto CheckImplRequirementsAtEndOfDefinition(
 
   const auto& identified = context.identified_facet_types().Get(identified_id);
   for (auto req : identified.required_impls()) {
-    // This replaces both IdentifiedWitness and ImplSelfWitness referring to
-    // this impl with the impl's ImplWitness. That causes any access through the
-    // witness to resolve to the value from the impl's witness table.
+    // This replaces any IdentifiedWitness referring to this impl with the
+    // impl's ImplWitness. That causes any access through the witness to resolve
+    // to the value from the impl's witness table.
     SubstWithImplWitness callbacks(&context, &impl, impl.witness_id);
     auto req_self_facet =
         req.self_facet.SubstIdentifiedWitnesses(context, loc_id, callbacks);
@@ -897,7 +882,8 @@ auto CheckImplRequirementsAtEndOfDefinition(
       context.emitter().Emit(
           loc_id, IdentifiedRequireImplsNotImplemented,
           facet_type.declared_facet_type_id,
-          context.constant_values().GetInstId(req_self_facet), req_interface);
+          context.constant_values().GetInstId(req.self_facet.RawValue()),
+          req_interface);
     }
     if (!result.has_value() || result.has_error_value()) {
       FillImplWitnessWithErrors(context, impl);
@@ -906,9 +892,9 @@ auto CheckImplRequirementsAtEndOfDefinition(
   }
 
   for (auto equiv : identified.equivalents()) {
-    // This replaces both IdentifiedWitness and ImplSelfWitness referring to
-    // this impl with the impl's ImplWitness. That causes any access through the
-    // witness to resolve to the value from the impl's witness table.
+    // This replaces any IdentifiedWitness referring to this impl with the
+    // impl's ImplWitness. That causes any access through the witness to resolve
+    // to the value from the impl's witness table.
     SubstWithImplWitness callbacks(&context, &impl, impl.witness_id);
     auto lhs = equiv.lhs.SubstIdentifiedWitnesses(context, loc_id, callbacks);
     auto rhs = equiv.rhs.SubstIdentifiedWitnesses(context, loc_id, callbacks);

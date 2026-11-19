@@ -53,11 +53,6 @@ class SubstIdentifiedWitnessesCallbacks {
   virtual auto ReplaceIdentified(SemIR::IdentifiedWitness witness)
       -> SemIR::InstId = 0;
 
-  // Callback to return an InstId to use in place of the ImplSelfWitness. If it
-  // returns None, the ImplSelfWitness will be left in place.
-  virtual auto ReplaceImplSelfWitness(SemIR::ImplSelfWitness witness)
-      -> SemIR::InstId = 0;
-
  private:
   Context* context_;
 };
@@ -74,8 +69,7 @@ class ConstantWithIdentifiedWitnesses {
   auto EvaluateIdentifiedWitnesses(Context& context, SemIR::LocId loc_id) const
       -> SemIR::ConstantId;
   // Replaces all IdentifiedWitnesses based on the behaviour of a callback that
-  // is run as each witness is visited. Also gives the opportunity to replace
-  // ImplSelfWitness in the same substitution pass.
+  // is run as each witness is visited.
   auto SubstIdentifiedWitnesses(
       Context& context, SemIR::LocId loc_id,
       SubstIdentifiedWitnessesCallbacks& callbacks) const -> SemIR::ConstantId;
@@ -107,8 +101,7 @@ class InterfaceWithIdentifiedWitnesses {
   auto EvaluateIdentifiedWitnesses(Context& context, SemIR::LocId loc_id) const
       -> SemIR::SpecificInterface;
   // Replaces all IdentifiedWitnesses in the interface's specific based on the
-  // behaviour of a callback that is run as each witness is visited. Also gives
-  // the opportunity to replace ImplSelfWitness in the same substitution pass.
+  // behaviour of a callback that is run as each witness is visited.
   auto SubstIdentifiedWitnesses(Context& context, SemIR::LocId loc_id,
                                 SubstIdentifiedWitnessesCallbacks& callbacks)
       const -> SemIR::SpecificInterface;

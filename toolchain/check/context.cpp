@@ -75,7 +75,6 @@ auto Context::VerifyOnFinish() const -> void {
   vtable_stack_.VerifyOnFinish();
   region_stack_.VerifyOnFinish();
   CARBON_CHECK(impl_lookup_stack_.empty());
-  CARBON_CHECK(declaring_impl_decls_.empty());
   CARBON_CHECK(eval_impl_lookup_to_identified_witness_ == 0);
   CARBON_CHECK(return_form_expr_ == std::nullopt);
   CARBON_CHECK(impl_definition_stack_.empty());

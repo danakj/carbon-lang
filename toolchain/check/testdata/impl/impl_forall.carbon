@@ -176,12 +176,12 @@ impl forall [T: Invalid] T as Z where .Z1 impls Y {}
 // CHECK:STDOUT:   %.Self.frozen.e58: type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %.Self.frozen.7b7: %Z.type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %.Self.frozen.as_type: type = facet_access_type %.Self.frozen.7b7 [symbolic_self]
-// CHECK:STDOUT:   %.db1: <witness> = impl_self_witness %.Self.frozen.7b7, @Z [symbolic_self]
-// CHECK:STDOUT:   %impl.elem0.e1c: type = impl_witness_access %.db1, element0 [symbolic_self]
+// CHECK:STDOUT:   %Z.lookup_impl_witness.90d: <witness> = lookup_impl_witness %.Self.frozen.7b7, @Z [symbolic_self]
+// CHECK:STDOUT:   %impl.elem0.778: type = impl_witness_access %Z.lookup_impl_witness.90d, element0 [symbolic_self]
 // CHECK:STDOUT:   %.Self: %Z.type = symbolic_binding .Self [symbolic_self]
-// CHECK:STDOUT:   %.513: <witness> = impl_self_witness %.Self, @Z [symbolic_self]
-// CHECK:STDOUT:   %impl.elem0.ff0: type = impl_witness_access %.513, element0 [symbolic_self]
-// CHECK:STDOUT:   %Z_where.type: type = facet_type <@Z where %impl.elem0.ff0 impls @Y> [concrete]
+// CHECK:STDOUT:   %Z.lookup_impl_witness.b8d: <witness> = lookup_impl_witness %.Self, @Z [symbolic_self]
+// CHECK:STDOUT:   %impl.elem0.555: type = impl_witness_access %Z.lookup_impl_witness.b8d, element0 [symbolic_self]
+// CHECK:STDOUT:   %Z_where.type: type = facet_type <@Z where %impl.elem0.555 impls @Y> [concrete]
 // CHECK:STDOUT: }
 // CHECK:STDOUT:
 // CHECK:STDOUT: file {
@@ -203,10 +203,10 @@ impl forall [T: Invalid] T as Z where .Z1 impls Y {}
 // CHECK:STDOUT:     %.Self.as_type: type = facet_access_type %.Self.ref [symbolic_self = constants.%.Self.frozen.as_type]
 // CHECK:STDOUT:     %.loc14_39: type = converted %.Self.ref, %.Self.as_type [symbolic_self = constants.%.Self.frozen.as_type]
 // CHECK:STDOUT:     %Z1.ref: %Z.assoc_type = name_ref Z1, @Z1.%assoc0 [concrete = constants.%assoc0]
-// CHECK:STDOUT:     %impl.elem0.loc14_39.1: type = impl_witness_access constants.%.db1, element0 [symbolic_self = constants.%impl.elem0.e1c]
+// CHECK:STDOUT:     %impl.elem0.loc14_39.1: type = impl_witness_access constants.%Z.lookup_impl_witness.90d, element0 [symbolic_self = constants.%impl.elem0.778]
 // CHECK:STDOUT:     %Y.ref: type = name_ref Y, file.%Y.decl [concrete = constants.%Y.type]
 // CHECK:STDOUT:     %impls.loc14_43.1 = requirement_impls %impl.elem0.loc14_39.1, %Y.ref [concrete]
-// CHECK:STDOUT:     %impl.elem0.loc14_39.2: type = impl_witness_access constants.%.513, element0 [symbolic_self = constants.%impl.elem0.ff0]
+// CHECK:STDOUT:     %impl.elem0.loc14_39.2: type = impl_witness_access constants.%Z.lookup_impl_witness.b8d, element0 [symbolic_self = constants.%impl.elem0.555]
 // CHECK:STDOUT:     %impls.loc14_43.2 = requirement_impls %impl.elem0.loc14_39.2, %Y.ref [concrete]
 // CHECK:STDOUT:     %.loc14_33: type = where_expr [concrete = constants.%Z_where.type] {
 // CHECK:STDOUT:       %base_facet_type = requirement_base_facet_type %Z.ref [concrete]

@@ -534,12 +534,6 @@ class SubstMatchingWitnessesFromImplLookup
     return SemIR::InstId::None;
   }
 
-  auto ReplaceImplSelfWitness(SemIR::ImplSelfWitness /*witness*/)
-      -> SemIR::InstId override {
-    // ImplSelfWitnesses should only appear in impl decls and are all replaced.
-    CARBON_FATAL();
-  }
-
  private:
   llvm::ArrayRef<IdentifiedFacetType::RequiredImpl> req_impls_;
   llvm::ArrayRef<SemIR::InstId> found_witness_inst_ids_;
@@ -1163,19 +1157,25 @@ auto EvalLookupSingleFinalWitness(Context& context, SemIR::LocId loc_id,
          .query_specific_interface_id =
              eval_query.query_specific_interface_id});
   }
-  // If the lookup comes from inside an impl decl and is for that impl, get a
-  // witness for that impl even though it does not yet exist.
-  if (!context.declaring_impl_decls().empty()) {
-    const auto& declaring = context.declaring_impl_decls().Peek();
-    if (query_self_const_id == declaring.self_id ||
-        IsPeriodSelf(context, eval_query.query_self_inst_id)) {
-      if (query_specific_interface == declaring.specific_interface) {
-        return EvalOrAddInst<SemIR::ImplSelfWitness>(
-            context, loc_id,
-            {.type_id =
-                 GetSingletonType(context, SemIR::WitnessType::TypeInstId),
-             .period_self = eval_query.query_self_inst_id,
-             .specific_interface_id = eval_query.query_specific_interface_id});
+
+  // Lookups into `.Self` for interfaces in its type stay symbolic, they are
+  // building an abstract facet type and are refering to the interfaces on the
+  // LHS of the `where`.
+  if (IsPeriodSelf(context, eval_query.query_self_inst_id)) {
+    auto period_self_type_id =
+        context.insts().Get(eval_query.query_self_inst_id).type_id();
+    auto identified_id = TryToIdentifyFacetType(
+        context, loc_id, query_self_const_id, period_self_type_id,
+        /*allow_partially_identified=*/false);
+    if (identified_id.has_value()) {
+      const auto& identified =
+          context.identified_facet_types().Get(identified_id);
+      for (auto r : identified.required_impls()) {
+        // FIXME: Explain why this is okay - because there's no .Self in the
+        // type of .Self that would refer to the .Self.
+        if (r.interface.RawValue() == query_specific_interface) {
+          return SemIR::ConstantId::None;
+        }
       }
     }
   }

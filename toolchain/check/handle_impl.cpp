@@ -110,12 +110,6 @@ auto HandleParseNode(Context& context, Parse::ImplTypeAsId node_id) -> bool {
   // TODO: Revisit this once #3714 is resolved.
   AddNameToLookup(context, SemIR::NameId::SelfType, self_type.inst_id);
   context.node_stack().Push(node_id, self_type.inst_id);
-
-  // The specific interface in here, if any, is populated by the `where`
-  // expression that introduces a `.Self` in the impl's constraint facet type.
-  context.declaring_impl_decls().Push(
-      {.self_id = self_type.type_id.AsConstantId(),
-       .specific_interface = SemIR::SpecificInterface::None});
   return true;
 }
 
@@ -148,12 +142,6 @@ auto HandleParseNode(Context& context, Parse::ImplDefaultSelfAsId node_id)
   // There's no need to push `Self` into scope here, because we can find it in
   // the parent class scope.
   context.node_stack().Push(node_id, self_inst_id);
-
-  // The specific interface in here, if any, is populated by the `where`
-  // expression that introduces a `.Self` in the impl's constraint facet type.
-  context.declaring_impl_decls().Push(
-      {.self_id = context.constant_values().Get(self_inst_id),
-       .specific_interface = SemIR::SpecificInterface::None});
   return true;
 }
 
@@ -225,10 +213,6 @@ static auto BuildImplDecl(Context& context, Parse::AnyImplDeclId node_id,
   // Pop the `impl` introducer and any `forall` parameters as a "name".
   auto name = PopImplIntroducerAndParamsAsNameComponent(context, node_id);
   auto decl_block_id = context.inst_block_stack().Pop();
-
-  // Witnesses for this impl in the DeclaredFacetType of the decl will have
-  // been evaluated to ImplSelfWitness.
-  context.declaring_impl_decls().Pop();
 
   // Convert the constraint expression to a type. This contains all constraints,
   // including rewrites and other constrains on the RHS of `where`.

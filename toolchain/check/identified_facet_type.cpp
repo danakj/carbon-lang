@@ -115,10 +115,6 @@ class EvaluateSubstCallbacks : public SubstInstCallbacks {
             orig_inst_id)) {
       return SubstIdentifiedWitness(*witness);
     }
-    if (auto witness =
-            context().insts().TryGetAs<SemIR::ImplSelfWitness>(orig_inst_id)) {
-      return SubstImplSelfWitness(*witness);
-    }
     return orig_inst_id;
   }
 
@@ -126,9 +122,6 @@ class EvaluateSubstCallbacks : public SubstInstCallbacks {
       -> SemIR::InstId override {
     if (auto witness = new_inst.TryAs<SemIR::IdentifiedWitness>()) {
       return SubstIdentifiedWitness(*witness);
-    }
-    if (auto witness = new_inst.TryAs<SemIR::ImplSelfWitness>()) {
-      return SubstImplSelfWitness(*witness);
     }
     return RebuildNewInst(loc_id_, new_inst);
   }
@@ -163,16 +156,6 @@ class EvaluateSubstCallbacks : public SubstInstCallbacks {
     auto inst_id = context().constant_values().GetInstId(const_id);
     CARBON_CHECK(!context().insts().Is<SemIR::IdentifiedWitness>(inst_id));
     return inst_id;
-  }
-
-  auto SubstImplSelfWitness(SemIR::ImplSelfWitness witness) -> SemIR::InstId {
-    if (subst_callbacks_) {
-      auto replaced_id = subst_callbacks_->ReplaceImplSelfWitness(witness);
-      if (replaced_id.has_value()) {
-        return replaced_id;
-      }
-    }
-    return RebuildNewInst(loc_id_, witness);
   }
 
   SemIR::LocId loc_id_;

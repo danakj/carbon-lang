@@ -89,29 +89,6 @@ auto HandleParseNode(Context& context, Parse::WhereOperandId node_id) -> bool {
   auto period_self =
       MakePeriodSelfFacetValue(context, node_id, period_self_type_id);
 
-  if (context.node_stack().PeekIs(Parse::NodeKind::ImplTypeAs) ||
-      context.node_stack().PeekIs(Parse::NodeKind::ImplDefaultSelfAs)) {
-    // We are in an impl declaration. We want to find the interface being
-    // impl'd, which will have to be on the LHS of the `where`. We want to catch
-    // lookups into that interface with `.Self` so we identify it with `.Self`.
-    auto identified_id = TryToIdentifyFacetType(
-        context, node_id, context.constant_values().Get(period_self),
-        period_self_type_id, /*allow_partially_identified=*/false);
-    if (identified_id.has_value()) {
-      const auto& identified =
-          context.identified_facet_types().Get(identified_id);
-      auto impl_as_target =
-          identified.EvaluateImplWitnessesToGetImplAsTarget(context, node_id);
-      if (impl_as_target.is_valid()) {
-        auto& declaring = context.declaring_impl_decls().Peek();
-        if (declaring.specific_interface != SemIR::SpecificInterface::None) {
-          CARBON_CHECK(declaring.specific_interface == impl_as_target.target());
-        }
-        declaring.specific_interface = impl_as_target.target();
-      }
-    }
-  }
-
   // Going to put each requirement on `args_type_info_stack`, so we can have an
   // inst block with the varying number of requirements but keeping other
   // instructions on the current inst block from the `inst_block_stack()`.
