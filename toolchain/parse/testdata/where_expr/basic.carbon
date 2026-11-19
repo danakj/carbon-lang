@@ -58,7 +58,7 @@ fn F() {
 // CHECK:STDOUT:   │ │ │   ╭─TypeTypeLiteral 'type'
 // CHECK:STDOUT:   │ │ │ ╭─WhereOperand 'where'
 // CHECK:STDOUT:   │ │ │ │   ╭─IdentifierNameNotBeforeSignature 'U'
-// CHECK:STDOUT:   │ │ │ │ ╭─DesignatorExpr '.'
+// CHECK:STDOUT:   │ │ │ │ ╭─RewriteDesignatorExpr '.'
 // CHECK:STDOUT:   │ │ │ │ │ ╭─IdentifierNameNotBeforeSignature 'V'
 // CHECK:STDOUT:   │ │ │ │ ├─DesignatorExpr '.'
 // CHECK:STDOUT:   │ │ │ ├─RequirementEqual '='

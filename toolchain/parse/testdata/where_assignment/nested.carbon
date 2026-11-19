@@ -26,7 +26,7 @@ impl C as Z {
 // CHECK:STDOUT:   │ │ │ │   ╭─IdentifierNameExpr 'Y'
 // CHECK:STDOUT:   │ │ │ │ ╭─WhereOperand 'where'
 // CHECK:STDOUT:   │ │ │ │ │   ╭─IdentifierNameNotBeforeSignature 'Y1'
-// CHECK:STDOUT:   │ │ │ │ │ ╭─DesignatorExpr '.'
+// CHECK:STDOUT:   │ │ │ │ │ ╭─RewriteDesignatorExpr '.'
 // CHECK:STDOUT:   │ │ │ │ │ ├─IdentifierNameExpr 'Z1'
 // CHECK:STDOUT:   │ │ │ │ ├─RequirementEqual '='
 // CHECK:STDOUT:   │ │ │ ├─WhereExpr 'where'

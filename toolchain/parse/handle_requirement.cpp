@@ -21,7 +21,7 @@ auto HandleRequirementBegin(Context& context) -> void {
     context.AddNode(NodeKind::IdentifierNameNotBeforeSignature,
                     context.Consume(),
                     /*has_error=*/false);
-    context.AddNode(NodeKind::DesignatorExpr, period, /*has_error=*/false);
+    context.AddNode(NodeKind::RewriteDesignatorExpr, period, /*has_error=*/false);
     state.token = context.Consume();
     context.PushState(state, StateKind::RequirementOperatorFinish);
   } else {

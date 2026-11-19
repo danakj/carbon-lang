@@ -1446,10 +1446,19 @@ struct DesignatorExpr {
   NodeIdOneOf<IdentifierNameNotBeforeSignature, SelfTypeName> name;
 };
 
+// `.Member` on the LHS of a rewrite requirement.
+struct RewriteDesignatorExpr {
+  static constexpr auto Kind = NodeKind::RewriteDesignatorExpr.Define(
+      {.category = NodeCategory::Expr, .child_count = 1});
+
+  Lex::PeriodTokenIndex token;
+  IdentifierNameNotBeforeSignatureId name;
+};
+
 struct RequirementEqual {
   static constexpr auto Kind = NodeKind::RequirementEqual.Define(
       {.category = NodeCategory::Requirement, .child_count = 2});
-  DesignatorExprId lhs;
+  RewriteDesignatorExprId lhs;
   Lex::EqualTokenIndex token;
   AnyExprId rhs;
 };

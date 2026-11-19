@@ -25,6 +25,10 @@ auto PerformMemberAccess(Context& context, SemIR::LocId loc_id,
                          SemIR::InstId base_id, SemIR::NameId name_id,
                          bool required = true) -> SemIR::InstId;
 
+auto GetRewriteTarget(Context& context, SemIR::LocId loc_id,
+                      SemIR::InstId period_self_id, SemIR::NameId name_id)
+    -> SemIR::InstId;
+
 // Creates SemIR to perform a compound member access with base expression
 // `base_id` and member name expression `member_expr_id`. Returns the result of
 // the access. If specified, `missing_impl_diagnostic_context()` is used to

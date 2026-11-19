@@ -152,7 +152,7 @@ interface Z {
 // CHECK:STDOUT:   │ │ │   ╭─IdentifierNameExpr 'Y'
 // CHECK:STDOUT:   │ │ │ ╭─WhereOperand 'where'
 // CHECK:STDOUT:   │ │ │ │   ╭─IdentifierNameNotBeforeSignature 'Y1'
-// CHECK:STDOUT:   │ │ │ │ ╭─DesignatorExpr '.'
+// CHECK:STDOUT:   │ │ │ │ ╭─RewriteDesignatorExpr '.'
 // CHECK:STDOUT:   │ │ │ │ │ ╭─TupleLiteralStart '('
 // CHECK:STDOUT:   │ │ │ │ ├─TupleLiteral ')'
 // CHECK:STDOUT:   │ │ │ ├─RequirementEqual '='

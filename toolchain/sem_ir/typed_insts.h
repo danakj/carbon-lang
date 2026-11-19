@@ -1164,6 +1164,21 @@ struct ImplWitnessAccess {
   ElementIndex index;
 };
 
+// The target of a rewrite constraint, pointing to an associated constant.
+// Appears on the LHS of a rewrite.
+struct RewriteTarget {
+  static constexpr auto Kind =
+      InstKind::ImplWitnessAccess.Define<Parse::NodeId>(
+          {.ir_name = "rewrite_target",
+           .is_type = InstIsType::Maybe,
+           .constant_kind = InstConstantKind::Always,
+           .is_lowered = false});
+
+  TypeId type_id;
+  InstId witness_id;
+  ElementIndex index;
+};
+
 // A substituted value to use in place of an ImplWitnessAccess (which comes from
 // the RHS of a rewrite constraint in the same facet type), while preserving the
 // original reference to an associated constant as an ImplWitnessAccess. This

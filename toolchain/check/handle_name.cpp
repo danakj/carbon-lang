@@ -11,7 +11,9 @@
 #include "toolchain/check/name_lookup.h"
 #include "toolchain/check/pointer_dereference.h"
 #include "toolchain/check/type.h"
+#include "toolchain/diagnostics/emitter.h"
 #include "toolchain/lex/token_kind.h"
+#include "toolchain/parse/typed_nodes.h"
 #include "toolchain/sem_ir/inst.h"
 #include "toolchain/sem_ir/typed_insts.h"
 
@@ -224,6 +226,19 @@ auto HandleParseNode(Context& context, Parse::DesignatorExprId node_id)
         PerformMemberAccess(context, node_id, period_self_id, name_id);
     context.node_stack().Push(node_id, member_id);
   }
+  return true;
+}
+
+auto HandleParseNode(Context& context, Parse::RewriteDesignatorExprId node_id)
+    -> bool {
+  SemIR::NameId name_id = context.node_stack().PopName();
+
+  // Look up `.Self` and then `Member` in `.Self`.
+  SemIR::InstId period_self_id =
+      HandleNameAsExpr(context, node_id, SemIR::NameId::PeriodSelf);
+  auto member_id =
+      PerformMemberAccess(context, node_id, period_self_id, name_id);
+  context.node_stack().Push(node_id, member_id);
   return true;
 }
 

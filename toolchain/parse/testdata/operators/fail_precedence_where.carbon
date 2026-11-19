@@ -141,7 +141,7 @@ fn GreaterInArgument() {
 // CHECK:STDOUT:   │ │     ╭─ShortCircuitOperatorAnd 'and'
 // CHECK:STDOUT:   │ │   ╭─WhereOperand 'where' has_error
 // CHECK:STDOUT:   │ │   │   ╭─IdentifierNameNotBeforeSignature 'A'
-// CHECK:STDOUT:   │ │   │ ╭─DesignatorExpr '.'
+// CHECK:STDOUT:   │ │   │ ╭─RewriteDesignatorExpr '.'
 // CHECK:STDOUT:   │ │   │ ├─IdentifierNameExpr 'B'
 // CHECK:STDOUT:   │ │   ├─RequirementEqual '='
 // CHECK:STDOUT:   │ │ ╭─WhereExpr 'where' has_error
@@ -197,7 +197,7 @@ fn GreaterInArgument() {
 // CHECK:STDOUT:   │ │     ╭─IdentifierNameExpr 'W'
 // CHECK:STDOUT:   │ │   ╭─WhereOperand 'where'
 // CHECK:STDOUT:   │ │   │   ╭─IdentifierNameNotBeforeSignature 'H'
-// CHECK:STDOUT:   │ │   │ ╭─DesignatorExpr '.'
+// CHECK:STDOUT:   │ │   │ ╭─RewriteDesignatorExpr '.'
 // CHECK:STDOUT:   │ │   │ ├─BoolTypeLiteral 'bool'
 // CHECK:STDOUT:   │ │   ├─RequirementEqual '='
 // CHECK:STDOUT:   │ │ ╭─WhereExpr 'where'
