@@ -13,20 +13,13 @@ namespace Carbon::SemIR {
 // The canonical list of singleton kinds. The index of each in the array acts as
 // a means to determine the InstId of the singleton inst for the kind.
 static constexpr std::array SingletonInstKinds = {
-    InstKind::AutoType,
-    InstKind::BoolType,
-    InstKind::BoundMethodType,
-    InstKind::CharLiteralType,
-    InstKind::ErrorInst,
-    InstKind::FloatLiteralType,
-    InstKind::FormType,
-    InstKind::ImplInterfaceSpecificType,
-    InstKind::InstType,
-    InstKind::IntLiteralType,
-    InstKind::NamespaceType,
-    InstKind::SpecificFunctionType,
-    InstKind::VtableType,
-    InstKind::WitnessType,
+    InstKind::AutoType,        InstKind::BoolType,
+    InstKind::BoundMethodType, InstKind::CharLiteralType,
+    InstKind::ErrorInst,       InstKind::FloatLiteralType,
+    InstKind::FormType,        InstKind::ImplInterfaceSpecificType,
+    InstKind::InstType,        InstKind::IntLiteralType,
+    InstKind::NamespaceType,   InstKind::SpecificFunctionType,
+    InstKind::VtableType,      InstKind::WitnessType,
 };
 
 // We have some builtin insts with fixed InstIds that are determined relative to

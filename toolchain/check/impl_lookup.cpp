@@ -1159,7 +1159,7 @@ auto EvalLookupSingleFinalWitness(Context& context, SemIR::LocId loc_id,
   }
 
   // Lookups into `.Self` for interfaces in its type stay symbolic, they are
-  // building an abstract facet type and are refering to the interfaces on the
+  // building an abstract facet type and are referring to the interfaces on the
   // LHS of the `where`.
   if (IsPeriodSelf(context, eval_query.query_self_inst_id)) {
     auto period_self_type_id =
