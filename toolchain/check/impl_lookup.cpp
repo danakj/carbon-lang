@@ -1164,6 +1164,9 @@ auto EvalLookupSingleFinalWitness(Context& context, SemIR::LocId loc_id,
   if (IsPeriodSelf(context, eval_query.query_self_inst_id)) {
     auto period_self_type_id =
         context.insts().Get(eval_query.query_self_inst_id).type_id();
+    // When we identify with `.Self` as the self-type, we won't cause any
+    // `.Self` to be replaced and thus no evaluation and further lookups to
+    // occur.
     auto identified_id = TryToIdentifyFacetType(
         context, loc_id, query_self_const_id, period_self_type_id,
         /*allow_partially_identified=*/false);
@@ -1171,8 +1174,8 @@ auto EvalLookupSingleFinalWitness(Context& context, SemIR::LocId loc_id,
       const auto& identified =
           context.identified_facet_types().Get(identified_id);
       for (auto r : identified.required_impls()) {
-        // FIXME: Explain why this is okay - because there's no .Self in the
-        // type of .Self that would refer to the .Self.
+        // We didn't replace any `.Self` when identifying, so we did not produce
+        // any IdentifiedWitnesses. So we can just use the raw value here.
         if (r.interface.RawValue() == query_specific_interface) {
           return SemIR::ConstantId::None;
         }
