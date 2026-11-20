@@ -142,12 +142,14 @@ auto HandleParseNode(Context& context, Parse::WhereOperandId node_id) -> bool {
     // already been handled, so we need to freeze them again here.
     for (const auto& rewrite : base_declared_facet_type.rewrite_constraints) {
       if (rewrite.lhs_id != SemIR::ErrorInst::InstId) {
-        auto const_id = context.constant_values().Get(
-            GetImplWitnessAccessWithoutSubstitution(context.sem_ir(),
-                                                    rewrite.lhs_id));
-        auto frozen_const_id = FreezePeriodSelf(context, const_id);
-        context.where_stack().Peek().rewrites.Insert(frozen_const_id,
-                                                     rewrite.rhs_id);
+        auto access =
+            context.insts().GetAs<SemIR::RewriteTarget>(rewrite.lhs_id);
+        auto frozen_witness = FreezePeriodSelf(
+            context, context.constant_values().Get(access.witness_id));
+        auto index = access.index;
+        context.where_stack().Peek().rewrites.Insert(
+            Context::WhereStackEntry::Target{frozen_witness, index},
+            rewrite.rhs_id);
       }
     }
 
@@ -319,10 +321,11 @@ auto HandleParseNode(Context& context, Parse::RequirementEqualId node_id)
     // Note that the where_stack rewrites need to be frozen. Since this
     // expression is inside of facet type construction, it will already be
     // frozen.
+    auto target = context.insts().GetAs<SemIR::RewriteTarget>(lhs_id);
+    auto witness = context.constant_values().Get(target.witness_id);
+    auto index = target.index;
     context.where_stack().Peek().rewrites.Insert(
-        context.constant_values().Get(
-            GetImplWitnessAccessWithoutSubstitution(context.sem_ir(), lhs_id)),
-        rhs_id);
+        Context::WhereStackEntry::Target{witness, index}, rhs_id);
   }
   return true;
 }
@@ -475,7 +478,12 @@ auto HandleParseNode(Context& context, Parse::RequirementImplsId node_id)
         auto lhs_id = SubstPeriodSelf(
             context, rhs_node, context.constant_values().Get(rewrite.lhs_id),
             context.constant_values().Get(lhs_as_type.inst_id));
-        context.where_stack().Peek().rewrites.Insert(lhs_id, rewrite.rhs_id);
+        auto target =
+            context.constant_values().GetInstAs<SemIR::RewriteTarget>(lhs_id);
+        auto witness = context.constant_values().Get(target.witness_id);
+        auto index = target.index;
+        context.where_stack().Peek().rewrites.Insert(
+            Context::WhereStackEntry::Target{witness, index}, rewrite.rhs_id);
       }
     }
   }

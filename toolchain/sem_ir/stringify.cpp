@@ -752,15 +752,22 @@ class Stringifier {
     return std::nullopt;
   }
 
-  auto StringifyInst(InstId /*inst_id*/, ImplWitnessAccess inst) -> void {
-    auto witness_inst_id =
-        sem_ir_->constant_values().GetConstantInstId(inst.witness_id);
+  auto StringifyWitnessAndIndex(InstId inst_id, InstId witness_inst_id,
+                                ElementIndex element_index) -> void {
+    witness_inst_id =
+        sem_ir_->constant_values().GetConstantInstId(witness_inst_id);
 
     auto specific_interface = SemIR::SpecificInterface::None;
     if (auto self_witness =
             sem_ir_->insts().TryGetAs<ImplSelfWitness>(witness_inst_id)) {
       specific_interface = sem_ir_->specific_interfaces().Get(
           self_witness->specific_interface_id);
+    } else if (auto impl_witness =
+                   sem_ir_->insts().TryGetAs<ImplWitness>(witness_inst_id)) {
+      auto table = sem_ir_->insts().GetAs<ImplWitnessTable>(
+          impl_witness->witness_table_id);
+      const auto& impl = sem_ir_->impls().Get(table.impl_id);
+      specific_interface = impl.interface;
     } else if (auto id_witness = sem_ir_->insts().TryGetAs<IdentifiedWitness>(
                    witness_inst_id)) {
       specific_interface = sem_ir_->specific_interfaces().Get(
@@ -774,12 +781,12 @@ class Stringifier {
     const auto& interface =
         sem_ir_->interfaces().Get(specific_interface.interface_id);
     if (!interface.associated_entities_id.has_value()) {
-      step_stack_->Push(".(TODO: element ", inst.index, " in incomplete ",
+      step_stack_->Push(".(TODO: element ", element_index, " in incomplete ",
                         witness_inst_id, ")");
     } else {
       auto entities =
           sem_ir_->inst_blocks().Get(interface.associated_entities_id);
-      size_t index = inst.index.index;
+      size_t index = element_index.index;
       CARBON_CHECK(index < entities.size(), "Access out of bounds.");
       auto entity_inst_id = entities[index];
       step_stack_->PushString(")");
@@ -810,8 +817,11 @@ class Stringifier {
       step_stack_->Push(".(");
     }
 
-    if (auto self_witness =
-            sem_ir_->insts().TryGetAs<ImplSelfWitness>(witness_inst_id)) {
+    if (sem_ir_->insts().Is<SemIR::RewriteTarget>(inst_id)) {
+      // Rewrites always target into the constrained facet. We don't stringify
+      // self.
+    } else if (auto self_witness = sem_ir_->insts().TryGetAs<ImplSelfWitness>(
+                   witness_inst_id)) {
       bool is_period_self = false;
       if (auto sym_name = sem_ir_->insts().TryGetAs<SymbolicBinding>(
               self_witness->period_self)) {
@@ -822,17 +832,17 @@ class Stringifier {
       if (!is_period_self) {
         step_stack_->PushInstId(self_witness->period_self);
       }
-    } else if (auto lookup = sem_ir_->insts().TryGetAs<IdentifiedWitness>(
+    } else if (auto identified = sem_ir_->insts().TryGetAs<IdentifiedWitness>(
                    witness_inst_id)) {
       bool is_period_self = false;
       if (auto sym_name = sem_ir_->insts().TryGetAs<SymbolicBinding>(
-              lookup->query_self_inst_id)) {
+              identified->query_self_inst_id)) {
         auto name_id =
             sem_ir_->entity_names().Get(sym_name->entity_name_id).name_id;
         is_period_self = (name_id == NameId::PeriodSelf);
       }
       if (!is_period_self) {
-        step_stack_->PushInstId(lookup->query_self_inst_id);
+        step_stack_->PushInstId(identified->query_self_inst_id);
       }
     } else if (auto lookup = sem_ir_->insts().TryGetAs<LookupImplWitness>(
                    witness_inst_id)) {
@@ -850,6 +860,13 @@ class Stringifier {
       // TODO: Omit parens if not needed for precedence.
       step_stack_->Push("(", witness_inst_id, ")");
     }
+  }
+
+  auto StringifyInst(InstId inst_id, ImplWitnessAccess inst) -> void {
+    StringifyWitnessAndIndex(inst_id, inst.witness_id, inst.index);
+  }
+  auto StringifyInst(InstId inst_id, RewriteTarget inst) -> void {
+    StringifyWitnessAndIndex(inst_id, inst.witness_id, inst.index);
   }
 
   auto StringifyInst(InstId /*inst_id*/, ImportRefUnloaded inst) -> void {

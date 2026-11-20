@@ -334,6 +334,10 @@ class TypeCompleter {
                         SemIR::ImplWitnessAccess inst) const
       -> SemIR::CompleteTypeInfo;
 
+  auto BuildInfoForInst(SemIR::TypeId /*type_id*/,
+                        SemIR::RewriteTarget inst) const
+      -> SemIR::CompleteTypeInfo;
+
   template <typename InstT>
     requires(InstT::Kind.is_type() == SemIR::InstIsType::Never)
   auto BuildInfoForInst(SemIR::TypeId /*type_id*/, InstT inst) const
@@ -852,6 +856,13 @@ auto TypeCompleter::BuildInfoForInst(SemIR::TypeId type_id,
   return MakeDependentTypeInfo(type_id);
 }
 
+auto TypeCompleter::BuildInfoForInst(SemIR::TypeId type_id,
+                                     SemIR::RewriteTarget /*inst*/) const
+    -> SemIR::CompleteTypeInfo {
+  // The type is dependent on the targeted associated constant.
+  return MakeDependentTypeInfo(type_id);
+}
+
 // Builds and returns the value representation for the given type. All nested
 // types, as found by AddNestedIncompleteTypes, are known to be complete.
 auto TypeCompleter::BuildInfo(SemIR::TypeId type_id, SemIR::Inst inst) const
@@ -1065,9 +1076,14 @@ static auto IdentifyFacetType(Context& context, SemIR::LocId loc_id,
                                                             rewrite.lhs_id)),
                 context.constant_values().Get(rewrite.rhs_id)};
       };
+      auto rewrites_before = std::move(rewrites);
+      rewrites.clear();
+      rewrites.reserve(rewrites_before.size() +
+                       declared_facet_type.rewrite_constraints.size());
       llvm::append_range(
           rewrites, llvm::map_range(declared_facet_type.rewrite_constraints,
                                     rewrite_as_constants));
+      llvm::append_range(rewrites, rewrites_before);
     } else {
       auto rewrite_as_constants =
           [&](auto rewrite) -> IdentifiedFacetType::Equivalent {

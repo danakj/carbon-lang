@@ -180,7 +180,7 @@ impl () as Z where .Z1 = {};
 // CHECK:STDERR:        ╭─┤ fail_require_non_extended_rewrite_wrong_type.carbon:[[@LINE+14]]:1
 // CHECK:STDERR: ->     │ impl () as N {}
 // CHECK:STDERR:        · ┳━━━━━━━━━━━━━━
-// CHECK:STDERR:        · ┗━━┫ error: constraint `N` being implemented requires that `().(Z.Z1)` equals
+// CHECK:STDERR:        · ┗━━┫ error: constraint `N` being implemented requires that `.(Z.Z1)` equals
 // CHECK:STDERR:        ·    ┃        `()`; found `{}` and `()`
 // CHECK:STDERR:        ·    ┃        [IdentifiedRequireImplsNotEquivalent]
 // CHECK:STDERR:        ╰────
@@ -226,7 +226,7 @@ constraint N {
 // CHECK:STDERR: ->     │ impl () as N where .Z1 = {} {}
 // CHECK:STDERR:        · ┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // CHECK:STDERR:        · ┗━━┫ error: constraint `N where .(Z.Z1) = {}` being implemented requires that
-// CHECK:STDERR:        ·    ┃        `().(Z.Z1)` equals `()`; found `{}` and `()`
+// CHECK:STDERR:        ·    ┃        `.(Z.Z1)` equals `()`; found `{}` and `()`
 // CHECK:STDERR:        ·    ┃        [IdentifiedRequireImplsNotEquivalent]
 // CHECK:STDERR:        ╰────
 // CHECK:STDERR:

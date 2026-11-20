@@ -1241,14 +1241,14 @@ auto InstNamer::NamingContext::NameInst() -> void {
       return;
     }
     case CARBON_KIND(ImplWitnessAccess inst): {
-      // TODO: Include information about the impl?
+      // TODO: Include information about the interface?
       RawStringOstream out;
       out << "impl.elem" << inst.index.index;
       AddInstName(out.TakeStr());
       return;
     }
     case CARBON_KIND(ImplWitnessAccessSubstituted inst): {
-      // TODO: Include information about the impl?
+      // TODO: Include information about the interface?
       RawStringOstream out;
       auto access = sem_ir().insts().GetAs<ImplWitnessAccess>(
           inst.impl_witness_access_id);
@@ -1429,6 +1429,13 @@ auto InstNamer::NamingContext::NameInst() -> void {
     }
     case ReturnSlotPattern::Kind: {
       AddInstNameId(NameId::ReturnSlot, ".patt");
+      return;
+    }
+    case CARBON_KIND(RewriteTarget inst): {
+      // TODO: Include information about the interface?
+      RawStringOstream out;
+      out << "rewrite.elem" << inst.index.index;
+      AddInstName(out.TakeStr());
       return;
     }
     case CARBON_KIND(SpecificFunction inst): {

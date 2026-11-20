@@ -194,6 +194,23 @@ auto IdentifiedFacetType::EvaluateImplWitnessesToGetImplAsTarget(
   return ImplAsTarget(std::move(targets));
 }
 
+// Replace RewriteTargets with ImplWitnessAccess when pulling
+// evaluated/substituted constraints out of an IdentifiedFacetType.
+static auto EvalAndAccessRewriteTarget(Context& context, SemIR::LocId loc_id,
+                                       SemIR::ConstantId const_id)
+    -> SemIR::ConstantId {
+  if (auto rewrite =
+          context.constant_values().TryGetInstAs<SemIR::RewriteTarget>(
+              const_id)) {
+    return EvalOrAddInst<SemIR::ImplWitnessAccess>(
+        context, loc_id,
+        {.type_id = rewrite->type_id,
+         .witness_id = rewrite->witness_id,
+         .index = rewrite->index});
+  }
+  return const_id;
+}
+
 auto ConstantWithIdentifiedWitnesses::EvaluateIdentifiedWitnesses(
     Context& context, SemIR::LocId loc_id) const -> SemIR::ConstantId {
   if (context.eval_impl_lookup_to_identified_witness()) {
@@ -202,7 +219,8 @@ auto ConstantWithIdentifiedWitnesses::EvaluateIdentifiedWitnesses(
   EvaluateSubstCallbacks callbacks(&context, loc_id);
   auto inst_id = SubstInst(
       context, context.constant_values().GetInstId(const_id_), callbacks);
-  return context.constant_values().Get(inst_id);
+  auto const_id = context.constant_values().Get(inst_id);
+  return EvalAndAccessRewriteTarget(context, loc_id, const_id);
 }
 
 auto ConstantWithIdentifiedWitnesses::SubstIdentifiedWitnesses(
@@ -220,7 +238,8 @@ auto ConstantWithIdentifiedWitnesses::SubstIdentifiedWitnesses(
   EvaluateSubstCallbacks subst_callbacks(&context, loc_id, &callbacks);
   auto inst_id = SubstInst(
       context, context.constant_values().GetInstId(const_id_), subst_callbacks);
-  return context.constant_values().Get(inst_id);
+  auto const_id = context.constant_values().Get(inst_id);
+  return EvalAndAccessRewriteTarget(context, loc_id, const_id);
 }
 
 auto InterfaceWithIdentifiedWitnesses::EvaluateIdentifiedWitnesses(

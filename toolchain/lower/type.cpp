@@ -681,6 +681,11 @@ static auto BuildTypeForInst(FileContext& /*context*/,
   CARBON_FATAL("Unexpected ImplWitnessAccess in lowering");
 }
 
+static auto BuildTypeForInst(FileContext& /*context*/,
+                             SemIR::RewriteTarget /*inst*/) -> LoweredTypes {
+  CARBON_FATAL("Unexpected RewriteTarget in lowering");
+}
+
 static auto BuildTypeForInst(FileContext& context, SemIR::IntType inst)
     -> LoweredTypes {
   auto width_inst =

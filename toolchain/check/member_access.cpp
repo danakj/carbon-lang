@@ -186,8 +186,10 @@ static auto PerformImplWitnessAccessAndSubstitute(
       GetOrAddInst<SemIR::ImplWitnessAccess>(context, loc_id, access);
 
   if (!context.where_stack().empty()) {
+    auto witness = context.constant_values().Get(access.witness_id);
+    auto index = access.index;
     if (auto result = context.where_stack().Peek().rewrites.Lookup(
-            context.constant_values().Get(access_id))) {
+            Context::WhereStackEntry::Target{witness, index})) {
       return GetOrAddInst<SemIR::ImplWitnessAccessSubstituted>(
           context, loc_id,
           {.type_id = access.type_id,
@@ -502,36 +504,6 @@ auto PerformMemberAccess(Context& context, SemIR::LocId loc_id,
   }
 }
 
-auto GetRewriteTarget(Context& context, SemIR::LocId loc_id,
-                      SemIR::InstId period_self_id, SemIR::NameId name_id)
-    -> SemIR::InstId {
-  auto period_self_type_id = context.insts().Get(period_self_id).type_id();
-  if (!RequireCompleteType(
-          context, period_self_type_id, loc_id, [&](auto& builder) {
-            CARBON_DIAGNOSTIC_CONTEXT(IncompleteTypeInRewriteTarget,
-                                      "rewrite target in incomplete type {0}",
-                                      SemIR::TypeId);
-            builder.Attach(loc_id, IncompleteTypeInRewriteTarget,
-                           period_self_type_id);
-          })) {
-    return SemIR::ErrorInst::InstId;
-  }
-
-  llvm::SmallVector<LookupScope> lookup_scopes;
-  auto append = AppendLookupScopesForConstant(
-      context, loc_id, period_self_type_id.AsConstantId(),
-      context.constant_values().Get(period_self_id),
-      /*extended_scope=*/false, &lookup_scopes);
-  CARBON_CHECK(append);
-  // The name scope constant needs to be a type, but is currently a facet, so
-  // perform `as type` to get a FacetAccessType.
-  auto period_self_as_type = ExprAsType(context, loc_id, period_self_id);
-  return LookupMemberNameInScope(
-      context, loc_id, period_self_id, name_id,
-      period_self_as_type.type_id.AsConstantId(), lookup_scopes,
-      /*lookup_in_type_of_base=*/false, /*required=*/true);
-}
-
 // Common logic for `AccessMemberAction` and `AccessOptionalMemberAction`.
 static auto PerformActionHelper(Context& context, SemIR::LocId loc_id,
                                 SemIR::InstId base_id, SemIR::NameId name_id,
@@ -586,19 +558,17 @@ static auto PerformActionHelper(Context& context, SemIR::LocId loc_id,
         base_type_id = SemIR::ErrorInst::TypeId;
       }
 
-      auto base_type_const_id = base_type_id.AsConstantId();
       llvm::SmallVector<LookupScope> lookup_scopes;
-      if (AppendLookupScopesForConstant(context, loc_id, base_type_const_id,
-                                        base_const_id, /*extended_scope=*/false,
-                                        &lookup_scopes)) {
+      if (AppendLookupScopesForConstant(
+              context, loc_id, base_type_id.AsConstantId(), base_const_id,
+              /*extended_scope=*/false, &lookup_scopes)) {
         // The name scope constant needs to be a type, but is currently a
-        // facet, so perform `as type` to get a FacetAccessType.
+        // constrained facet, so perform `as type` to get a FacetAccessType.
         auto base_as_type = ExprAsType(context, loc_id, base_id);
-        base_type_const_id = base_as_type.type_id.AsConstantId();
-        return LookupMemberNameInScope(context, loc_id, base_id, name_id,
-                                       base_type_const_id, lookup_scopes,
-                                       /*lookup_in_type_of_base=*/false,
-                                       required);
+        return LookupMemberNameInScope(
+            context, loc_id, base_id, name_id,
+            base_as_type.type_id.AsConstantId(), lookup_scopes,
+            /*lookup_in_type_of_base=*/false, required);
       }
     }
   }

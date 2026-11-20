@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
 #include "toolchain/check/context.h"
+#include "toolchain/check/facet_type.h"
 #include "toolchain/check/generic.h"
 #include "toolchain/check/handle.h"
 #include "toolchain/check/inst.h"
@@ -14,6 +15,7 @@
 #include "toolchain/diagnostics/emitter.h"
 #include "toolchain/lex/token_kind.h"
 #include "toolchain/parse/typed_nodes.h"
+#include "toolchain/sem_ir/ids.h"
 #include "toolchain/sem_ir/inst.h"
 #include "toolchain/sem_ir/typed_insts.h"
 
@@ -238,6 +240,34 @@ auto HandleParseNode(Context& context, Parse::RewriteDesignatorExprId node_id)
       HandleNameAsExpr(context, node_id, SemIR::NameId::PeriodSelf);
   auto member_id =
       PerformMemberAccess(context, node_id, period_self_id, name_id);
+
+  // Change the ImplWitnessAccess into a RewriteTarget instruction.
+  if (member_id == SemIR::ErrorInst::InstId) {
+  } else if (auto access = context.insts().TryGetAs<SemIR::ImplWitnessAccess>(
+                 GetImplWitnessAccessWithoutSubstitution(context.sem_ir(),
+                                                         member_id))) {
+    member_id = AddInst<SemIR::RewriteTarget>(context, node_id,
+                                              {.type_id = access->type_id,
+                                               .witness_id = access->witness_id,
+                                               .index = access->index});
+  } else {
+    auto const_member_id =
+        context.constant_values().GetConstantInstId(member_id);
+    if (const_member_id == SemIR::ErrorInst::InstId) {
+      member_id = SemIR::ErrorInst::InstId;
+    } else {
+      // The rewrite must be a reference to some other constant expression that
+      // resolves to an ImplWitnessAccess, such as an `alias`.
+      auto const_access =
+          context.insts().GetAs<SemIR::ImplWitnessAccess>(const_member_id);
+      member_id =
+          AddInst<SemIR::RewriteTarget>(context, node_id,
+                                        {.type_id = const_access.type_id,
+                                         .witness_id = const_access.witness_id,
+                                         .index = const_access.index});
+    }
+  }
+
   context.node_stack().Push(node_id, member_id);
   return true;
 }

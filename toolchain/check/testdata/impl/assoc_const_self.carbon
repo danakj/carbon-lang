@@ -137,12 +137,13 @@ fn CallF() {
 // CHECK:STDOUT:   %.Self.frozen: %I.type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %.Self.frozen.as_type: type = facet_access_type %.Self.frozen [symbolic_self]
 // CHECK:STDOUT:   %.f01: <witness> = impl_self_witness %.Self.frozen, @I [symbolic_self]
-// CHECK:STDOUT:   %impl.elem0.4da: %.Self.frozen.as_type = impl_witness_access %.f01, element0 [symbolic_self]
+// CHECK:STDOUT:   %impl.elem0: %.Self.frozen.as_type = impl_witness_access %.f01, element0 [symbolic_self]
+// CHECK:STDOUT:   %rewrite.elem0.539: %.Self.frozen.as_type = rewrite_target %.f01, element0 [symbolic_self]
 // CHECK:STDOUT:   %.Self: %I.type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %.Self.as_type: type = facet_access_type %.Self [symbolic_self]
 // CHECK:STDOUT:   %.00f: <witness> = impl_self_witness %.Self, @I [symbolic_self]
-// CHECK:STDOUT:   %impl.elem0.ca3: %.Self.as_type = impl_witness_access %.00f, element0 [symbolic_self]
-// CHECK:STDOUT:   %I_where.type.b84: type = facet_type <@I where %impl.elem0.ca3 = %empty_struct> [concrete]
+// CHECK:STDOUT:   %rewrite.elem0.bd9: %.Self.as_type = rewrite_target %.00f, element0 [symbolic_self]
+// CHECK:STDOUT:   %I_where.type.fde: type = facet_type <@I where %rewrite.elem0.bd9 = %empty_struct> [concrete]
 // CHECK:STDOUT:   %.aaf: <witness> = impl_self_witness %empty_struct_type, @I [concrete]
 // CHECK:STDOUT:   %I.impl_witness.57e: <witness> = impl_witness @empty_struct_type.as.I.impl.%I.impl_witness_table [concrete]
 // CHECK:STDOUT:   %I.facet.f72: %I.type = facet_value %empty_struct_type, (%I.impl_witness.57e) [concrete]
@@ -151,7 +152,7 @@ fn CallF() {
 // CHECK:STDOUT:   %Int.generic: %Int.type = struct_value () [concrete]
 // CHECK:STDOUT:   %i32: type = class_type @Int, @Int(%int_32) [concrete]
 // CHECK:STDOUT:   %int_0.5c6: Core.IntLiteral = int_value 0 [concrete]
-// CHECK:STDOUT:   %I_where.type.8e4: type = facet_type <@I where %impl.elem0.ca3 = %int_0.5c6> [concrete]
+// CHECK:STDOUT:   %I_where.type.c50: type = facet_type <@I where %rewrite.elem0.bd9 = %int_0.5c6> [concrete]
 // CHECK:STDOUT:   %.c43: <witness> = impl_self_witness %i32, @I [concrete]
 // CHECK:STDOUT:   %I.impl_witness.f53: <witness> = impl_witness @i32.as.I.impl.%I.impl_witness_table [concrete]
 // CHECK:STDOUT:   %ImplicitAs.type.0ff: type = generic_interface_type @ImplicitAs [concrete]
@@ -203,16 +204,17 @@ fn CallF() {
 // CHECK:STDOUT:     %.Self.as_type: type = facet_access_type %.Self.ref [symbolic_self = constants.%.Self.frozen.as_type]
 // CHECK:STDOUT:     %.loc8_20: type = converted %.Self.ref, %.Self.as_type [symbolic_self = constants.%.Self.frozen.as_type]
 // CHECK:STDOUT:     %V.ref: %I.assoc_type = name_ref V, @V.%assoc0 [concrete = constants.%assoc0.660]
-// CHECK:STDOUT:     %impl.elem0.loc8_20.1: %.Self.frozen.as_type = impl_witness_access constants.%.f01, element0 [symbolic_self = constants.%impl.elem0.4da]
+// CHECK:STDOUT:     %impl.elem0: %.Self.frozen.as_type = impl_witness_access constants.%.f01, element0 [symbolic_self = constants.%impl.elem0]
+// CHECK:STDOUT:     %rewrite.elem0.loc8_20.1: %.Self.frozen.as_type = rewrite_target constants.%.f01, element0 [symbolic_self = constants.%rewrite.elem0.539]
 // CHECK:STDOUT:     %.loc8_26.1: %empty_struct_type = struct_literal () [concrete = constants.%empty_struct]
 // CHECK:STDOUT:     %empty_struct: %empty_struct_type = struct_value () [concrete = constants.%empty_struct]
 // CHECK:STDOUT:     %.loc8_26.2: %empty_struct_type = converted %.loc8_26.1, %empty_struct [concrete = constants.%empty_struct]
-// CHECK:STDOUT:     %rewrite.loc8_23.1 = requirement_rewrite %impl.elem0.loc8_20.1, %.loc8_26.2 [concrete]
-// CHECK:STDOUT:     %impl.elem0.loc8_20.2: %.Self.as_type = impl_witness_access constants.%.00f, element0 [symbolic_self = constants.%impl.elem0.ca3]
-// CHECK:STDOUT:     %rewrite.loc8_23.2 = requirement_rewrite %impl.elem0.loc8_20.2, %.loc8_26.2 [concrete]
-// CHECK:STDOUT:     %.loc8_14: type = where_expr [concrete = constants.%I_where.type.b84] {
+// CHECK:STDOUT:     %rewrite.loc8_23.1 = requirement_rewrite %rewrite.elem0.loc8_20.1, %.loc8_26.2 [concrete]
+// CHECK:STDOUT:     %rewrite.elem0.loc8_20.2: %.Self.as_type = rewrite_target constants.%.00f, element0 [symbolic_self = constants.%rewrite.elem0.bd9]
+// CHECK:STDOUT:     %rewrite.loc8_23.2 = requirement_rewrite %rewrite.elem0.loc8_20.2, %.loc8_26.2 [concrete]
+// CHECK:STDOUT:     %.loc8_14: type = where_expr [concrete = constants.%I_where.type.fde] {
 // CHECK:STDOUT:       %base_facet_type = requirement_base_facet_type %I.ref [concrete]
-// CHECK:STDOUT:       %rewrite.loc8_23.2 = requirement_rewrite %impl.elem0.loc8_20.2, %.loc8_26.2 [concrete]
+// CHECK:STDOUT:       %rewrite.loc8_23.2 = requirement_rewrite %rewrite.elem0.loc8_20.2, %.loc8_26.2 [concrete]
 // CHECK:STDOUT:     }
 // CHECK:STDOUT:   }
 // CHECK:STDOUT:   %.loc8: <witness> = impl_self_witness @empty_struct_type.as.I.impl.%.loc8_7.2, @I [concrete = constants.%.aaf]
@@ -225,14 +227,15 @@ fn CallF() {
 // CHECK:STDOUT:     %.Self.as_type: type = facet_access_type %.Self.ref [symbolic_self = constants.%.Self.frozen.as_type]
 // CHECK:STDOUT:     %.loc10_21: type = converted %.Self.ref, %.Self.as_type [symbolic_self = constants.%.Self.frozen.as_type]
 // CHECK:STDOUT:     %V.ref: %I.assoc_type = name_ref V, @V.%assoc0 [concrete = constants.%assoc0.660]
-// CHECK:STDOUT:     %impl.elem0.loc10_21.1: %.Self.frozen.as_type = impl_witness_access constants.%.f01, element0 [symbolic_self = constants.%impl.elem0.4da]
+// CHECK:STDOUT:     %impl.elem0.loc10_21: %.Self.frozen.as_type = impl_witness_access constants.%.f01, element0 [symbolic_self = constants.%impl.elem0]
+// CHECK:STDOUT:     %rewrite.elem0.loc10_21.1: %.Self.frozen.as_type = rewrite_target constants.%.f01, element0 [symbolic_self = constants.%rewrite.elem0.539]
 // CHECK:STDOUT:     %int_0: Core.IntLiteral = int_value 0 [concrete = constants.%int_0.5c6]
-// CHECK:STDOUT:     %rewrite.loc10_24.1 = requirement_rewrite %impl.elem0.loc10_21.1, %int_0 [concrete]
-// CHECK:STDOUT:     %impl.elem0.loc10_21.2: %.Self.as_type = impl_witness_access constants.%.00f, element0 [symbolic_self = constants.%impl.elem0.ca3]
-// CHECK:STDOUT:     %rewrite.loc10_24.2 = requirement_rewrite %impl.elem0.loc10_21.2, %int_0 [concrete]
-// CHECK:STDOUT:     %.loc10_15.1: type = where_expr [concrete = constants.%I_where.type.8e4] {
+// CHECK:STDOUT:     %rewrite.loc10_24.1 = requirement_rewrite %rewrite.elem0.loc10_21.1, %int_0 [concrete]
+// CHECK:STDOUT:     %rewrite.elem0.loc10_21.2: %.Self.as_type = rewrite_target constants.%.00f, element0 [symbolic_self = constants.%rewrite.elem0.bd9]
+// CHECK:STDOUT:     %rewrite.loc10_24.2 = requirement_rewrite %rewrite.elem0.loc10_21.2, %int_0 [concrete]
+// CHECK:STDOUT:     %.loc10_15.1: type = where_expr [concrete = constants.%I_where.type.c50] {
 // CHECK:STDOUT:       %base_facet_type = requirement_base_facet_type %I.ref [concrete]
-// CHECK:STDOUT:       %rewrite.loc10_24.2 = requirement_rewrite %impl.elem0.loc10_21.2, %int_0 [concrete]
+// CHECK:STDOUT:       %rewrite.loc10_24.2 = requirement_rewrite %rewrite.elem0.loc10_21.2, %int_0 [concrete]
 // CHECK:STDOUT:     }
 // CHECK:STDOUT:   }
 // CHECK:STDOUT:   %.loc10: <witness> = impl_self_witness @i32.as.I.impl.%i32, @I [concrete = constants.%.c43]
@@ -332,13 +335,14 @@ fn CallF() {
 // CHECK:STDOUT:   %.Self.frozen: %I.type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %.Self.frozen.as_type: type = facet_access_type %.Self.frozen [symbolic_self]
 // CHECK:STDOUT:   %.f01: <witness> = impl_self_witness %.Self.frozen, @I [symbolic_self]
-// CHECK:STDOUT:   %impl.elem0.4da: %.Self.frozen.as_type = impl_witness_access %.f01, element0 [symbolic_self]
+// CHECK:STDOUT:   %impl.elem0: %.Self.frozen.as_type = impl_witness_access %.f01, element0 [symbolic_self]
+// CHECK:STDOUT:   %rewrite.elem0.539: %.Self.frozen.as_type = rewrite_target %.f01, element0 [symbolic_self]
 // CHECK:STDOUT:   %int_0: Core.IntLiteral = int_value 0 [concrete]
 // CHECK:STDOUT:   %.Self: %I.type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %.Self.as_type: type = facet_access_type %.Self [symbolic_self]
 // CHECK:STDOUT:   %.00f: <witness> = impl_self_witness %.Self, @I [symbolic_self]
-// CHECK:STDOUT:   %impl.elem0.ca3: %.Self.as_type = impl_witness_access %.00f, element0 [symbolic_self]
-// CHECK:STDOUT:   %I_where.type.8e4: type = facet_type <@I where %impl.elem0.ca3 = %int_0> [concrete]
+// CHECK:STDOUT:   %rewrite.elem0.bd9: %.Self.as_type = rewrite_target %.00f, element0 [symbolic_self]
+// CHECK:STDOUT:   %I_where.type.c50: type = facet_type <@I where %rewrite.elem0.bd9 = %int_0> [concrete]
 // CHECK:STDOUT:   %.aaf: <witness> = impl_self_witness %empty_struct_type, @I [concrete]
 // CHECK:STDOUT:   %I.impl_witness: <witness> = impl_witness @empty_struct_type.as.I.impl.%I.impl_witness_table [concrete]
 // CHECK:STDOUT:   %ImplicitAs.type.0ff: type = generic_interface_type @ImplicitAs [concrete]
@@ -372,14 +376,15 @@ fn CallF() {
 // CHECK:STDOUT:     %.Self.as_type: type = facet_access_type %.Self.ref [symbolic_self = constants.%.Self.frozen.as_type]
 // CHECK:STDOUT:     %.loc19_20: type = converted %.Self.ref, %.Self.as_type [symbolic_self = constants.%.Self.frozen.as_type]
 // CHECK:STDOUT:     %V.ref: %I.assoc_type = name_ref V, @V.%assoc0 [concrete = constants.%assoc0.660]
-// CHECK:STDOUT:     %impl.elem0.loc19_20.1: %.Self.frozen.as_type = impl_witness_access constants.%.f01, element0 [symbolic_self = constants.%impl.elem0.4da]
+// CHECK:STDOUT:     %impl.elem0: %.Self.frozen.as_type = impl_witness_access constants.%.f01, element0 [symbolic_self = constants.%impl.elem0]
+// CHECK:STDOUT:     %rewrite.elem0.loc19_20.1: %.Self.frozen.as_type = rewrite_target constants.%.f01, element0 [symbolic_self = constants.%rewrite.elem0.539]
 // CHECK:STDOUT:     %int_0: Core.IntLiteral = int_value 0 [concrete = constants.%int_0]
-// CHECK:STDOUT:     %rewrite.loc19_23.1 = requirement_rewrite %impl.elem0.loc19_20.1, %int_0 [concrete]
-// CHECK:STDOUT:     %impl.elem0.loc19_20.2: %.Self.as_type = impl_witness_access constants.%.00f, element0 [symbolic_self = constants.%impl.elem0.ca3]
-// CHECK:STDOUT:     %rewrite.loc19_23.2 = requirement_rewrite %impl.elem0.loc19_20.2, %int_0 [concrete]
-// CHECK:STDOUT:     %.loc19_14.1: type = where_expr [concrete = constants.%I_where.type.8e4] {
+// CHECK:STDOUT:     %rewrite.loc19_23.1 = requirement_rewrite %rewrite.elem0.loc19_20.1, %int_0 [concrete]
+// CHECK:STDOUT:     %rewrite.elem0.loc19_20.2: %.Self.as_type = rewrite_target constants.%.00f, element0 [symbolic_self = constants.%rewrite.elem0.bd9]
+// CHECK:STDOUT:     %rewrite.loc19_23.2 = requirement_rewrite %rewrite.elem0.loc19_20.2, %int_0 [concrete]
+// CHECK:STDOUT:     %.loc19_14.1: type = where_expr [concrete = constants.%I_where.type.c50] {
 // CHECK:STDOUT:       %base_facet_type = requirement_base_facet_type %I.ref [concrete]
-// CHECK:STDOUT:       %rewrite.loc19_23.2 = requirement_rewrite %impl.elem0.loc19_20.2, %int_0 [concrete]
+// CHECK:STDOUT:       %rewrite.loc19_23.2 = requirement_rewrite %rewrite.elem0.loc19_20.2, %int_0 [concrete]
 // CHECK:STDOUT:     }
 // CHECK:STDOUT:   }
 // CHECK:STDOUT:   %.loc19: <witness> = impl_self_witness @empty_struct_type.as.I.impl.%.loc19_7.2, @I [concrete = constants.%.aaf]
@@ -472,12 +477,13 @@ fn CallF() {
 // CHECK:STDOUT:   %.Self.frozen: %I.type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %.Self.frozen.as_type: type = facet_access_type %.Self.frozen [symbolic_self]
 // CHECK:STDOUT:   %.f01: <witness> = impl_self_witness %.Self.frozen, @I [symbolic_self]
-// CHECK:STDOUT:   %impl.elem0.4da: %.Self.frozen.as_type = impl_witness_access %.f01, element0 [symbolic_self]
+// CHECK:STDOUT:   %impl.elem0: %.Self.frozen.as_type = impl_witness_access %.f01, element0 [symbolic_self]
+// CHECK:STDOUT:   %rewrite.elem0.539: %.Self.frozen.as_type = rewrite_target %.f01, element0 [symbolic_self]
 // CHECK:STDOUT:   %.Self: %I.type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %.Self.as_type: type = facet_access_type %.Self [symbolic_self]
 // CHECK:STDOUT:   %.00f: <witness> = impl_self_witness %.Self, @I [symbolic_self]
-// CHECK:STDOUT:   %impl.elem0.ca3: %.Self.as_type = impl_witness_access %.00f, element0 [symbolic_self]
-// CHECK:STDOUT:   %I_where.type.d5e: type = facet_type <@I where %impl.elem0.ca3 = %empty_tuple> [concrete]
+// CHECK:STDOUT:   %rewrite.elem0.bd9: %.Self.as_type = rewrite_target %.00f, element0 [symbolic_self]
+// CHECK:STDOUT:   %I_where.type.567: type = facet_type <@I where %rewrite.elem0.bd9 = %empty_tuple> [concrete]
 // CHECK:STDOUT:   %.b7f: <witness> = impl_self_witness %C, @I [concrete]
 // CHECK:STDOUT:   %I.impl_witness: <witness> = impl_witness @C.as.I.impl.%I.impl_witness_table [concrete]
 // CHECK:STDOUT:   %.cf4: type = fn_type_with_self_type %ImplicitAs.WithSelf.Convert.type.26a, %ImplicitAs.facet [concrete]
@@ -521,16 +527,17 @@ fn CallF() {
 // CHECK:STDOUT:     %.Self.as_type: type = facet_access_type %.Self.ref [symbolic_self = constants.%.Self.frozen.as_type]
 // CHECK:STDOUT:     %.loc22_19: type = converted %.Self.ref, %.Self.as_type [symbolic_self = constants.%.Self.frozen.as_type]
 // CHECK:STDOUT:     %V.ref: %I.assoc_type = name_ref V, @V.%assoc0 [concrete = constants.%assoc0.660]
-// CHECK:STDOUT:     %impl.elem0.loc22_19.1: %.Self.frozen.as_type = impl_witness_access constants.%.f01, element0 [symbolic_self = constants.%impl.elem0.4da]
+// CHECK:STDOUT:     %impl.elem0.loc22_19: %.Self.frozen.as_type = impl_witness_access constants.%.f01, element0 [symbolic_self = constants.%impl.elem0]
+// CHECK:STDOUT:     %rewrite.elem0.loc22_19.1: %.Self.frozen.as_type = rewrite_target constants.%.f01, element0 [symbolic_self = constants.%rewrite.elem0.539]
 // CHECK:STDOUT:     %.loc22_25.1: %empty_tuple.type = tuple_literal () [concrete = constants.%empty_tuple]
 // CHECK:STDOUT:     %empty_tuple: %empty_tuple.type = tuple_value () [concrete = constants.%empty_tuple]
 // CHECK:STDOUT:     %.loc22_25.2: %empty_tuple.type = converted %.loc22_25.1, %empty_tuple [concrete = constants.%empty_tuple]
-// CHECK:STDOUT:     %rewrite.loc22_22.1 = requirement_rewrite %impl.elem0.loc22_19.1, %.loc22_25.2 [concrete]
-// CHECK:STDOUT:     %impl.elem0.loc22_19.2: %.Self.as_type = impl_witness_access constants.%.00f, element0 [symbolic_self = constants.%impl.elem0.ca3]
-// CHECK:STDOUT:     %rewrite.loc22_22.2 = requirement_rewrite %impl.elem0.loc22_19.2, %.loc22_25.2 [concrete]
-// CHECK:STDOUT:     %.loc22_13.1: type = where_expr [concrete = constants.%I_where.type.d5e] {
+// CHECK:STDOUT:     %rewrite.loc22_22.1 = requirement_rewrite %rewrite.elem0.loc22_19.1, %.loc22_25.2 [concrete]
+// CHECK:STDOUT:     %rewrite.elem0.loc22_19.2: %.Self.as_type = rewrite_target constants.%.00f, element0 [symbolic_self = constants.%rewrite.elem0.bd9]
+// CHECK:STDOUT:     %rewrite.loc22_22.2 = requirement_rewrite %rewrite.elem0.loc22_19.2, %.loc22_25.2 [concrete]
+// CHECK:STDOUT:     %.loc22_13.1: type = where_expr [concrete = constants.%I_where.type.567] {
 // CHECK:STDOUT:       %base_facet_type = requirement_base_facet_type %I.ref [concrete]
-// CHECK:STDOUT:       %rewrite.loc22_22.2 = requirement_rewrite %impl.elem0.loc22_19.2, %.loc22_25.2 [concrete]
+// CHECK:STDOUT:       %rewrite.loc22_22.2 = requirement_rewrite %rewrite.elem0.loc22_19.2, %.loc22_25.2 [concrete]
 // CHECK:STDOUT:     }
 // CHECK:STDOUT:   }
 // CHECK:STDOUT:   %.loc22: <witness> = impl_self_witness @C.as.I.impl.%C.ref, @I [concrete = constants.%.b7f]
@@ -757,10 +764,10 @@ fn CallF() {
 // CHECK:STDOUT:     %.loc23_24: type = converted %.Self.ref, %.Self.as_type [symbolic_self = constants.%.Self.frozen.as_type]
 // CHECK:STDOUT:     %V.ref: <error> = name_ref V, <error> [concrete = <error>]
 // CHECK:STDOUT:     %.loc23_30: %empty_tuple.type = tuple_literal () [concrete = constants.%empty_tuple]
-// CHECK:STDOUT:     %rewrite = requirement_rewrite %V.ref, <error> [concrete]
+// CHECK:STDOUT:     %rewrite = requirement_rewrite <error>, <error> [concrete]
 // CHECK:STDOUT:     %.loc23_18: type = where_expr [concrete = <error>] {
 // CHECK:STDOUT:       %base_facet_type = requirement_base_facet_type %I.type [concrete]
-// CHECK:STDOUT:       %rewrite = requirement_rewrite %V.ref, <error> [concrete]
+// CHECK:STDOUT:       %rewrite = requirement_rewrite <error>, <error> [concrete]
 // CHECK:STDOUT:     }
 // CHECK:STDOUT:   }
 // CHECK:STDOUT: }
@@ -850,14 +857,15 @@ fn CallF() {
 // CHECK:STDOUT:   %.Self: %I.type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %.Self.as_type: type = facet_access_type %.Self [symbolic_self]
 // CHECK:STDOUT:   %I.lookup_impl_witness.ced: <witness> = lookup_impl_witness %.Self.frozen.3a0, @I [symbolic_self]
-// CHECK:STDOUT:   %impl.elem0.cba: %.Self.frozen.as_type = impl_witness_access %I.lookup_impl_witness.ced, element0 [symbolic_self]
+// CHECK:STDOUT:   %impl.elem0: %.Self.frozen.as_type = impl_witness_access %I.lookup_impl_witness.ced, element0 [symbolic_self]
+// CHECK:STDOUT:   %rewrite.elem0.a7e: %.Self.frozen.as_type = rewrite_target %I.lookup_impl_witness.ced, element0 [symbolic_self]
 // CHECK:STDOUT:   %ImplicitAs.type.052: type = facet_type <@ImplicitAs, @ImplicitAs(%.Self.as_type)> [symbolic_self]
 // CHECK:STDOUT:   %I.lookup_impl_witness.78b: <witness> = lookup_impl_witness %.Self, @I [symbolic_self]
-// CHECK:STDOUT:   %impl.elem0.e15: %.Self.as_type = impl_witness_access %I.lookup_impl_witness.78b, element0 [symbolic_self]
-// CHECK:STDOUT:   %I_where.type.14d: type = facet_type <@I where %empty_struct_type impls @ImplicitAs, @ImplicitAs(%.Self.as_type) and %impl.elem0.e15 = %empty_struct> [concrete]
-// CHECK:STDOUT:   %pattern_type.692: type = pattern_type %I_where.type.14d [concrete]
-// CHECK:STDOUT:   %T.patt: %pattern_type.692 = symbolic_binding_pattern T, 0 [symbolic]
-// CHECK:STDOUT:   %T: %I_where.type.14d = symbolic_binding T, 0 [symbolic]
+// CHECK:STDOUT:   %rewrite.elem0.19d: %.Self.as_type = rewrite_target %I.lookup_impl_witness.78b, element0 [symbolic_self]
+// CHECK:STDOUT:   %I_where.type.7ed: type = facet_type <@I where %empty_struct_type impls @ImplicitAs, @ImplicitAs(%.Self.as_type) and %rewrite.elem0.19d = %empty_struct> [concrete]
+// CHECK:STDOUT:   %pattern_type.85f: type = pattern_type %I_where.type.7ed [concrete]
+// CHECK:STDOUT:   %T.patt: %pattern_type.85f = symbolic_binding_pattern T, 0 [symbolic]
+// CHECK:STDOUT:   %T: %I_where.type.7ed = symbolic_binding T, 0 [symbolic]
 // CHECK:STDOUT:   %F.type: type = fn_type @F [concrete]
 // CHECK:STDOUT:   %F: %F.type = struct_value () [concrete]
 // CHECK:STDOUT:   %CallF.type: type = fn_type @CallF [concrete]
@@ -883,9 +891,9 @@ fn CallF() {
 // CHECK:STDOUT:   %Core.import = import Core
 // CHECK:STDOUT:   %I.decl: type = interface_decl @I [concrete = constants.%I.type] {} {}
 // CHECK:STDOUT:   %F.decl: %F.type = fn_decl @F [concrete = constants.%F] {
-// CHECK:STDOUT:     %T.patt.loc8_15.1: %pattern_type.692 = symbolic_binding_pattern T, 0 [symbolic = %T.patt.loc8_15.2 (constants.%T.patt)]
+// CHECK:STDOUT:     %T.patt.loc8_15.1: %pattern_type.85f = symbolic_binding_pattern T, 0 [symbolic = %T.patt.loc8_15.2 (constants.%T.patt)]
 // CHECK:STDOUT:   } {
-// CHECK:STDOUT:     %.loc8_19.1: type = splice_block %.loc8_19.2 [concrete = constants.%I_where.type.14d] {
+// CHECK:STDOUT:     %.loc8_19.1: type = splice_block %.loc8_19.2 [concrete = constants.%I_where.type.7ed] {
 // CHECK:STDOUT:       %.Self.frozen.loc8_15: type = symbolic_binding .Self [symbolic_self = constants.%.Self.frozen.e58]
 // CHECK:STDOUT:       %I.ref: type = name_ref I, file.%I.decl [concrete = constants.%I.type]
 // CHECK:STDOUT:       %.Self.frozen.loc8_19: %I.type = symbolic_binding .Self [symbolic_self = constants.%.Self.frozen.3a0]
@@ -903,22 +911,23 @@ fn CallF() {
 // CHECK:STDOUT:       %.Self.as_type.loc8_61: type = facet_access_type %.Self.ref.loc8_61 [symbolic_self = constants.%.Self.frozen.as_type]
 // CHECK:STDOUT:       %.loc8_61: type = converted %.Self.ref.loc8_61, %.Self.as_type.loc8_61 [symbolic_self = constants.%.Self.frozen.as_type]
 // CHECK:STDOUT:       %V.ref: %I.assoc_type = name_ref V, @V.%assoc0 [concrete = constants.%assoc0.660]
-// CHECK:STDOUT:       %impl.elem0.loc8_61.1: %.Self.frozen.as_type = impl_witness_access constants.%I.lookup_impl_witness.ced, element0 [symbolic_self = constants.%impl.elem0.cba]
+// CHECK:STDOUT:       %impl.elem0: %.Self.frozen.as_type = impl_witness_access constants.%I.lookup_impl_witness.ced, element0 [symbolic_self = constants.%impl.elem0]
+// CHECK:STDOUT:       %rewrite.elem0.loc8_61.1: %.Self.frozen.as_type = rewrite_target constants.%I.lookup_impl_witness.ced, element0 [symbolic_self = constants.%rewrite.elem0.a7e]
 // CHECK:STDOUT:       %.loc8_67.1: %empty_struct_type = struct_literal () [concrete = constants.%empty_struct]
 // CHECK:STDOUT:       %empty_struct: %empty_struct_type = struct_value () [concrete = constants.%empty_struct]
 // CHECK:STDOUT:       %.loc8_67.2: %empty_struct_type = converted %.loc8_67.1, %empty_struct [concrete = constants.%empty_struct]
-// CHECK:STDOUT:       %rewrite.loc8_64.1 = requirement_rewrite %impl.elem0.loc8_61.1, %.loc8_67.2 [concrete]
+// CHECK:STDOUT:       %rewrite.loc8_64.1 = requirement_rewrite %rewrite.elem0.loc8_61.1, %.loc8_67.2 [concrete]
 // CHECK:STDOUT:       %ImplicitAs.type.loc8_55.2: type = facet_type <@ImplicitAs, @ImplicitAs(constants.%.Self.as_type)> [symbolic_self = constants.%ImplicitAs.type.052]
 // CHECK:STDOUT:       %impls.loc8_28.2 = requirement_impls %.loc8_26.2, %ImplicitAs.type.loc8_55.2 [concrete]
-// CHECK:STDOUT:       %impl.elem0.loc8_61.2: %.Self.as_type = impl_witness_access constants.%I.lookup_impl_witness.78b, element0 [symbolic_self = constants.%impl.elem0.e15]
-// CHECK:STDOUT:       %rewrite.loc8_64.2 = requirement_rewrite %impl.elem0.loc8_61.2, %.loc8_67.2 [concrete]
-// CHECK:STDOUT:       %.loc8_19.2: type = where_expr [concrete = constants.%I_where.type.14d] {
+// CHECK:STDOUT:       %rewrite.elem0.loc8_61.2: %.Self.as_type = rewrite_target constants.%I.lookup_impl_witness.78b, element0 [symbolic_self = constants.%rewrite.elem0.19d]
+// CHECK:STDOUT:       %rewrite.loc8_64.2 = requirement_rewrite %rewrite.elem0.loc8_61.2, %.loc8_67.2 [concrete]
+// CHECK:STDOUT:       %.loc8_19.2: type = where_expr [concrete = constants.%I_where.type.7ed] {
 // CHECK:STDOUT:         %base_facet_type = requirement_base_facet_type %I.ref [concrete]
 // CHECK:STDOUT:         %impls.loc8_28.2 = requirement_impls %.loc8_26.2, %ImplicitAs.type.loc8_55.2 [concrete]
-// CHECK:STDOUT:         %rewrite.loc8_64.2 = requirement_rewrite %impl.elem0.loc8_61.2, %.loc8_67.2 [concrete]
+// CHECK:STDOUT:         %rewrite.loc8_64.2 = requirement_rewrite %rewrite.elem0.loc8_61.2, %.loc8_67.2 [concrete]
 // CHECK:STDOUT:       }
 // CHECK:STDOUT:     }
-// CHECK:STDOUT:     %T.loc8_15.2: %I_where.type.14d = symbolic_binding T, 0 [symbolic = %T.loc8_15.1 (constants.%T)]
+// CHECK:STDOUT:     %T.loc8_15.2: %I_where.type.7ed = symbolic_binding T, 0 [symbolic = %T.loc8_15.1 (constants.%T)]
 // CHECK:STDOUT:   }
 // CHECK:STDOUT:   %CallF.decl: %CallF.type = fn_decl @CallF [concrete = constants.%CallF] {} {}
 // CHECK:STDOUT: }
@@ -940,9 +949,9 @@ fn CallF() {
 // CHECK:STDOUT: !requires:
 // CHECK:STDOUT: }
 // CHECK:STDOUT:
-// CHECK:STDOUT: generic fn @F(%T.loc8_15.2: %I_where.type.14d) {
-// CHECK:STDOUT:   %T.patt.loc8_15.2: %pattern_type.692 = symbolic_binding_pattern T, 0 [symbolic = %T.patt.loc8_15.2 (constants.%T.patt)]
-// CHECK:STDOUT:   %T.loc8_15.1: %I_where.type.14d = symbolic_binding T, 0 [symbolic = %T.loc8_15.1 (constants.%T)]
+// CHECK:STDOUT: generic fn @F(%T.loc8_15.2: %I_where.type.7ed) {
+// CHECK:STDOUT:   %T.patt.loc8_15.2: %pattern_type.85f = symbolic_binding_pattern T, 0 [symbolic = %T.patt.loc8_15.2 (constants.%T.patt)]
+// CHECK:STDOUT:   %T.loc8_15.1: %I_where.type.7ed = symbolic_binding T, 0 [symbolic = %T.loc8_15.1 (constants.%T)]
 // CHECK:STDOUT:
 // CHECK:STDOUT:   fn();
 // CHECK:STDOUT: }

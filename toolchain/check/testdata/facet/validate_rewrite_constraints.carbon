@@ -57,7 +57,7 @@ fn G() {
   // CHECK:STDERR: ->     │   F({}, C);
   // CHECK:STDERR:        ·   ┳━━━━━━━
   // CHECK:STDERR:        ·   ┗━━┫ error: cannot convert type `C` into type implementing
-  // CHECK:STDERR:        ·      ┃        `I({}) where {} = ()`
+  // CHECK:STDERR:        ·      ┃        `I({}) where .(I({}).X) = ()`
   // CHECK:STDERR:        ·      ┃        [ConversionFailureTypeToFacet]
   // CHECK:STDERR:        ╰────
   // CHECK:STDERR:
@@ -1199,7 +1199,7 @@ fn G(generic U: I & J where .I1 = () and .J1 = {}, generic T: K where .K1 = U an
   // CHECK:STDERR: ->     │   F(U, T);
   // CHECK:STDERR:        ·   ┳━━━━━━
   // CHECK:STDERR:        ·   ┗━━┫ error: cannot convert type `T` that implements
-  // CHECK:STDERR:        ·      ┃        `K where .(K.K2) = {} and .(K.K1) = U as I & J and .(K.K3) = {}`
+  // CHECK:STDERR:        ·      ┃        `K where .(K.K2) = {} and .(K.K3) = {} and .(K.K1) = U as I & J`
   // CHECK:STDERR:        ·      ┃        into type implementing
   // CHECK:STDERR:        ·      ┃        `K where .(K.K2) = .(K.K1).(I.I1) and .(K.K3) = .(K.K1).(J.J1)`
   // CHECK:STDERR:        ·      ┃        [ConversionFailureFacetToFacet]
@@ -1220,7 +1220,7 @@ fn G2(generic U: I & J where .I1 = () and .J1 = {}, generic T: K where .K1 = U a
   // CHECK:STDERR: ->     │   F(U, T);
   // CHECK:STDERR:        ·   ┳━━━━━━
   // CHECK:STDERR:        ·   ┗━━┫ error: cannot convert type `T` that implements
-  // CHECK:STDERR:        ·      ┃        `K where .(K.K1) = U as I & J and .(K.K3) = {}` into type
+  // CHECK:STDERR:        ·      ┃        `K where .(K.K3) = {} and .(K.K1) = U as I & J` into type
   // CHECK:STDERR:        ·      ┃        implementing
   // CHECK:STDERR:        ·      ┃        `K where .(K.K2) = .(K.K1).(I.I1) and .(K.K3) = .(K.K1).(J.J1)`
   // CHECK:STDERR:        ·      ┃        [ConversionFailureFacetToFacet]
@@ -1241,7 +1241,7 @@ fn G3(generic U: I & J where .J1 = {}, generic T: K where .K1 = U and .K2 = () a
   // CHECK:STDERR: ->     │   F(U, T);
   // CHECK:STDERR:        ·   ┳━━━━━━
   // CHECK:STDERR:        ·   ┗━━┫ error: cannot convert type `T` that implements
-  // CHECK:STDERR:        ·      ┃        `K where .(K.K2) = () and .(K.K1) = U as I & J and .(K.K3) = {}`
+  // CHECK:STDERR:        ·      ┃        `K where .(K.K2) = () and .(K.K3) = {} and .(K.K1) = U as I & J`
   // CHECK:STDERR:        ·      ┃        into type implementing
   // CHECK:STDERR:        ·      ┃        `K where .(K.K2) = .(K.K1).(I.I1) and .(K.K3) = .(K.K1).(J.J1)`
   // CHECK:STDERR:        ·      ┃        [ConversionFailureFacetToFacet]
@@ -1283,7 +1283,7 @@ fn G5(generic U: I & J where .I1 = (), generic T: K where .K1 = U and .K2 = () a
   // CHECK:STDERR: ->     │   F(U, T);
   // CHECK:STDERR:        ·   ┳━━━━━━
   // CHECK:STDERR:        ·   ┗━━┫ error: cannot convert type `T` that implements
-  // CHECK:STDERR:        ·      ┃        `K where .(K.K2) = () and .(K.K1) = U as I & J and .(K.K3) = {}`
+  // CHECK:STDERR:        ·      ┃        `K where .(K.K2) = () and .(K.K3) = {} and .(K.K1) = U as I & J`
   // CHECK:STDERR:        ·      ┃        into type implementing
   // CHECK:STDERR:        ·      ┃        `K where .(K.K2) = .(K.K1).(I.I1) and .(K.K3) = .(K.K1).(J.J1)`
   // CHECK:STDERR:        ·      ┃        [ConversionFailureFacetToFacet]
@@ -1630,37 +1630,37 @@ fn G(generic T: N) {
 // CHECK:STDOUT:   %empty_tuple.type: type = tuple_type () [concrete]
 // CHECK:STDOUT:   %.Self: %Z.type = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %Z.lookup_impl_witness.b8d: <witness> = lookup_impl_witness %.Self, @Z [symbolic_self]
-// CHECK:STDOUT:   %impl.elem0.555: type = impl_witness_access %Z.lookup_impl_witness.b8d, element0 [symbolic_self]
-// CHECK:STDOUT:   %Z_where.type.7b9: type = facet_type <@Z where %impl.elem0.555 = %empty_struct_type> [concrete]
+// CHECK:STDOUT:   %rewrite.elem0.c63: type = rewrite_target %Z.lookup_impl_witness.b8d, element0 [symbolic_self]
+// CHECK:STDOUT:   %Z_where.type.377: type = facet_type <@Z where %rewrite.elem0.c63 = %empty_struct_type> [concrete]
 // CHECK:STDOUT:   %F.type: type = fn_type @F [concrete]
 // CHECK:STDOUT:   %F: %F.type = struct_value () [concrete]
-// CHECK:STDOUT:   %impl.elem1.025: type = impl_witness_access %Z.lookup_impl_witness.b8d, element1 [symbolic_self]
-// CHECK:STDOUT:   %Z_where.type.c91: type = facet_type <@Z where %impl.elem0.555 = %empty_struct_type and %impl.elem1.025 = %empty_struct_type> [concrete]
-// CHECK:STDOUT:   %pattern_type.81e: type = pattern_type %Z_where.type.c91 [concrete]
-// CHECK:STDOUT:   %T.patt: %pattern_type.81e = symbolic_binding_pattern T, 0 [symbolic]
-// CHECK:STDOUT:   %T: %Z_where.type.c91 = symbolic_binding T, 0 [symbolic]
+// CHECK:STDOUT:   %rewrite.elem1.b50: type = rewrite_target %Z.lookup_impl_witness.b8d, element1 [symbolic_self]
+// CHECK:STDOUT:   %Z_where.type.e56: type = facet_type <@Z where %rewrite.elem0.c63 = %empty_struct_type and %rewrite.elem1.b50 = %empty_struct_type> [concrete]
+// CHECK:STDOUT:   %pattern_type.9c9: type = pattern_type %Z_where.type.e56 [concrete]
+// CHECK:STDOUT:   %T.patt: %pattern_type.9c9 = symbolic_binding_pattern T, 0 [symbolic]
+// CHECK:STDOUT:   %T: %Z_where.type.e56 = symbolic_binding T, 0 [symbolic]
 // CHECK:STDOUT:   %T.as_type: type = facet_access_type %T [symbolic]
-// CHECK:STDOUT:   %Z.lookup_impl_witness.9fe: <witness> = lookup_impl_witness %T, @Z [symbolic]
-// CHECK:STDOUT:   %facet_value: %Z_where.type.7b9 = facet_value %T.as_type, (%Z.lookup_impl_witness.9fe) [symbolic]
+// CHECK:STDOUT:   %Z.lookup_impl_witness.5f2: <witness> = lookup_impl_witness %T, @Z [symbolic]
+// CHECK:STDOUT:   %facet_value: %Z_where.type.377 = facet_value %T.as_type, (%Z.lookup_impl_witness.5f2) [symbolic]
 // CHECK:STDOUT:   %F.specific_fn: <specific function> = specific_function %F, @F(%facet_value) [symbolic]
 // CHECK:STDOUT: }
 // CHECK:STDOUT:
-// CHECK:STDOUT: generic fn @G(%T.loc10_15.2: %Z_where.type.c91) {
+// CHECK:STDOUT: generic fn @G(%T.loc10_15.2: %Z_where.type.e56) {
 // CHECK:STDOUT:   <elided>
 // CHECK:STDOUT:
 // CHECK:STDOUT: !definition:
 // CHECK:STDOUT:   %T.as_type.loc14_6.2: type = facet_access_type %T.loc10_15.1 [symbolic = %T.as_type.loc14_6.2 (constants.%T.as_type)]
-// CHECK:STDOUT:   %Z.lookup_impl_witness: <witness> = lookup_impl_witness %T.loc10_15.1, @Z [symbolic = %Z.lookup_impl_witness (constants.%Z.lookup_impl_witness.9fe)]
-// CHECK:STDOUT:   %facet_value.loc14_6.2: %Z_where.type.7b9 = facet_value %T.as_type.loc14_6.2, (%Z.lookup_impl_witness) [symbolic = %facet_value.loc14_6.2 (constants.%facet_value)]
+// CHECK:STDOUT:   %Z.lookup_impl_witness: <witness> = lookup_impl_witness %T.loc10_15.1, @Z [symbolic = %Z.lookup_impl_witness (constants.%Z.lookup_impl_witness.5f2)]
+// CHECK:STDOUT:   %facet_value.loc14_6.2: %Z_where.type.377 = facet_value %T.as_type.loc14_6.2, (%Z.lookup_impl_witness) [symbolic = %facet_value.loc14_6.2 (constants.%facet_value)]
 // CHECK:STDOUT:   %F.specific_fn.loc14_3.2: <specific function> = specific_function constants.%F, @F(%facet_value.loc14_6.2) [symbolic = %F.specific_fn.loc14_3.2 (constants.%F.specific_fn)]
 // CHECK:STDOUT:
 // CHECK:STDOUT:   fn() {
 // CHECK:STDOUT:   !entry:
 // CHECK:STDOUT:     %F.ref: %F.type = name_ref F, file.%F.decl [concrete = constants.%F]
-// CHECK:STDOUT:     %T.ref: %Z_where.type.c91 = name_ref T, %T.loc10_15.2 [symbolic = %T.loc10_15.1 (constants.%T)]
+// CHECK:STDOUT:     %T.ref: %Z_where.type.e56 = name_ref T, %T.loc10_15.2 [symbolic = %T.loc10_15.1 (constants.%T)]
 // CHECK:STDOUT:     %T.as_type.loc14_6.1: type = facet_access_type %T.ref [symbolic = %T.as_type.loc14_6.2 (constants.%T.as_type)]
-// CHECK:STDOUT:     %facet_value.loc14_6.1: %Z_where.type.7b9 = facet_value %T.as_type.loc14_6.1, (constants.%Z.lookup_impl_witness.9fe) [symbolic = %facet_value.loc14_6.2 (constants.%facet_value)]
-// CHECK:STDOUT:     %.loc14: %Z_where.type.7b9 = converted %T.ref, %facet_value.loc14_6.1 [symbolic = %facet_value.loc14_6.2 (constants.%facet_value)]
+// CHECK:STDOUT:     %facet_value.loc14_6.1: %Z_where.type.377 = facet_value %T.as_type.loc14_6.1, (constants.%Z.lookup_impl_witness.5f2) [symbolic = %facet_value.loc14_6.2 (constants.%facet_value)]
+// CHECK:STDOUT:     %.loc14: %Z_where.type.377 = converted %T.ref, %facet_value.loc14_6.1 [symbolic = %facet_value.loc14_6.2 (constants.%facet_value)]
 // CHECK:STDOUT:     %F.specific_fn.loc14_3.1: <specific function> = specific_function %F.ref, @F(constants.%facet_value) [symbolic = %F.specific_fn.loc14_3.2 (constants.%F.specific_fn)]
 // CHECK:STDOUT:     %F.call: init %empty_tuple.type = call %F.specific_fn.loc14_3.1()
 // CHECK:STDOUT:     <elided>

@@ -1167,12 +1167,11 @@ struct ImplWitnessAccess {
 // The target of a rewrite constraint, pointing to an associated constant.
 // Appears on the LHS of a rewrite.
 struct RewriteTarget {
-  static constexpr auto Kind =
-      InstKind::ImplWitnessAccess.Define<Parse::NodeId>(
-          {.ir_name = "rewrite_target",
-           .is_type = InstIsType::Maybe,
-           .constant_kind = InstConstantKind::Always,
-           .is_lowered = false});
+  static constexpr auto Kind = InstKind::RewriteTarget.Define<Parse::NodeId>(
+      {.ir_name = "rewrite_target",
+       .is_type = InstIsType::Maybe,
+       .constant_kind = InstConstantKind::Always,
+       .is_lowered = false});
 
   TypeId type_id;
   InstId witness_id;

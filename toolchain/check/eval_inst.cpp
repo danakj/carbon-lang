@@ -319,18 +319,18 @@ static auto TryFindValueInRewriteConstraints(
   // the `search_facet`. If we find a rewrite into `specific_interface_id`, we
   // can evaluate to the RHS of that rewrite.
   for (auto rewrite : access_identified.rewrites()) {
-    auto rewrite_lhs_access =
-        context.constant_values().TryGetInstAs<SemIR::ImplWitnessAccess>(
+    auto rewrite_lhs_target =
+        context.constant_values().TryGetInstAs<SemIR::RewriteTarget>(
             rewrite.lhs.RawValue());
-    if (!rewrite_lhs_access) {
+    if (!rewrite_lhs_target) {
       continue;
     }
-    if (rewrite_lhs_access->index != interface_index) {
+    if (rewrite_lhs_target->index != interface_index) {
       continue;
     }
 
     auto rewrite_lhs_witness = context.insts().GetAs<SemIR::IdentifiedWitness>(
-        rewrite_lhs_access->witness_id);
+        rewrite_lhs_target->witness_id);
 
     // The LHS of a rewrite can be an arbitrary type. For example:
     // ```

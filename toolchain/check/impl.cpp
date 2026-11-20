@@ -511,11 +511,11 @@ auto AddImplWitnessForDeclaration(Context& context, SemIR::LocId loc_id,
   // in the IdentifiedFacetType only contains rewrites into extended interfaces.
   // So we don't need to filter them any further here.
   for (auto rewrite : identified.rewrites()) {
-    // We use the rewrite LHS without replacing the witness so that the
-    // ImplWitnessAccess has no chance to be evaluated away.
-    auto access = context.constant_values().GetInstAs<SemIR::ImplWitnessAccess>(
+    // We use the rewrite LHS without replacing the witness since we just need
+    // the index from it.
+    auto target = context.constant_values().GetInstAs<SemIR::RewriteTarget>(
         rewrite.lhs.RawValue());
-    auto& table_entry = table[access.index.index];
+    auto& table_entry = table[target.index.index];
     if (table_entry == SemIR::ErrorInst::InstId) {
       // Don't overwrite an error value. This prioritizes not generating
       // multiple errors for one associated constant over picking a value
@@ -547,7 +547,7 @@ auto AddImplWitnessForDeclaration(Context& context, SemIR::LocId loc_id,
         context.constant_values().Get(impl.self_id)));
 
     auto decl_id = context.constant_values().GetConstantInstId(
-        assoc_entities[access.index.index]);
+        assoc_entities[target.index.index]);
     CARBON_CHECK(decl_id.has_value(), "Non-constant associated entity");
     if (decl_id == SemIR::ErrorInst::InstId) {
       table_entry = SemIR::ErrorInst::InstId;

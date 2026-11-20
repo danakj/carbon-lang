@@ -293,8 +293,15 @@ class Context {
   struct WhereStackEntry {
     // A map from an ImplWitnessAccess on the LHS of a rewrite constraint to its
     // value on the RHS. Used during checking of a `where` expression to allow
-    // constraints to access values from earlier constraints.
-    Map<SemIR::ConstantId, SemIR::InstId> rewrites;
+    // constraints to access values from earlier constraints. The `Target` is
+    // the operands of a RewriteTarget, for storing rewrites, or an
+    // ImplWitnessAccess for finding rewrites.
+    struct Target {
+      SemIR::ConstantId witness_id;
+      SemIR::ElementIndex index;
+      auto operator==(const Target& /*rhs*/) const -> bool = default;
+    };
+    Map<Target, SemIR::InstId> rewrites;
 
     // A collection of `A impls B` facts known about the current `where`
     // expression being checked. Used to allow constraints to know about `impls`
