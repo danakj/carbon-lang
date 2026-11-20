@@ -846,7 +846,8 @@ template <typename InstT>
            SemIR::CppTemplateNameType, SemIR::FloatLiteralType,
            SemIR::FunctionType, SemIR::FunctionTypeWithSelfType,
            SemIR::GenericInterfaceType, SemIR::GenericNamedConstraintType,
-           SemIR::InstType, SemIR::IntLiteralType, SemIR::NamespaceType,
+           SemIR::ImplInterfaceSpecificType, SemIR::InstType,
+           SemIR::IntLiteralType, SemIR::NamespaceType,
            SemIR::ParameterizedClassType, SemIR::SpecificFunctionType,
            SemIR::UnboundElementType, SemIR::WhereExpr, SemIR::WitnessType>())
 static auto BuildTypeForInst(FileContext& context, InstT /*inst*/)

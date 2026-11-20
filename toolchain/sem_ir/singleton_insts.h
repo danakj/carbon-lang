@@ -20,6 +20,7 @@ static constexpr std::array SingletonInstKinds = {
     InstKind::ErrorInst,
     InstKind::FloatLiteralType,
     InstKind::FormType,
+    InstKind::ImplInterfaceSpecificType,
     InstKind::InstType,
     InstKind::IntLiteralType,
     InstKind::NamespaceType,

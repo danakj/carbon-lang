@@ -164,7 +164,7 @@ fn F(c: C, s: SubscriptType, v: Copyable) {
 // CHECK:STDOUT:   %IndirectIndexWith.lookup_impl_witness.37b: <witness> = lookup_impl_witness %.Self, @IndirectIndexWith, @IndirectIndexWith(%SubscriptType.f8f) [symbolic_self]
 // CHECK:STDOUT:   %rewrite.elem0.673: type = rewrite_target %IndirectIndexWith.lookup_impl_witness.37b, element0 [symbolic_self]
 // CHECK:STDOUT:   %IndirectIndexWith_where.type.511: type = facet_type <@IndirectIndexWith, @IndirectIndexWith(%SubscriptType.f8f) where %rewrite.elem0.673 = %Copyable> [concrete]
-// CHECK:STDOUT:   %.537: <witness> = impl_self_witness %C, @IndirectIndexWith, @IndirectIndexWith(%SubscriptType.f8f) [concrete]
+// CHECK:STDOUT:   %.c83: <impl interface specific> = impl_interface_specific @IndirectIndexWith, @IndirectIndexWith(%SubscriptType.f8f) [concrete]
 // CHECK:STDOUT:   %IndirectIndexWith.impl_witness.d52: <witness> = impl_witness @C.as.IndirectIndexWith.impl.%IndirectIndexWith.impl_witness_table [concrete]
 // CHECK:STDOUT:   %pattern_type.98b: type = pattern_type %C [concrete]
 // CHECK:STDOUT:   %self.param_patt.303: %pattern_type.98b = value_param_pattern [concrete]
@@ -219,7 +219,7 @@ fn F(c: C, s: SubscriptType, v: Copyable) {
 // CHECK:STDOUT:       %rewrite.loc17_68.2 = requirement_rewrite %rewrite.elem0.loc17_55.2, %Copyable.ref [concrete]
 // CHECK:STDOUT:     }
 // CHECK:STDOUT:   }
-// CHECK:STDOUT:   %.loc17: <witness> = impl_self_witness @C.as.IndirectIndexWith.impl.%C.ref, @IndirectIndexWith, @IndirectIndexWith(constants.%SubscriptType.f8f) [concrete = constants.%.537]
+// CHECK:STDOUT:   %.loc17: <impl interface specific> = impl_interface_specific @IndirectIndexWith, @IndirectIndexWith(constants.%SubscriptType.f8f) [concrete = constants.%.c83]
 // CHECK:STDOUT: }
 // CHECK:STDOUT:
 // CHECK:STDOUT: impl @C.as.IndirectIndexWith.impl: %C.ref as %IndirectIndexWith.type {

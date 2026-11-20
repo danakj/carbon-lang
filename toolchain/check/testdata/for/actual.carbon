@@ -115,7 +115,7 @@ fn Read(generic y: Core.IntLiteral) {
 // CHECK:STDOUT:   %rewrite.elem1.137: %Destroy.type = rewrite_target %Iterate.lookup_impl_witness.1d8, element1 [symbolic_self]
 // CHECK:STDOUT:   %rewrite.elem0.689: %facet_type.bd0 = rewrite_target %Iterate.lookup_impl_witness.1d8, element0 [symbolic_self]
 // CHECK:STDOUT:   %Iterate_where.type.833: type = facet_type <@Iterate where %rewrite.elem1.137 = %Destroy.facet.0e1 and %rewrite.elem0.689 = %facet_value> [symbolic]
-// CHECK:STDOUT:   %.712: <witness> = impl_self_witness %IntRange.0bb, @Iterate [symbolic]
+// CHECK:STDOUT:   %.4f2: <impl interface specific> = impl_interface_specific @Iterate [concrete]
 // CHECK:STDOUT:   %Iterate.impl_witness: <witness> = impl_witness @IntRange.as.Iterate.impl.%Iterate.impl_witness_table, @IntRange.as.Iterate.impl(%N) [symbolic]
 // CHECK:STDOUT:   %self.param_patt.b7f: %pattern_type.711 = value_param_pattern [symbolic]
 // CHECK:STDOUT:   %self.patt.835f4: %pattern_type.711 = wrapper_binding_pattern self, %self.param_patt.b7f [symbolic]
@@ -247,7 +247,7 @@ fn Read(generic y: Core.IntLiteral) {
 // CHECK:STDOUT:   %Core.IntLiteral: type = import_ref Core//prelude/types/int_literal, IntLiteral, loaded [concrete = Core.IntLiteral]
 // CHECK:STDOUT:   %Core.Int: %Int.type = import_ref Core//prelude/types/int, Int, loaded [concrete = constants.%Int.generic]
 // CHECK:STDOUT:   %Core.Iterate: type = import_ref Core//prelude/iterate, Iterate, loaded [concrete = constants.%Iterate.type]
-// CHECK:STDOUT:   %Core.import_ref.55a: %Iterate.assoc_type = import_ref Core//prelude/iterate, loc{{\d+_\d+}}, loaded [concrete = constants.%assoc0.d28]
+// CHECK:STDOUT:   %Core.import_ref.55a7: %Iterate.assoc_type = import_ref Core//prelude/iterate, loc{{\d+_\d+}}, loaded [concrete = constants.%assoc0.d28]
 // CHECK:STDOUT:   %Core.import_ref.bbd: %Iterate.assoc_type = import_ref Core//prelude/iterate, loc{{\d+_\d+}}, loaded [concrete = constants.%assoc1.bf7]
 // CHECK:STDOUT:   %Core.import_ref.987: @Optional.%Optional.None.type (%Optional.None.type.626) = import_ref Core//prelude/iterate, inst{{[0-9A-F]+}} [indirect], loaded [symbolic = @Optional.%Optional.None (constants.%Optional.None.3ad)]
 // CHECK:STDOUT:   %Core.import_ref.300: @Optional.%Optional.Some.type (%Optional.Some.type.63b) = import_ref Core//prelude/iterate, inst{{[0-9A-F]+}} [indirect], loaded [symbolic = @Optional.%Optional.Some (constants.%Optional.Some.792)]
@@ -320,7 +320,6 @@ fn Read(generic y: Core.IntLiteral) {
 // CHECK:STDOUT:   %Copy.lookup_impl_witness: <witness> = lookup_impl_witness %Int.loc9_24, @Copy [symbolic = %Copy.lookup_impl_witness (constants.%Copy.lookup_impl_witness.923)]
 // CHECK:STDOUT:   %facet_value.loc9_24: %facet_type.bd0 = facet_value %Int.loc9_24, (%SubobjectDestroy.lookup_impl_witness, %DestroyImpl.lookup_impl_witness, %Copy.lookup_impl_witness) [symbolic = %facet_value.loc9_24 (constants.%facet_value)]
 // CHECK:STDOUT:   %Iterate_where.type: type = facet_type <@Iterate where constants.%rewrite.elem1.137 = %Destroy.facet.loc9_24 and constants.%rewrite.elem0.689 = %facet_value.loc9_24> [symbolic = %Iterate_where.type (constants.%Iterate_where.type.833)]
-// CHECK:STDOUT:   %.loc9_87: <witness> = impl_self_witness %IntRange, @Iterate [symbolic = %.loc9_87 (constants.%.712)]
 // CHECK:STDOUT:   %Iterate.impl_witness.loc9_87.2: <witness> = impl_witness %Iterate.impl_witness_table, @IntRange.as.Iterate.impl(%N) [symbolic = %Iterate.impl_witness.loc9_87.2 (constants.%Iterate.impl_witness)]
 // CHECK:STDOUT:
 // CHECK:STDOUT: !definition:
@@ -472,7 +471,7 @@ fn Read(generic y: Core.IntLiteral) {
 // CHECK:STDOUT:       %.Self.ref.loc9_60: %Iterate.type = name_ref .Self, %.Self.frozen [symbolic_self = constants.%.Self.frozen.bdd]
 // CHECK:STDOUT:       %.Self.as_type.loc9_60: type = facet_access_type %.Self.ref.loc9_60 [symbolic_self = constants.%.Self.frozen.as_type]
 // CHECK:STDOUT:       %.loc9_60: type = converted %.Self.ref.loc9_60, %.Self.as_type.loc9_60 [symbolic_self = constants.%.Self.frozen.as_type]
-// CHECK:STDOUT:       %ElementType.ref: %Iterate.assoc_type = name_ref ElementType, imports.%Core.import_ref.55a [concrete = constants.%assoc0.d28]
+// CHECK:STDOUT:       %ElementType.ref: %Iterate.assoc_type = name_ref ElementType, imports.%Core.import_ref.55a7 [concrete = constants.%assoc0.d28]
 // CHECK:STDOUT:       %impl.elem0: %facet_type.bd0 = impl_witness_access constants.%Iterate.lookup_impl_witness.98d, element0 [symbolic_self = constants.%impl.elem0.c20]
 // CHECK:STDOUT:       %rewrite.elem0.loc9_60.1: %facet_type.bd0 = rewrite_target constants.%Iterate.lookup_impl_witness.98d, element0 [symbolic_self = constants.%rewrite.elem0.634]
 // CHECK:STDOUT:       %Core.ref.loc9_75: <namespace> = name_ref Core, imports.%Core [concrete = imports.%Core]
@@ -493,7 +492,7 @@ fn Read(generic y: Core.IntLiteral) {
 // CHECK:STDOUT:         %rewrite.loc9_73.2 = requirement_rewrite %rewrite.elem0.loc9_60.2, %.loc9_85 [concrete]
 // CHECK:STDOUT:       }
 // CHECK:STDOUT:     }
-// CHECK:STDOUT:     %.loc9: <witness> = impl_self_witness @IntRange.as.Iterate.impl.%Self.ref, @Iterate [symbolic = @IntRange.as.Iterate.impl.%.loc9_87 (constants.%.712)]
+// CHECK:STDOUT:     %.loc9: <impl interface specific> = impl_interface_specific @Iterate [concrete = constants.%.4f2]
 // CHECK:STDOUT:     %field_decl.loc22: @IntRange.%IntRange.elem (%IntRange.elem.945) = field_decl start, element0, %Int.loc22_32.1 in [concrete] {
 // CHECK:STDOUT:       %Core.ref.loc22: <namespace> = name_ref Core, imports.%Core [concrete = imports.%Core]
 // CHECK:STDOUT:       %Int.ref.loc22: %Int.type = name_ref Int, imports.%Core.Int [concrete = constants.%Int.generic]
@@ -850,7 +849,6 @@ fn Read(generic y: Core.IntLiteral) {
 // CHECK:STDOUT:   %Copy.lookup_impl_witness => constants.%Copy.lookup_impl_witness.923
 // CHECK:STDOUT:   %facet_value.loc9_24 => constants.%facet_value
 // CHECK:STDOUT:   %Iterate_where.type => constants.%Iterate_where.type.833
-// CHECK:STDOUT:   %.loc9_87 => constants.%.712
 // CHECK:STDOUT:   %Iterate.impl_witness.loc9_87.2 => constants.%Iterate.impl_witness
 // CHECK:STDOUT:
 // CHECK:STDOUT: !definition:

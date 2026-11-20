@@ -74,7 +74,7 @@ fn F() {
 // CHECK:STDOUT:   %Copy.impl_witness.ad7: <witness> = impl_witness imports.%Copy.impl_witness_table.fb0, @ptr.as.Copy.impl(%struct_type.a.b.250) [concrete]
 // CHECK:STDOUT:   %Copy.facet.6ac: %Copy.type = facet_value %ptr.aa2, (%Copy.impl_witness.ad7) [concrete]
 // CHECK:STDOUT:   %Copy.WithSelf.Op.type.627: type = fn_type @Copy.WithSelf.Op, @Copy.WithSelf(%Copy.facet.6ac) [concrete]
-// CHECK:STDOUT:   %.dab30: type = fn_type_with_self_type %Copy.WithSelf.Op.type.627, %Copy.facet.6ac [concrete]
+// CHECK:STDOUT:   %.dab: type = fn_type_with_self_type %Copy.WithSelf.Op.type.627, %Copy.facet.6ac [concrete]
 // CHECK:STDOUT:   %ptr.as.Copy.impl.Op.type.c1c: type = fn_type @ptr.as.Copy.impl.Op, @ptr.as.Copy.impl(%struct_type.a.b.250) [concrete]
 // CHECK:STDOUT:   %ptr.as.Copy.impl.Op.09c: %ptr.as.Copy.impl.Op.type.c1c = struct_value () [concrete]
 // CHECK:STDOUT:   %ptr.as.Copy.impl.Op.specific_fn.ddf: <specific function> = specific_function %ptr.as.Copy.impl.Op.09c, @ptr.as.Copy.impl.Op(%struct_type.a.b.250) [concrete]
@@ -217,7 +217,7 @@ fn F() {
 // CHECK:STDOUT:   %p.var: ref %ptr.aa2 = var_storage %p.var_patt
 // CHECK:STDOUT:   %s.ref.loc18: ref %struct_type.a.b.250 = name_ref s, %s
 // CHECK:STDOUT:   %addr.loc18: %ptr.aa2 = addr_of %s.ref.loc18
-// CHECK:STDOUT:   %impl.elem0.loc18: %.dab30 = impl_witness_access constants.%Copy.impl_witness.ad7, element0 [concrete = constants.%ptr.as.Copy.impl.Op.09c]
+// CHECK:STDOUT:   %impl.elem0.loc18: %.dab = impl_witness_access constants.%Copy.impl_witness.ad7, element0 [concrete = constants.%ptr.as.Copy.impl.Op.09c]
 // CHECK:STDOUT:   %bound_method.loc18_39.1: <bound method> = bound_method %addr.loc18, %impl.elem0.loc18
 // CHECK:STDOUT:   %specific_fn.loc18: <specific function> = specific_function %impl.elem0.loc18, @ptr.as.Copy.impl.Op(constants.%struct_type.a.b.250) [concrete = constants.%ptr.as.Copy.impl.Op.specific_fn.ddf]
 // CHECK:STDOUT:   %bound_method.loc18_39.2: <bound method> = bound_method %addr.loc18, %specific_fn.loc18

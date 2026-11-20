@@ -1072,8 +1072,8 @@ fn CopyUnsignedLong() {
 // CHECK:STDOUT:   %To.fe9: Core.IntLiteral = symbolic_binding To, 0 [symbolic]
 // CHECK:STDOUT:   %Core.IntLiteral.as.ImplicitAs.impl.Convert.type.3c6: type = fn_type @Core.IntLiteral.as.ImplicitAs.impl.Convert.1, @Core.IntLiteral.as.ImplicitAs.impl.6b6(%To.fe9) [symbolic]
 // CHECK:STDOUT:   %Core.IntLiteral.as.ImplicitAs.impl.Convert.6f2: %Core.IntLiteral.as.ImplicitAs.impl.Convert.type.3c6 = struct_value () [symbolic]
-// CHECK:STDOUT:   %From.fe9: Core.IntLiteral = symbolic_binding From, 0 [symbolic]
 // CHECK:STDOUT:   %ImplicitAs.type.5be: type = facet_type <@ImplicitAs, @ImplicitAs(Core.IntLiteral)> [concrete]
+// CHECK:STDOUT:   %From.fe9: Core.IntLiteral = symbolic_binding From, 0 [symbolic]
 // CHECK:STDOUT:   %Int.as.ImplicitAs.impl.Convert.type.dfd: type = fn_type @Int.as.ImplicitAs.impl.Convert, @Int.as.ImplicitAs.impl(%From.fe9) [symbolic]
 // CHECK:STDOUT:   %Int.as.ImplicitAs.impl.Convert.914: %Int.as.ImplicitAs.impl.Convert.type.dfd = struct_value () [symbolic]
 // CHECK:STDOUT:   %ImplicitAs.impl_witness.b1b: <witness> = impl_witness imports.%ImplicitAs.impl_witness_table.f53, @Core.IntLiteral.as.ImplicitAs.impl.6b6(%int_64) [concrete]
@@ -1570,9 +1570,9 @@ fn CopyUnsignedLong() {
 // CHECK:STDOUT:   %EqWith.impl_witness_table.c27 = impl_witness_table (%Core.import_ref.a87, %Core.import_ref.adc), @Cpp.long.as.EqWith.impl.8aa [concrete]
 // CHECK:STDOUT:   %Core.import_ref.0e88: %Cpp.long.as.OrderedWith.impl.Less.type.335 = import_ref Core//prelude/types/cpp/int, loc{{\d+_\d+}}, loaded [concrete = constants.%Cpp.long.as.OrderedWith.impl.Less.606]
 // CHECK:STDOUT:   %Core.import_ref.757: %Cpp.long.as.OrderedWith.impl.LessOrEquivalent.type.42c = import_ref Core//prelude/types/cpp/int, loc{{\d+_\d+}}, loaded [concrete = constants.%Cpp.long.as.OrderedWith.impl.LessOrEquivalent.0c8]
-// CHECK:STDOUT:   %Core.import_ref.c32: %Cpp.long.as.OrderedWith.impl.Greater.type.725 = import_ref Core//prelude/types/cpp/int, loc{{\d+_\d+}}, loaded [concrete = constants.%Cpp.long.as.OrderedWith.impl.Greater.7c8]
+// CHECK:STDOUT:   %Core.import_ref.c32c: %Cpp.long.as.OrderedWith.impl.Greater.type.725 = import_ref Core//prelude/types/cpp/int, loc{{\d+_\d+}}, loaded [concrete = constants.%Cpp.long.as.OrderedWith.impl.Greater.7c8]
 // CHECK:STDOUT:   %Core.import_ref.381: %Cpp.long.as.OrderedWith.impl.GreaterOrEquivalent.type.2d9 = import_ref Core//prelude/types/cpp/int, loc{{\d+_\d+}}, loaded [concrete = constants.%Cpp.long.as.OrderedWith.impl.GreaterOrEquivalent.a09]
-// CHECK:STDOUT:   %OrderedWith.impl_witness_table.303 = impl_witness_table (%Core.import_ref.0e88, %Core.import_ref.757, %Core.import_ref.c32, %Core.import_ref.381), @Cpp.long.as.OrderedWith.impl.f3c [concrete]
+// CHECK:STDOUT:   %OrderedWith.impl_witness_table.303 = impl_witness_table (%Core.import_ref.0e88, %Core.import_ref.757, %Core.import_ref.c32c, %Core.import_ref.381), @Cpp.long.as.OrderedWith.impl.f3c [concrete]
 // CHECK:STDOUT: }
 // CHECK:STDOUT:
 // CHECK:STDOUT: fn @ComparisonsHomogeneousLong() {
@@ -1839,9 +1839,9 @@ fn CopyUnsignedLong() {
 // CHECK:STDOUT:   %EqWith.impl_witness_table.537 = impl_witness_table (%Core.import_ref.c7e, %Core.import_ref.7ec), @Cpp.long.as.EqWith.impl.c5a [concrete]
 // CHECK:STDOUT:   %Core.Equal.4b2: @Cpp.long.as.EqWith.impl.c5a.%Cpp.long.as.EqWith.impl.Equal.type.1 (%Cpp.long.as.EqWith.impl.Equal.type.0deb16.2) = import_ref Core//prelude/types/cpp/int, Equal, loaded [symbolic = @Cpp.long.as.EqWith.impl.c5a.%Cpp.long.as.EqWith.impl.Equal.1 (constants.%Cpp.long.as.EqWith.impl.Equal.f0198d.2)]
 // CHECK:STDOUT:   %Core.NotEqual.a67: @Cpp.long.as.EqWith.impl.c5a.%Cpp.long.as.EqWith.impl.NotEqual.type.1 (%Cpp.long.as.EqWith.impl.NotEqual.type.f949cd.2) = import_ref Core//prelude/types/cpp/int, NotEqual, loaded [symbolic = @Cpp.long.as.EqWith.impl.c5a.%Cpp.long.as.EqWith.impl.NotEqual.1 (constants.%Cpp.long.as.EqWith.impl.NotEqual.ba1dc6.2)]
-// CHECK:STDOUT:   %Core.import_ref.75e9: @T.as_type.as.EqWith.impl.e67.%T.as_type.as.EqWith.impl.Equal.type.2 (%T.as_type.as.EqWith.impl.Equal.type.f29d5f.1) = import_ref Core//prelude/types/int, loc{{\d+_\d+}}, loaded [symbolic = @T.as_type.as.EqWith.impl.e67.%T.as_type.as.EqWith.impl.Equal.2 (constants.%T.as_type.as.EqWith.impl.Equal.e8c54e.1)]
+// CHECK:STDOUT:   %Core.import_ref.75e: @T.as_type.as.EqWith.impl.e67.%T.as_type.as.EqWith.impl.Equal.type.2 (%T.as_type.as.EqWith.impl.Equal.type.f29d5f.1) = import_ref Core//prelude/types/int, loc{{\d+_\d+}}, loaded [symbolic = @T.as_type.as.EqWith.impl.e67.%T.as_type.as.EqWith.impl.Equal.2 (constants.%T.as_type.as.EqWith.impl.Equal.e8c54e.1)]
 // CHECK:STDOUT:   %Core.import_ref.179: @T.as_type.as.EqWith.impl.e67.%T.as_type.as.EqWith.impl.NotEqual.type.2 (%T.as_type.as.EqWith.impl.NotEqual.type.ecd1fa.1) = import_ref Core//prelude/types/int, loc{{\d+_\d+}}, loaded [symbolic = @T.as_type.as.EqWith.impl.e67.%T.as_type.as.EqWith.impl.NotEqual.2 (constants.%T.as_type.as.EqWith.impl.NotEqual.3679bb.1)]
-// CHECK:STDOUT:   %EqWith.impl_witness_table.44b = impl_witness_table (%Core.import_ref.75e9, %Core.import_ref.179), @T.as_type.as.EqWith.impl.e67 [concrete]
+// CHECK:STDOUT:   %EqWith.impl_witness_table.44b = impl_witness_table (%Core.import_ref.75e, %Core.import_ref.179), @T.as_type.as.EqWith.impl.e67 [concrete]
 // CHECK:STDOUT:   %Core.Equal.e4a: @T.as_type.as.EqWith.impl.e67.%T.as_type.as.EqWith.impl.Equal.type.1 (%T.as_type.as.EqWith.impl.Equal.type.f29d5f.2) = import_ref Core//prelude/types/int, Equal, loaded [symbolic = @T.as_type.as.EqWith.impl.e67.%T.as_type.as.EqWith.impl.Equal.1 (constants.%T.as_type.as.EqWith.impl.Equal.e8c54e.2)]
 // CHECK:STDOUT:   %Core.NotEqual.d05: @T.as_type.as.EqWith.impl.e67.%T.as_type.as.EqWith.impl.NotEqual.type.1 (%T.as_type.as.EqWith.impl.NotEqual.type.ecd1fa.2) = import_ref Core//prelude/types/int, NotEqual, loaded [symbolic = @T.as_type.as.EqWith.impl.e67.%T.as_type.as.EqWith.impl.NotEqual.1 (constants.%T.as_type.as.EqWith.impl.NotEqual.3679bb.2)]
 // CHECK:STDOUT:   %Core.import_ref.06c923.2: %Cpp.long.as.ImplicitAs.impl.Convert.type = import_ref Core//prelude/types/cpp/int, loc{{\d+_\d+}}, loaded [concrete = constants.%Cpp.long.as.ImplicitAs.impl.Convert]
@@ -2251,7 +2251,7 @@ fn CopyUnsignedLong() {
 // CHECK:STDOUT:   %EqWith.facet.bd0: %EqWith.type.006 = facet_value Core.IntLiteral, (%EqWith.impl_witness.e5c) [concrete]
 // CHECK:STDOUT:   %EqWith.WithSelf.Equal.type.32b: type = fn_type @EqWith.WithSelf.Equal, @EqWith.WithSelf(%Cpp.long, %EqWith.facet.bd0) [concrete]
 // CHECK:STDOUT:   %EqWith.WithSelf.NotEqual.type.273: type = fn_type @EqWith.WithSelf.NotEqual, @EqWith.WithSelf(%Cpp.long, %EqWith.facet.bd0) [concrete]
-// CHECK:STDOUT:   %.b552: type = fn_type_with_self_type %EqWith.WithSelf.Equal.type.32b, %EqWith.facet.bd0 [concrete]
+// CHECK:STDOUT:   %.b55: type = fn_type_with_self_type %EqWith.WithSelf.Equal.type.32b, %EqWith.facet.bd0 [concrete]
 // CHECK:STDOUT:   %T.as_type.as.EqWith.impl.Equal.type.abbd95.1: type = fn_type @T.as_type.as.EqWith.impl.Equal.4, @T.as_type.as.EqWith.impl.f28(%ImplicitAs.facet.ee1) [concrete]
 // CHECK:STDOUT:   %T.as_type.as.EqWith.impl.Equal.4052fe.1: %T.as_type.as.EqWith.impl.Equal.type.abbd95.1 = struct_value () [concrete]
 // CHECK:STDOUT:   %T.as_type.as.EqWith.impl.NotEqual.type.6cb43d.1: type = fn_type @T.as_type.as.EqWith.impl.NotEqual.4, @T.as_type.as.EqWith.impl.f28(%ImplicitAs.facet.ee1) [concrete]
@@ -2485,7 +2485,7 @@ fn CopyUnsignedLong() {
 // CHECK:STDOUT:   %Int.as.OrderedWith.impl.LessOrEquivalent.call: init bool = call %bound_method.loc15_5.3(%b.ref.loc15, %.loc15_8.2)
 // CHECK:STDOUT:   %int_1.loc17: Core.IntLiteral = int_value 1 [concrete = constants.%int_1.5b8]
 // CHECK:STDOUT:   %a.ref.loc17: %Cpp.long = name_ref a, %a
-// CHECK:STDOUT:   %impl.elem0.loc17_5: %.b552 = impl_witness_access constants.%EqWith.impl_witness.e5c, element0 [concrete = constants.%T.as_type.as.EqWith.impl.Equal.4052fe.2]
+// CHECK:STDOUT:   %impl.elem0.loc17_5: %.b55 = impl_witness_access constants.%EqWith.impl_witness.e5c, element0 [concrete = constants.%T.as_type.as.EqWith.impl.Equal.4052fe.2]
 // CHECK:STDOUT:   %bound_method.loc17_5.1: <bound method> = bound_method %int_1.loc17, %impl.elem0.loc17_5 [concrete = constants.%T.as_type.as.EqWith.impl.Equal.bound.33f085.1]
 // CHECK:STDOUT:   %ImplicitAs.facet.loc17_5.1: %ImplicitAs.type.3c9 = facet_value Core.IntLiteral, (constants.%ImplicitAs.impl_witness.157) [concrete = constants.%ImplicitAs.facet.ee1]
 // CHECK:STDOUT:   %.loc17_5.1: %ImplicitAs.type.3c9 = converted Core.IntLiteral, %ImplicitAs.facet.loc17_5.1 [concrete = constants.%ImplicitAs.facet.ee1]
@@ -2835,8 +2835,8 @@ fn CopyUnsignedLong() {
 // CHECK:STDOUT:   %Core.import_ref.5d6: @Cpp.long.as.ModAssignWith.impl.%Cpp.long.as.ModAssignWith.impl.Op.type.2 (%Cpp.long.as.ModAssignWith.impl.Op.type.3d7ddc.1) = import_ref Core//prelude/types/cpp/int, loc{{\d+_\d+}}, loaded [symbolic = @Cpp.long.as.ModAssignWith.impl.%Cpp.long.as.ModAssignWith.impl.Op.2 (constants.%Cpp.long.as.ModAssignWith.impl.Op.002543.1)]
 // CHECK:STDOUT:   %ModAssignWith.impl_witness_table.616 = impl_witness_table (%Core.import_ref.5d6), @Cpp.long.as.ModAssignWith.impl [concrete]
 // CHECK:STDOUT:   %Core.Op.894: @Cpp.long.as.ModAssignWith.impl.%Cpp.long.as.ModAssignWith.impl.Op.type.1 (%Cpp.long.as.ModAssignWith.impl.Op.type.3d7ddc.2) = import_ref Core//prelude/types/cpp/int, Op, loaded [symbolic = @Cpp.long.as.ModAssignWith.impl.%Cpp.long.as.ModAssignWith.impl.Op.1 (constants.%Cpp.long.as.ModAssignWith.impl.Op.002543.2)]
-// CHECK:STDOUT:   %Core.import_ref.53b: @Cpp.long.as.BitAndAssignWith.impl.%Cpp.long.as.BitAndAssignWith.impl.Op.type.2 (%Cpp.long.as.BitAndAssignWith.impl.Op.type.4fd52d.1) = import_ref Core//prelude/types/cpp/int, loc{{\d+_\d+}}, loaded [symbolic = @Cpp.long.as.BitAndAssignWith.impl.%Cpp.long.as.BitAndAssignWith.impl.Op.2 (constants.%Cpp.long.as.BitAndAssignWith.impl.Op.fb3b66.1)]
-// CHECK:STDOUT:   %BitAndAssignWith.impl_witness_table.288 = impl_witness_table (%Core.import_ref.53b), @Cpp.long.as.BitAndAssignWith.impl [concrete]
+// CHECK:STDOUT:   %Core.import_ref.53b6: @Cpp.long.as.BitAndAssignWith.impl.%Cpp.long.as.BitAndAssignWith.impl.Op.type.2 (%Cpp.long.as.BitAndAssignWith.impl.Op.type.4fd52d.1) = import_ref Core//prelude/types/cpp/int, loc{{\d+_\d+}}, loaded [symbolic = @Cpp.long.as.BitAndAssignWith.impl.%Cpp.long.as.BitAndAssignWith.impl.Op.2 (constants.%Cpp.long.as.BitAndAssignWith.impl.Op.fb3b66.1)]
+// CHECK:STDOUT:   %BitAndAssignWith.impl_witness_table.288 = impl_witness_table (%Core.import_ref.53b6), @Cpp.long.as.BitAndAssignWith.impl [concrete]
 // CHECK:STDOUT:   %Core.Op.0a6: @Cpp.long.as.BitAndAssignWith.impl.%Cpp.long.as.BitAndAssignWith.impl.Op.type.1 (%Cpp.long.as.BitAndAssignWith.impl.Op.type.4fd52d.2) = import_ref Core//prelude/types/cpp/int, Op, loaded [symbolic = @Cpp.long.as.BitAndAssignWith.impl.%Cpp.long.as.BitAndAssignWith.impl.Op.1 (constants.%Cpp.long.as.BitAndAssignWith.impl.Op.fb3b66.2)]
 // CHECK:STDOUT:   %Core.import_ref.e41: @Cpp.long.as.BitOrAssignWith.impl.%Cpp.long.as.BitOrAssignWith.impl.Op.type.2 (%Cpp.long.as.BitOrAssignWith.impl.Op.type.035048.1) = import_ref Core//prelude/types/cpp/int, loc{{\d+_\d+}}, loaded [symbolic = @Cpp.long.as.BitOrAssignWith.impl.%Cpp.long.as.BitOrAssignWith.impl.Op.2 (constants.%Cpp.long.as.BitOrAssignWith.impl.Op.c04b02.1)]
 // CHECK:STDOUT:   %BitOrAssignWith.impl_witness_table.ab8 = impl_witness_table (%Core.import_ref.e41), @Cpp.long.as.BitOrAssignWith.impl [concrete]
@@ -3251,7 +3251,7 @@ fn CopyUnsignedLong() {
 // CHECK:STDOUT:   %RightShiftAssignWith.impl_witness.a62: <witness> = impl_witness imports.%RightShiftAssignWith.impl_witness_table.f0c, @Int.as.RightShiftAssignWith.impl(%int_64, %ImplicitAs.facet.018) [concrete]
 // CHECK:STDOUT:   %RightShiftAssignWith.facet.e9e: %RightShiftAssignWith.type.690 = facet_value %i64, (%RightShiftAssignWith.impl_witness.a62) [concrete]
 // CHECK:STDOUT:   %RightShiftAssignWith.WithSelf.Op.type.4f1: type = fn_type @RightShiftAssignWith.WithSelf.Op, @RightShiftAssignWith.WithSelf(%Cpp.long, %RightShiftAssignWith.facet.e9e) [concrete]
-// CHECK:STDOUT:   %.3a6: type = fn_type_with_self_type %RightShiftAssignWith.WithSelf.Op.type.4f1, %RightShiftAssignWith.facet.e9e [concrete]
+// CHECK:STDOUT:   %.3a65: type = fn_type_with_self_type %RightShiftAssignWith.WithSelf.Op.type.4f1, %RightShiftAssignWith.facet.e9e [concrete]
 // CHECK:STDOUT:   %Int.as.RightShiftAssignWith.impl.Op.type.13a5a2.1: type = fn_type @Int.as.RightShiftAssignWith.impl.Op.2, @Int.as.RightShiftAssignWith.impl(%int_64, %ImplicitAs.facet.018) [concrete]
 // CHECK:STDOUT:   %Int.as.RightShiftAssignWith.impl.Op.4119c1.1: %Int.as.RightShiftAssignWith.impl.Op.type.13a5a2.1 = struct_value () [concrete]
 // CHECK:STDOUT:   %Int.as.RightShiftAssignWith.impl.Op.type.13a5a2.2: type = fn_type @Int.as.RightShiftAssignWith.impl.Op.1, @Int.as.RightShiftAssignWith.impl(%int_64, %ImplicitAs.facet.018) [concrete]
@@ -3473,7 +3473,7 @@ fn CopyUnsignedLong() {
 // CHECK:STDOUT:   %Int.as.LeftShiftAssignWith.impl.Op.call: init %empty_tuple.type = call %bound_method.loc19_5.3(%a.ref.loc19, %.loc19_9.2)
 // CHECK:STDOUT:   %a.ref.loc20: ref %i64 = name_ref a, %a
 // CHECK:STDOUT:   %b.ref.loc20: %Cpp.long = name_ref b, %b
-// CHECK:STDOUT:   %impl.elem0.loc20_5: %.3a6 = impl_witness_access constants.%RightShiftAssignWith.impl_witness.a62, element0 [concrete = constants.%Int.as.RightShiftAssignWith.impl.Op.4119c1.2]
+// CHECK:STDOUT:   %impl.elem0.loc20_5: %.3a65 = impl_witness_access constants.%RightShiftAssignWith.impl_witness.a62, element0 [concrete = constants.%Int.as.RightShiftAssignWith.impl.Op.4119c1.2]
 // CHECK:STDOUT:   %bound_method.loc20_5.1: <bound method> = bound_method %a.ref.loc20, %impl.elem0.loc20_5
 // CHECK:STDOUT:   %specific_fn.loc20: <specific function> = specific_function %impl.elem0.loc20_5, @Int.as.RightShiftAssignWith.impl.Op.1(constants.%int_64, constants.%ImplicitAs.facet.018) [concrete = constants.%Int.as.RightShiftAssignWith.impl.Op.specific_fn.052e44.1]
 // CHECK:STDOUT:   %bound_method.loc20_5.2: <bound method> = bound_method %a.ref.loc20, %specific_fn.loc20

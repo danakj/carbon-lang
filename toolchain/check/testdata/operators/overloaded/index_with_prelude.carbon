@@ -119,7 +119,7 @@ let x: i32 = c[0];
 // CHECK:STDOUT:   %IndexWith.lookup_impl_witness.1cf: <witness> = lookup_impl_witness %.Self.109, @IndexWith, @IndexWith(%SubscriptType.f8f) [symbolic_self]
 // CHECK:STDOUT:   %rewrite.elem0.88b: type = rewrite_target %IndexWith.lookup_impl_witness.1cf, element0 [symbolic_self]
 // CHECK:STDOUT:   %IndexWith_where.type.273: type = facet_type <@IndexWith, @IndexWith(%SubscriptType.f8f) where %rewrite.elem0.88b = %ElementType> [concrete]
-// CHECK:STDOUT:   %.7ae: <witness> = impl_self_witness %C, @IndexWith, @IndexWith(%SubscriptType.f8f) [concrete]
+// CHECK:STDOUT:   %.a0f: <impl interface specific> = impl_interface_specific @IndexWith, @IndexWith(%SubscriptType.f8f) [concrete]
 // CHECK:STDOUT:   %IndexWith.impl_witness.ae9: <witness> = impl_witness @C.as.IndexWith.impl.%IndexWith.impl_witness_table [concrete]
 // CHECK:STDOUT:   %pattern_type.98b: type = pattern_type %C [concrete]
 // CHECK:STDOUT:   %self.param_patt.303: %pattern_type.98b = value_param_pattern [concrete]
@@ -202,7 +202,7 @@ let x: i32 = c[0];
 // CHECK:STDOUT:       %rewrite.loc8_60.2 = requirement_rewrite %rewrite.elem0.loc8_47.2, %ElementType.ref.loc8_62 [concrete]
 // CHECK:STDOUT:     }
 // CHECK:STDOUT:   }
-// CHECK:STDOUT:   %.loc8: <witness> = impl_self_witness @C.as.IndexWith.impl.%C.ref, @IndexWith, @IndexWith(constants.%SubscriptType.f8f) [concrete = constants.%.7ae]
+// CHECK:STDOUT:   %.loc8: <impl interface specific> = impl_interface_specific @IndexWith, @IndexWith(constants.%SubscriptType.f8f) [concrete = constants.%.a0f]
 // CHECK:STDOUT:   %SubscriptType.ref: type = name_ref SubscriptType, %SubscriptType.decl [concrete = constants.%SubscriptType.f8f]
 // CHECK:STDOUT:   %s: %SubscriptType.f8f = wrapper_binding s, @__global_init.%.loc14_25.6
 // CHECK:STDOUT:   name_binding_decl {
@@ -342,7 +342,7 @@ let x: i32 = c[0];
 // CHECK:STDOUT:   %IndexWith.lookup_impl_witness.de3: <witness> = lookup_impl_witness %.Self.96f, @IndexWith, @IndexWith(Core.IntLiteral) [symbolic_self]
 // CHECK:STDOUT:   %rewrite.elem0.160: type = rewrite_target %IndexWith.lookup_impl_witness.de3, element0 [symbolic_self]
 // CHECK:STDOUT:   %IndexWith_where.type.179: type = facet_type <@IndexWith, @IndexWith(Core.IntLiteral) where %rewrite.elem0.160 = %C> [concrete]
-// CHECK:STDOUT:   %.a1a: <witness> = impl_self_witness %tuple.type.748, @IndexWith, @IndexWith(Core.IntLiteral) [concrete]
+// CHECK:STDOUT:   %.544: <impl interface specific> = impl_interface_specific @IndexWith, @IndexWith(Core.IntLiteral) [concrete]
 // CHECK:STDOUT:   %IndexWith.impl_witness.b92: <witness> = impl_witness @tuple.type.as.IndexWith.impl.%IndexWith.impl_witness_table [concrete]
 // CHECK:STDOUT:   %pattern_type.8b4: type = pattern_type %tuple.type.748 [concrete]
 // CHECK:STDOUT:   %self.param_patt.284: %pattern_type.8b4 = value_param_pattern [concrete]
@@ -422,7 +422,7 @@ let x: i32 = c[0];
 // CHECK:STDOUT:       %rewrite.loc8_67.2 = requirement_rewrite %rewrite.elem0.loc8_54.2, %C.ref.loc8_69 [concrete]
 // CHECK:STDOUT:     }
 // CHECK:STDOUT:   }
-// CHECK:STDOUT:   %.loc8: <witness> = impl_self_witness @tuple.type.as.IndexWith.impl.%.loc8_11.2, @IndexWith, @IndexWith(Core.IntLiteral) [concrete = constants.%.a1a]
+// CHECK:STDOUT:   %.loc8: <impl interface specific> = impl_interface_specific @IndexWith, @IndexWith(Core.IntLiteral) [concrete = constants.%.544]
 // CHECK:STDOUT:   %.loc14_13.1: type = splice_block %.loc14_13.3 [concrete = constants.%tuple.type.748] {
 // CHECK:STDOUT:     %C.ref.loc14_9: type = name_ref C, %C.decl [concrete = constants.%C]
 // CHECK:STDOUT:     %C.ref.loc14_12: type = name_ref C, %C.decl [concrete = constants.%C]
@@ -553,7 +553,7 @@ let x: i32 = c[0];
 // CHECK:STDOUT:   %IndexWith.lookup_impl_witness.1cf: <witness> = lookup_impl_witness %.Self.109, @IndexWith, @IndexWith(%SubscriptType.f8f) [symbolic_self]
 // CHECK:STDOUT:   %rewrite.elem0.88b: type = rewrite_target %IndexWith.lookup_impl_witness.1cf, element0 [symbolic_self]
 // CHECK:STDOUT:   %IndexWith_where.type.273: type = facet_type <@IndexWith, @IndexWith(%SubscriptType.f8f) where %rewrite.elem0.88b = %ElementType> [concrete]
-// CHECK:STDOUT:   %.7ae: <witness> = impl_self_witness %C, @IndexWith, @IndexWith(%SubscriptType.f8f) [concrete]
+// CHECK:STDOUT:   %.a0f: <impl interface specific> = impl_interface_specific @IndexWith, @IndexWith(%SubscriptType.f8f) [concrete]
 // CHECK:STDOUT:   %IndexWith.impl_witness.ae9: <witness> = impl_witness @C.as.IndexWith.impl.%IndexWith.impl_witness_table [concrete]
 // CHECK:STDOUT:   %pattern_type.98b: type = pattern_type %C [concrete]
 // CHECK:STDOUT:   %self.param_patt.303: %pattern_type.98b = value_param_pattern [concrete]
@@ -631,7 +631,7 @@ let x: i32 = c[0];
 // CHECK:STDOUT:       %rewrite.loc8_60.2 = requirement_rewrite %rewrite.elem0.loc8_47.2, %ElementType.ref.loc8_62 [concrete]
 // CHECK:STDOUT:     }
 // CHECK:STDOUT:   }
-// CHECK:STDOUT:   %.loc8: <witness> = impl_self_witness @C.as.IndexWith.impl.%C.ref, @IndexWith, @IndexWith(constants.%SubscriptType.f8f) [concrete = constants.%.7ae]
+// CHECK:STDOUT:   %.loc8: <impl interface specific> = impl_interface_specific @IndexWith, @IndexWith(constants.%SubscriptType.f8f) [concrete = constants.%.a0f]
 // CHECK:STDOUT:   %C.ref: type = name_ref C, %C.decl [concrete = constants.%C]
 // CHECK:STDOUT:   %c: %C = wrapper_binding c, @__global_init.%.loc14_13.6
 // CHECK:STDOUT:   name_binding_decl {

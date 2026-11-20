@@ -65,7 +65,7 @@ fn Call() { ().(I.G)(); }
 // CHECK:STDOUT:   %I.WithSelf.F.c83: %I.WithSelf.F.type.2e1 = struct_value () [symbolic]
 // CHECK:STDOUT:   %I.assoc_type: type = assoc_entity_type @I [concrete]
 // CHECK:STDOUT:   %assoc0: %I.assoc_type = assoc_entity element0, @I.WithSelf.%I.WithSelf.F.decl [concrete]
-// CHECK:STDOUT:   %.c3e: <witness> = impl_self_witness %C, @I [concrete]
+// CHECK:STDOUT:   %.2ea: <impl interface specific> = impl_interface_specific @I [concrete]
 // CHECK:STDOUT:   %I.impl_witness: <witness> = impl_witness @C.as.I.impl.%I.impl_witness_table [concrete]
 // CHECK:STDOUT:   %I.facet: %I.type = facet_value %C, (%I.impl_witness) [concrete]
 // CHECK:STDOUT:   %I.WithSelf.F.type.42f: type = fn_type @I.WithSelf.F, @I.WithSelf(%I.facet) [concrete]
@@ -147,7 +147,7 @@ fn Call() { ().(I.G)(); }
 // CHECK:STDOUT:     %C.ref: type = name_ref C, file.%C.decl [concrete = constants.%C]
 // CHECK:STDOUT:     %I.ref: type = name_ref I, @C.%I.decl [concrete = constants.%I.type]
 // CHECK:STDOUT:   }
-// CHECK:STDOUT:   %.loc17: <witness> = impl_self_witness @C.as.I.impl.%C.ref, @I [concrete = constants.%.c3e]
+// CHECK:STDOUT:   %.loc17: <impl interface specific> = impl_interface_specific @I [concrete = constants.%.2ea]
 // CHECK:STDOUT:   <elided>
 // CHECK:STDOUT:   complete_type_witness = %complete_type
 // CHECK:STDOUT:
@@ -263,7 +263,7 @@ fn Call() { ().(I.G)(); }
 // CHECK:STDOUT:   %pattern_type: type = pattern_type type [concrete]
 // CHECK:STDOUT:   %T.patt: %pattern_type = symbolic_binding_pattern T, 0 [symbolic]
 // CHECK:STDOUT:   %T: type = symbolic_binding T, 0 [symbolic]
-// CHECK:STDOUT:   %.917: <witness> = impl_self_witness %T, @I [symbolic]
+// CHECK:STDOUT:   %.6dd: <impl interface specific> = impl_interface_specific @I [concrete]
 // CHECK:STDOUT:   %I.impl_witness.899: <witness> = impl_witness @T.as.I.impl.%I.impl_witness_table, @T.as.I.impl(%T) [symbolic]
 // CHECK:STDOUT:   %T.as.I.impl.F.type.a03: type = fn_type @T.as.I.impl.F, @T.as.I.impl(%T) [symbolic]
 // CHECK:STDOUT:   %T.as.I.impl.F.745: %T.as.I.impl.F.type.a03 = struct_value () [symbolic]
@@ -272,7 +272,6 @@ fn Call() { ().(I.G)(); }
 // CHECK:STDOUT:   %I.WithSelf.F.f4d: %I.WithSelf.F.type.713 = struct_value () [symbolic]
 // CHECK:STDOUT:   %I.WithSelf.G.type.05e: type = fn_type @I.WithSelf.G, @I.WithSelf(%I.facet.510) [symbolic]
 // CHECK:STDOUT:   %I.WithSelf.G.c19: %I.WithSelf.G.type.05e = struct_value () [symbolic]
-// CHECK:STDOUT:   %.2ef: <witness> = impl_self_witness %empty_tuple.type, @I [concrete]
 // CHECK:STDOUT:   %I.impl_witness.e63: <witness> = impl_witness @T.as.I.impl.%I.impl_witness_table, @T.as.I.impl(%empty_tuple.type) [concrete]
 // CHECK:STDOUT:   %I.facet.b01: %I.type = facet_value %empty_tuple.type, (%I.impl_witness.e63) [concrete]
 // CHECK:STDOUT:   %I.WithSelf.F.type.0a9: type = fn_type @I.WithSelf.F, @I.WithSelf(%I.facet.b01) [concrete]
@@ -297,7 +296,7 @@ fn Call() { ().(I.G)(); }
 // CHECK:STDOUT:     }
 // CHECK:STDOUT:     %T.loc11_15.2: type = symbolic_binding T, 0 [symbolic = %T.loc11_15.1 (constants.%T)]
 // CHECK:STDOUT:   }
-// CHECK:STDOUT:   %.loc11: <witness> = impl_self_witness @T.as.I.impl.%T.ref, @I [symbolic = @T.as.I.impl.%.loc11_30 (constants.%.917)]
+// CHECK:STDOUT:   %.loc11: <impl interface specific> = impl_interface_specific @I [concrete = constants.%.6dd]
 // CHECK:STDOUT: }
 // CHECK:STDOUT:
 // CHECK:STDOUT: interface @I {
@@ -320,7 +319,6 @@ fn Call() { ().(I.G)(); }
 // CHECK:STDOUT: generic impl @T.as.I.impl(%T.loc11_15.2: type) {
 // CHECK:STDOUT:   %T.patt.loc11_15.2: %pattern_type = symbolic_binding_pattern T, 0 [symbolic = %T.patt.loc11_15.2 (constants.%T.patt)]
 // CHECK:STDOUT:   %T.loc11_15.1: type = symbolic_binding T, 0 [symbolic = %T.loc11_15.1 (constants.%T)]
-// CHECK:STDOUT:   %.loc11_30: <witness> = impl_self_witness %T.loc11_15.1, @I [symbolic = %.loc11_30 (constants.%.917)]
 // CHECK:STDOUT:   %I.impl_witness.loc11_30.2: <witness> = impl_witness %I.impl_witness_table, @T.as.I.impl(%T.loc11_15.1) [symbolic = %I.impl_witness.loc11_30.2 (constants.%I.impl_witness.899)]
 // CHECK:STDOUT:
 // CHECK:STDOUT: !definition:
@@ -387,7 +385,6 @@ fn Call() { ().(I.G)(); }
 // CHECK:STDOUT: specific @T.as.I.impl(constants.%T) {
 // CHECK:STDOUT:   %T.patt.loc11_15.2 => constants.%T.patt
 // CHECK:STDOUT:   %T.loc11_15.1 => constants.%T
-// CHECK:STDOUT:   %.loc11_30 => constants.%.917
 // CHECK:STDOUT:   %I.impl_witness.loc11_30.2 => constants.%I.impl_witness.899
 // CHECK:STDOUT:
 // CHECK:STDOUT: !definition:
@@ -412,7 +409,6 @@ fn Call() { ().(I.G)(); }
 // CHECK:STDOUT: specific @T.as.I.impl(constants.%empty_tuple.type) {
 // CHECK:STDOUT:   %T.patt.loc11_15.2 => constants.%T.patt
 // CHECK:STDOUT:   %T.loc11_15.1 => constants.%empty_tuple.type
-// CHECK:STDOUT:   %.loc11_30 => constants.%.2ef
 // CHECK:STDOUT:   %I.impl_witness.loc11_30.2 => constants.%I.impl_witness.e63
 // CHECK:STDOUT:
 // CHECK:STDOUT: !definition:

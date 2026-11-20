@@ -53,7 +53,7 @@ impl forall [T: Invalid] T as Z where .Z1 impls Y {}
 // CHECK:STDOUT:   %pattern_type: type = pattern_type type [concrete]
 // CHECK:STDOUT:   %T.patt: %pattern_type = symbolic_binding_pattern T, 0 [symbolic]
 // CHECK:STDOUT:   %T: type = symbolic_binding T, 0 [symbolic]
-// CHECK:STDOUT:   %.2a3: <witness> = impl_self_witness %T, @Simple [symbolic]
+// CHECK:STDOUT:   %.9eb: <impl interface specific> = impl_interface_specific @Simple [concrete]
 // CHECK:STDOUT:   %Simple.impl_witness: <witness> = impl_witness @T.as.Simple.impl.%Simple.impl_witness_table, @T.as.Simple.impl(%T) [symbolic]
 // CHECK:STDOUT:   %T.as.Simple.impl.F.type: type = fn_type @T.as.Simple.impl.F, @T.as.Simple.impl(%T) [symbolic]
 // CHECK:STDOUT:   %T.as.Simple.impl.F: %T.as.Simple.impl.F.type = struct_value () [symbolic]
@@ -78,7 +78,7 @@ impl forall [T: Invalid] T as Z where .Z1 impls Y {}
 // CHECK:STDOUT:     }
 // CHECK:STDOUT:     %T.loc7_15.2: type = symbolic_binding T, 0 [symbolic = %T.loc7_15.1 (constants.%T)]
 // CHECK:STDOUT:   }
-// CHECK:STDOUT:   %.loc7: <witness> = impl_self_witness @T.as.Simple.impl.%T.ref, @Simple [symbolic = @T.as.Simple.impl.%.loc7_35 (constants.%.2a3)]
+// CHECK:STDOUT:   %.loc7: <impl interface specific> = impl_interface_specific @Simple [concrete = constants.%.9eb]
 // CHECK:STDOUT: }
 // CHECK:STDOUT:
 // CHECK:STDOUT: interface @Simple {
@@ -100,7 +100,6 @@ impl forall [T: Invalid] T as Z where .Z1 impls Y {}
 // CHECK:STDOUT: generic impl @T.as.Simple.impl(%T.loc7_15.2: type) {
 // CHECK:STDOUT:   %T.patt.loc7_15.2: %pattern_type = symbolic_binding_pattern T, 0 [symbolic = %T.patt.loc7_15.2 (constants.%T.patt)]
 // CHECK:STDOUT:   %T.loc7_15.1: type = symbolic_binding T, 0 [symbolic = %T.loc7_15.1 (constants.%T)]
-// CHECK:STDOUT:   %.loc7_35: <witness> = impl_self_witness %T.loc7_15.1, @Simple [symbolic = %.loc7_35 (constants.%.2a3)]
 // CHECK:STDOUT:   %Simple.impl_witness.loc7_35.2: <witness> = impl_witness %Simple.impl_witness_table, @T.as.Simple.impl(%T.loc7_15.1) [symbolic = %Simple.impl_witness.loc7_35.2 (constants.%Simple.impl_witness)]
 // CHECK:STDOUT:
 // CHECK:STDOUT: !definition:
@@ -144,7 +143,6 @@ impl forall [T: Invalid] T as Z where .Z1 impls Y {}
 // CHECK:STDOUT: specific @T.as.Simple.impl(constants.%T) {
 // CHECK:STDOUT:   %T.patt.loc7_15.2 => constants.%T.patt
 // CHECK:STDOUT:   %T.loc7_15.1 => constants.%T
-// CHECK:STDOUT:   %.loc7_35 => constants.%.2a3
 // CHECK:STDOUT:   %Simple.impl_witness.loc7_35.2 => constants.%Simple.impl_witness
 // CHECK:STDOUT:
 // CHECK:STDOUT: !definition:

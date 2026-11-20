@@ -57,7 +57,7 @@ struct ImplFields {
   //
   // May be `None` if the impl's constraint is not valid.
   SpecificInterface interface;
-  // An `ImplSelfWitness` instruction, which contains the SpecificInterface
+  // An `ImplInterfaceSpecific` inst, which contains the SpecificInterface
   // inside it. If the impl is generic, the constant value of the instruction
   // has the impl's specific applied to it, so that GetConstantValueInSpecific
   // can be used to get the `interface` being implemented after deducing the

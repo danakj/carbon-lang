@@ -266,14 +266,9 @@ auto TypeIterator::ProcessType(InstId inst_id) -> std::optional<Step> {
       // We recurse into symbolic ImplWitnessAccess, replacing it with the self
       // value for the iteration. If there are nested accesses, this replaces
       // them all with the root self.
-      if (auto self_witness = sem_ir_->insts().TryGetAs<SemIR::ImplSelfWitness>(
-              access.witness_id)) {
-        PushInstId(self_witness->period_self);
-      } else {
-        auto lookup_witness =
-            sem_ir_->insts().GetAs<LookupImplWitness>(access.witness_id);
-        PushInstId(lookup_witness.query_self_inst_id);
-      }
+      auto lookup_witness =
+          sem_ir_->insts().GetAs<LookupImplWitness>(access.witness_id);
+      PushInstId(lookup_witness.query_self_inst_id);
       return Step::TypeWrapper{.kind = Step::TypeWrapper::ImplWitnessAccess,
                                .inst_id = inst_id};
     }

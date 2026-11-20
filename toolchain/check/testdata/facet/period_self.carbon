@@ -1417,7 +1417,7 @@ fn F() {
 // CHECK:STDOUT:   %Y.WithSelf.Y1.call.09a: init type = call %specific_impl_fn.85a() [template]
 // CHECK:STDOUT:   %Z_where.type.b70: type = facet_type <@Z where %rewrite.elem0.c63 = %Y.WithSelf.Y1.call.09a> [template]
 // CHECK:STDOUT:   %specific_impl_fn.bac: <specific function> = specific_impl_function %impl.elem0.aed, @Y.WithSelf.Y1(%T.95b, %T.as_type.917):identified [symbolic]
-// CHECK:STDOUT:   %.e25: <witness> = impl_self_witness %T.as_type.917, @Z [symbolic]
+// CHECK:STDOUT:   %.a9e: <impl interface specific> = impl_interface_specific @Z [concrete]
 // CHECK:STDOUT:   %Z.impl_witness.179: <witness> = impl_witness @T.as_type.as.Z.impl.%Z.impl_witness_table, @T.as_type.as.Z.impl(%T.95b) [symbolic]
 // CHECK:STDOUT:   %specific_impl_fn.d3c: <specific function> = specific_impl_function %impl.elem0.aed, @Y.WithSelf.Y1(%T.95b, %T.as_type.917) [symbolic]
 // CHECK:STDOUT:   %Y.WithSelf.Y1.call.bea: init type = call %specific_impl_fn.d3c() [template]
@@ -1431,7 +1431,6 @@ fn F() {
 // CHECK:STDOUT:   %empty_tuple.type.as.Y.impl.Y1.call: init type = call %empty_tuple.type.as.Y.impl.Y1.specific_fn.700() [symbolic_self]
 // CHECK:STDOUT:   %Z_where.type.553: type = facet_type <@Z where %rewrite.elem0.c63 = %empty_tuple.type.as.Y.impl.Y1.call> [concrete]
 // CHECK:STDOUT:   %empty_tuple.type.as.Y.impl.Y1.specific_fn.c56: <specific function> = specific_function %empty_tuple.type.as.Y.impl.Y1, @empty_tuple.type.as.Y.impl.Y1(%empty_tuple.type) [concrete]
-// CHECK:STDOUT:   %.78e: <witness> = impl_self_witness %empty_tuple.type, @Z [concrete]
 // CHECK:STDOUT:   %Z.impl_witness.a55: <witness> = impl_witness @T.as_type.as.Z.impl.%Z.impl_witness_table, @T.as_type.as.Z.impl(%Y.facet) [concrete]
 // CHECK:STDOUT: }
 // CHECK:STDOUT:
@@ -1481,7 +1480,7 @@ fn F() {
 // CHECK:STDOUT:     %T.loc16_15.1: %Y.type = symbolic_binding T, 0 [symbolic = %T.loc16_15.2 (constants.%T.95b)]
 // CHECK:STDOUT:   }
 // CHECK:STDOUT:   %specific_impl_fn: <specific function> = specific_impl_function constants.%impl.elem0.aed, @Y.WithSelf.Y1(constants.%T.95b, constants.%T.as_type.917):identified [symbolic = @T.as_type.as.Z.impl.%specific_impl_fn.loc16_27.2 (constants.%specific_impl_fn.bac)]
-// CHECK:STDOUT:   %.loc16: <witness> = impl_self_witness @T.as_type.as.Z.impl.%.loc16_20, @Z [symbolic = @T.as_type.as.Z.impl.%.loc16_51 (constants.%.e25)]
+// CHECK:STDOUT:   %.loc16: <impl interface specific> = impl_interface_specific @Z [concrete = constants.%.a9e]
 // CHECK:STDOUT: }
 // CHECK:STDOUT:
 // CHECK:STDOUT: generic impl @T.as_type.as.Z.impl(%T.loc16_15.1: %Y.type) {
@@ -1496,7 +1495,6 @@ fn F() {
 // CHECK:STDOUT:   %Y.WithSelf.Y1.call.loc16_27: init type = call %specific_impl_fn.loc16_27.1() [template = %Y.WithSelf.Y1.call.loc16_27 (constants.%Y.WithSelf.Y1.call.09a)]
 // CHECK:STDOUT:   %Z_where.type: type = facet_type <@Z where constants.%rewrite.elem0.c63 = %Y.WithSelf.Y1.call.loc16_27> [template = %Z_where.type (constants.%Z_where.type.b70)]
 // CHECK:STDOUT:   %specific_impl_fn.loc16_27.2: <specific function> = specific_impl_function %impl.elem0.loc16_27, @Y.WithSelf.Y1(%T.loc16_15.2, %T.as_type.loc16_20.2):identified [symbolic = %specific_impl_fn.loc16_27.2 (constants.%specific_impl_fn.bac)]
-// CHECK:STDOUT:   %.loc16_51: <witness> = impl_self_witness %T.as_type.loc16_20.2, @Z [symbolic = %.loc16_51 (constants.%.e25)]
 // CHECK:STDOUT:   %Z.impl_witness.loc16_51.2: <witness> = impl_witness %Z.impl_witness_table, @T.as_type.as.Z.impl(%T.loc16_15.2) [symbolic = %Z.impl_witness.loc16_51.2 (constants.%Z.impl_witness.179)]
 // CHECK:STDOUT:   %specific_impl_fn.loc16_51.2: <specific function> = specific_impl_function %impl.elem0.loc16_27, @Y.WithSelf.Y1(%T.loc16_15.2, %T.as_type.loc16_20.2) [symbolic = %specific_impl_fn.loc16_51.2 (constants.%specific_impl_fn.d3c)]
 // CHECK:STDOUT:   %Y.WithSelf.Y1.call.loc16_51: init type = call %specific_impl_fn.loc16_51.2() [template = %Y.WithSelf.Y1.call.loc16_51 (constants.%Y.WithSelf.Y1.call.bea)]
@@ -1527,7 +1525,6 @@ fn F() {
 // CHECK:STDOUT:   %Y.WithSelf.Y1.call.loc16_27 => constants.%Y.WithSelf.Y1.call.09a
 // CHECK:STDOUT:   %Z_where.type => constants.%Z_where.type.b70
 // CHECK:STDOUT:   %specific_impl_fn.loc16_27.2 => constants.%specific_impl_fn.bac
-// CHECK:STDOUT:   %.loc16_51 => constants.%.e25
 // CHECK:STDOUT:   %Z.impl_witness.loc16_51.2 => constants.%Z.impl_witness.179
 // CHECK:STDOUT:   %specific_impl_fn.loc16_51.2 => constants.%specific_impl_fn.d3c
 // CHECK:STDOUT:   %Y.WithSelf.Y1.call.loc16_51 => constants.%Y.WithSelf.Y1.call.bea
@@ -1545,7 +1542,6 @@ fn F() {
 // CHECK:STDOUT:   %Y.WithSelf.Y1.call.loc16_27 => constants.%empty_tuple.type.as.Y.impl.Y1.call
 // CHECK:STDOUT:   %Z_where.type => constants.%Z_where.type.553
 // CHECK:STDOUT:   %specific_impl_fn.loc16_27.2 => constants.%empty_tuple.type.as.Y.impl.Y1.specific_fn.c56
-// CHECK:STDOUT:   %.loc16_51 => constants.%.78e
 // CHECK:STDOUT:   %Z.impl_witness.loc16_51.2 => constants.%Z.impl_witness.a55
 // CHECK:STDOUT:   %specific_impl_fn.loc16_51.2 => constants.%empty_tuple.type.as.Y.impl.Y1.specific_fn.c56
 // CHECK:STDOUT:   %Y.WithSelf.Y1.call.loc16_51 => constants.%empty_tuple.type

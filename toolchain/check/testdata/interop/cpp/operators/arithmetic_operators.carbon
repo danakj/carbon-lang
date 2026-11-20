@@ -1277,7 +1277,7 @@ fn TestUnaryOperators(a: Cpp.Int16, b: Cpp.Int32) {
 // CHECK:STDOUT:   %complete_type.46e: <witness> = complete_type_witness %SubWith.type.120 [concrete]
 // CHECK:STDOUT:   %SubWith.facet.0b0: %SubWith.type.120 = facet_value %Int16, (%custom_witness.32cef1.1) [concrete]
 // CHECK:STDOUT:   %SubWith.WithSelf.Op.type.e1e: type = fn_type @SubWith.WithSelf.Op, @SubWith.WithSelf(%Int32, %SubWith.facet.0b0) [concrete]
-// CHECK:STDOUT:   %.988: type = fn_type_with_self_type %SubWith.WithSelf.Op.type.e1e, %SubWith.facet.0b0 [concrete]
+// CHECK:STDOUT:   %.9885: type = fn_type_with_self_type %SubWith.WithSelf.Op.type.e1e, %SubWith.facet.0b0 [concrete]
 // CHECK:STDOUT:   %complete_type.920: <witness> = complete_type_witness %MulWith.type.d67 [concrete]
 // CHECK:STDOUT:   %MulWith.facet.4b9: %MulWith.type.d67 = facet_value %Int16, (%custom_witness.3a0675.1) [concrete]
 // CHECK:STDOUT:   %MulWith.WithSelf.Op.type.8f2: type = fn_type @MulWith.WithSelf.Op, @MulWith.WithSelf(%Int32, %MulWith.facet.4b9) [concrete]
@@ -1420,7 +1420,7 @@ fn TestUnaryOperators(a: Cpp.Int16, b: Cpp.Int32) {
 // CHECK:STDOUT:   %Core.import_ref.972: @DivWith.WithSelf.%DivWith.assoc_type (%DivWith.assoc_type.e7d) = import_ref Core//prelude/operators/arithmetic, loc{{\d+_\d+}}, loaded [symbolic = @DivWith.WithSelf.%assoc1 (constants.%assoc1.2b8)]
 // CHECK:STDOUT:   %Core.import_ref.f2f: @DivWith.WithSelf.%DivWith.WithSelf.Op.type (%DivWith.WithSelf.Op.type.207) = import_ref Core//prelude/operators/arithmetic, loc{{\d+_\d+}}, loaded [symbolic = @DivWith.WithSelf.%DivWith.WithSelf.Op (constants.%DivWith.WithSelf.Op.4f1)]
 // CHECK:STDOUT:   %Core.import_ref.94d = import_ref Core//prelude/operators/arithmetic, loc{{\d+_\d+}}, unloaded
-// CHECK:STDOUT:   %Core.import_ref.ea5e3: @ModWith.WithSelf.%ModWith.assoc_type (%ModWith.assoc_type.1f1) = import_ref Core//prelude/operators/arithmetic, loc{{\d+_\d+}}, loaded [symbolic = @ModWith.WithSelf.%assoc1 (constants.%assoc1.f4b)]
+// CHECK:STDOUT:   %Core.import_ref.ea5: @ModWith.WithSelf.%ModWith.assoc_type (%ModWith.assoc_type.1f1) = import_ref Core//prelude/operators/arithmetic, loc{{\d+_\d+}}, loaded [symbolic = @ModWith.WithSelf.%assoc1 (constants.%assoc1.f4b)]
 // CHECK:STDOUT:   %Core.import_ref.9f8f: @ModWith.WithSelf.%ModWith.WithSelf.Op.type (%ModWith.WithSelf.Op.type.04e) = import_ref Core//prelude/operators/arithmetic, loc{{\d+_\d+}}, loaded [symbolic = @ModWith.WithSelf.%ModWith.WithSelf.Op (constants.%ModWith.WithSelf.Op.6fb)]
 // CHECK:STDOUT:   %Core.import_ref.be00 = import_ref Core//prelude/operators/arithmetic, loc{{\d+_\d+}}, unloaded
 // CHECK:STDOUT:   %Core.import_ref.74d: @T.as_type.as.DestroyImpl.impl.%T.as_type.as.DestroyImpl.impl.Op.type (%T.as_type.as.DestroyImpl.impl.Op.type.dea) = import_ref Core//prelude/destroy, loc{{\d+_\d+}}, loaded [symbolic = @T.as_type.as.DestroyImpl.impl.%T.as_type.as.DestroyImpl.impl.Op (constants.%T.as_type.as.DestroyImpl.impl.Op.6e5)]
@@ -1615,7 +1615,7 @@ fn TestUnaryOperators(a: Cpp.Int16, b: Cpp.Int32) {
 // CHECK:STDOUT:     %x.ref: @ModWith.loc168.%T.as_type.loc168_29.1 (%T.as_type.3ff) = name_ref x, %x
 // CHECK:STDOUT:     %y.ref: @ModWith.loc168.%U.as_type.loc167_35.1 (%U.as_type.0bd) = name_ref y, %y
 // CHECK:STDOUT:     %ModWith.type.loc170: type = facet_type <@ModWith.1, @ModWith.1(constants.%U.as_type.0bd)> [symbolic = %ModWith.type.loc167_35.1 (constants.%ModWith.type.68a)]
-// CHECK:STDOUT:     %.loc170_5.1: @ModWith.loc168.%ModWith.assoc_type (%ModWith.assoc_type.9c3) = specific_constant imports.%Core.import_ref.ea5e3, @ModWith.WithSelf(constants.%U.as_type.0bd, constants.%Self.c18) [symbolic = %assoc1 (constants.%assoc1.3d6)]
+// CHECK:STDOUT:     %.loc170_5.1: @ModWith.loc168.%ModWith.assoc_type (%ModWith.assoc_type.9c3) = specific_constant imports.%Core.import_ref.ea5, @ModWith.WithSelf(constants.%U.as_type.0bd, constants.%Self.c18) [symbolic = %assoc1 (constants.%assoc1.3d6)]
 // CHECK:STDOUT:     %Op.ref: @ModWith.loc168.%ModWith.assoc_type (%ModWith.assoc_type.9c3) = name_ref Op, %.loc170_5.1 [symbolic = %assoc1 (constants.%assoc1.3d6)]
 // CHECK:STDOUT:     %impl.elem1.loc170_5.1: @ModWith.loc168.%.loc170_5.6 (%.289) = impl_witness_access constants.%ModWith.lookup_impl_witness.7f3, element1 [symbolic = %impl.elem1.loc170_5.2 (constants.%impl.elem1.12e)]
 // CHECK:STDOUT:     %bound_method.loc170_5.1: <bound method> = bound_method %x.ref, %impl.elem1.loc170_5.1
@@ -2534,7 +2534,7 @@ fn TestUnaryOperators(a: Cpp.Int16, b: Cpp.Int32) {
 // CHECK:STDOUT:   %SubWith.lookup_impl_witness.loc137 => constants.%custom_witness.32cef1.1
 // CHECK:STDOUT:   %SubWith.facet => constants.%SubWith.facet.0b0
 // CHECK:STDOUT:   %SubWith.WithSelf.Op.type => constants.%SubWith.WithSelf.Op.type.e1e
-// CHECK:STDOUT:   %.loc137_5.6 => constants.%.988
+// CHECK:STDOUT:   %.loc137_5.6 => constants.%.9885
 // CHECK:STDOUT:   %impl.elem1.loc137_5.2 => constants.%Int16.Op.4dca31.9
 // CHECK:STDOUT:   %specific_impl_fn.loc137_5.2 => constants.%Int16.Op.4dca31.9
 // CHECK:STDOUT:   %SelfDestruct.specific_fn.2 => constants.%SelfDestruct.specific_fn.195

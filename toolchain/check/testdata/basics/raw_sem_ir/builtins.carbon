@@ -71,6 +71,7 @@
 // CHECK:STDOUT:     'inst(ErrorInst)': {kind: ErrorInst, type: type(Error)}
 // CHECK:STDOUT:     'inst(FloatLiteralType)': {kind: FloatLiteralType, type: type(TypeType)}
 // CHECK:STDOUT:     'inst(FormType)':  {kind: FormType, type: type(TypeType)}
+// CHECK:STDOUT:     'inst(ImplInterfaceSpecificType)': {kind: ImplInterfaceSpecificType, type: type(TypeType)}
 // CHECK:STDOUT:     'inst(InstType)':  {kind: InstType, type: type(TypeType)}
 // CHECK:STDOUT:     'inst(IntLiteralType)': {kind: IntLiteralType, type: type(TypeType)}
 // CHECK:STDOUT:     'inst(NamespaceType)': {kind: NamespaceType, type: type(TypeType)}
@@ -89,6 +90,7 @@
 // CHECK:STDOUT:       'inst(ErrorInst)': concrete_constant(inst(ErrorInst))
 // CHECK:STDOUT:       'inst(FloatLiteralType)': concrete_constant(inst(FloatLiteralType))
 // CHECK:STDOUT:       'inst(FormType)':  concrete_constant(inst(FormType))
+// CHECK:STDOUT:       'inst(ImplInterfaceSpecificType)': concrete_constant(inst(ImplInterfaceSpecificType))
 // CHECK:STDOUT:       'inst(InstType)':  concrete_constant(inst(InstType))
 // CHECK:STDOUT:       'inst(IntLiteralType)': concrete_constant(inst(IntLiteralType))
 // CHECK:STDOUT:       'inst(NamespaceType)': concrete_constant(inst(NamespaceType))

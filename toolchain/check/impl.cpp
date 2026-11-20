@@ -1067,10 +1067,10 @@ auto GetImplInterfaceInSpecific(Context& context, const SemIR::Impl& impl,
   if (interface_in_specific == SemIR::ErrorInst::ConstantId) {
     return SemIR::SpecificInterface::None;
   }
-  // The `interface_inst_id` is always an `ImplSelfWitness` at this time.
-  auto inst = context.constant_values().GetInstAs<SemIR::ImplSelfWitness>(
+  // The `interface_inst_id` is always an `ImplInterfaceSpecific`.
+  auto inst = context.constant_values().GetInstAs<SemIR::ImplInterfaceSpecific>(
       interface_in_specific);
-  return context.specific_interfaces().Get(inst.specific_interface_id);
+  return {inst.interface_id, inst.specific_id};
 }
 
 }  // namespace Carbon::Check

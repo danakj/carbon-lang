@@ -1092,21 +1092,25 @@ struct ImplDecl {
   DeclInstBlockId decl_block_id;
 };
 
-// A witness that `.Self` implements an interface, which is currently being
-// implemented. Only appears inside an `impl ... as` declaration, and acts as a
-// placeholder that is substituted to point to the `ImplWitness` once it is
-// constructed.
-struct ImplSelfWitness {
-  static constexpr auto Kind = InstKind::ImplSelfWitness.Define<Parse::NodeId>(
-      {.ir_name = "impl_self_witness",
-       .constant_kind = InstConstantKind::Always,
-       .is_lowered = false});
-  // Always the type of the builtin `WitnessType` singleton instruction.
+// An instruction tracking the impl's specific interface in the impl's generic
+// context. This is used to get the specific interface from a specific impl.
+struct ImplInterfaceSpecific {
+  static constexpr auto Kind =
+      InstKind::ImplInterfaceSpecific.Define<Parse::NodeId>(
+          {.ir_name = "impl_interface_specific",
+           .constant_kind = InstConstantKind::Always,
+           .is_lowered = false});
+  // Always an ImplInterfaceSpecificType.
   TypeId type_id;
-  // Initially the `.Self` facet value used in the impl lookup query.
-  InstId period_self;
-  // The interface of the impl being declared.
-  SpecificInterfaceId specific_interface_id;
+  InterfaceId interface_id;
+  SpecificId specific_id;
+};
+
+struct ImplInterfaceSpecificType
+    : public SingletonTypeInst<InstKind::ImplInterfaceSpecificType,
+                               "<impl interface specific>"> {
+  static constexpr auto TypeId =
+      TypeId::ForTypeConstant(ConstantId::ForConcreteConstant(TypeInstId));
 };
 
 // A witness that was modified while identifying a facet type and replacing a
