@@ -1180,6 +1180,7 @@ fn F(_: N where .Self impls I(.Self));
 // CHECK:STDOUT:   %I_where.type.691: type = facet_type <@I, @I(%.Self.c86) where %impl.elem0.c33 = %empty_tuple.type> [symbolic_self]
 // CHECK:STDOUT:   %.Self.105: %I.type.e26 = symbolic_binding .Self [symbolic_self]
 // CHECK:STDOUT:   %I.lookup_impl_witness.59f: <witness> = lookup_impl_witness %.Self.105, @I, @I(%.Self.c86) [symbolic_self]
+// CHECK:STDOUT:   %.Self.as_type: type = facet_access_type %.Self.105 [symbolic_self]
 // CHECK:STDOUT:   %impl.elem0.7f7: type = impl_witness_access %I.lookup_impl_witness.59f, element0 [symbolic_self]
 // CHECK:STDOUT:   %I_where.type.4b3: type = facet_type <@I, @I(%.Self.c86) where %impl.elem0.7f7 = %empty_tuple.type> [symbolic_self]
 // CHECK:STDOUT:   %pattern_type.ad5: type = pattern_type %I_where.type.4b3 [symbolic_self]
@@ -1403,6 +1404,11 @@ fn F(_: N where .Self impls I(.Self));
 // CHECK:STDOUT: !definition:
 // CHECK:STDOUT:   %I.type => constants.%I.type.e26
 // CHECK:STDOUT:   %Self.loc4_22.2 => constants.%Self.0b4
+// CHECK:STDOUT: }
+// CHECK:STDOUT:
+// CHECK:STDOUT: specific @I(constants.%.Self.as_type):identified {
+// CHECK:STDOUT:   %T.patt.loc4_14.2 => constants.%T.patt.3a0
+// CHECK:STDOUT:   %T.loc4_14.1 => constants.%.Self.as_type
 // CHECK:STDOUT: }
 // CHECK:STDOUT:
 // CHECK:STDOUT: specific @I.WithSelf(constants.%.Self.c86, constants.%Self.c5d) {

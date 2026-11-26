@@ -197,17 +197,6 @@ auto SubstPeriodSelf(Context& context, SemIR::LocId loc_id,
                      SemIR::ConstantId const_id,
                      SemIR::ConstantId period_self_replacement_id,
                      SubstPeriodSelfRebuildInst rebuild) -> SemIR::ConstantId {
-  // Don't replace `.Self` with itself; that is cyclical.
-  //
-  // If the types differ, we would try to convert the replacement to a `.Self`
-  // of the desired type in `const_id`, which is what we already have, so
-  // there's nothing we need to do. But trying to do that conversion recurses
-  // when the type of the `.Self` contains a `.Self`.
-  if (IsPeriodSelf(context, context.constant_values().GetInstId(
-                                period_self_replacement_id))) {
-    return const_id;
-  }
-
   SubstPeriodSelfCallbacks callbacks(&context, loc_id,
                                      period_self_replacement_id, rebuild);
   auto subst_id = SubstInst(

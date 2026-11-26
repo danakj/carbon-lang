@@ -196,7 +196,7 @@ fn F() {
   // above, we identify the facet type in `impl () as Z...` before we know
   // the interface being impl'd. When we replace `.Self` with `()` in a
   // witness, we lose that self type impls `Z`. So the resulting query
-  // `() as Y` in a LookupImplWitness can not resolve to an ImplWitness.
+  // `() as Y` in a LookupImplWitness can not resolve to an ImplWitness
   // and the `.Y1` access can't resolve to a concrete value.
   //
   // CHECK:STDERR:        ╭─┤ fail_todo_early_rewrite_query_indirectly_in_where.carbon:[[@LINE+8]]:3
@@ -280,29 +280,18 @@ interface Z {
 }
 
 interface Y {}
-// TODO: The .Self[frozen] doesn't replace the .Self in the facet type here
-// so we don't convert the witness to an ImplSelfWitness. Then we can't see
-// the value of .Z1 = {} in the impl decl.
 impl forall [T: Z where .Z1 = {}] T as Y {}
 
 class C(T: Y) {}
-// CHECK:STDERR:        ╭─┤ fail_todo_early_rewrite_query_in_deduce.carbon:[[@LINE+14]]:39
-// CHECK:STDERR:        │ class C(T: Y) {}
-// CHECK:STDERR:        ·         ──┬─
-// CHECK:STDERR:        ·           ╰──┤ initializing generic parameter `T` declared here
-// CHECK:STDERR:        ·              │ [InitializingGenericParam]
-// CHECK:STDERR:        ┆
-// CHECK:STDERR: ->     │ impl () as Z where .Z1 = {} and .Z2 = C(.Self) {}
-// CHECK:STDERR:        ·                                       ┳━━━━━━━
-// CHECK:STDERR:        ·                                       ┗━━┫ error: cannot convert type `.Self`
-// CHECK:STDERR:        ·                                          ┃        that implements `Z` into type
-// CHECK:STDERR:        ·                                          ┃        implementing `Y`
-// CHECK:STDERR:        ·                                          ┃        [ConversionFailureFacetToFacet]
-// CHECK:STDERR:        ╰────
-// CHECK:STDERR:
 impl () as Z where .Z1 = {} and .Z2 = C(.Self) {}
 
 fn F() {
+  // Like in fail_todo_early_rewrite_query_indirectly_in_interface_specific.carbon
+  // above, we identify the facet type in `impl () as Z...` before we know
+  // the interface being impl'd. When we replace `.Self` with `()` in a
+  // witness, we lose that self type impls `Z`. So the resulting query
+  // `() as Y` in a LookupImplWitness can not resolve to an ImplWitness.
+  //
   // CHECK:STDERR:        ╭─┤ fail_todo_early_rewrite_query_in_deduce.carbon:[[@LINE+14]]:37
   // CHECK:STDERR:        │ class C(T: Y) {}
   // CHECK:STDERR:        ·         ──┬─
