@@ -1219,7 +1219,7 @@ static auto GetOrAddLocalSpecific(
 
   // Get the specific.
   auto local_specific_id = resolver.local_specifics().GetOrAdd(
-      local_generic_id, args_id, import_specific.identified);
+      local_generic_id, args_id, import_specific.flags);
 
   if (!IsSpecificImported(import_specific,
                           resolver.local_specifics().Get(local_specific_id))) {

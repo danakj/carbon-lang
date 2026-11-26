@@ -324,6 +324,7 @@ class Context {
   }
 
   struct DeclaringImplDecl {
+    Parse::NodeId impl_decl_node_id;
     SemIR::ConstantId self_id;
     SemIR::SpecificInterface specific_interface;
     auto operator==(const DeclaringImplDecl& rhs) const -> bool = default;

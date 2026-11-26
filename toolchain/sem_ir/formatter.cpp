@@ -1765,7 +1765,7 @@ auto Formatter::FormatName(SpecificId id) -> void {
   const auto& specific = sem_ir_->specifics().Get(id);
   FormatName(specific.generic_id);
   FormatArg(specific.args_id);
-  if (specific.identified) {
+  if (specific.flags.identified()) {
     out() << ":identified";
   }
 }

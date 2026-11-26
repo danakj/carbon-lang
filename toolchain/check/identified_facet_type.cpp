@@ -136,11 +136,14 @@ class EvaluateSubstCallbacks : public SubstInstCallbacks {
   auto RebuildSpecific(SemIR::SpecificId orig_specific_id,
                        SemIR::InstBlockId args_id)
       -> SemIR::SpecificId override {
-    auto generic_id = context().specifics().Get(orig_specific_id).generic_id;
+    const auto& specific = context().specifics().Get(orig_specific_id);
+    auto generic_id = specific.generic_id;
     // Drop the `identified` flag from any specifics we create here, as we have
     // substituted the IdentifiedWitness instructions away.
-    return context().specifics().GetOrAdd(generic_id, args_id,
-                                          /*identified=*/false);
+    return context().specifics().GetOrAdd(
+        generic_id, args_id,
+        DropSpecificKeyFlags(specific.flags,
+                             SpecificKeyFlagsState::Identified));
   }
 
  private:

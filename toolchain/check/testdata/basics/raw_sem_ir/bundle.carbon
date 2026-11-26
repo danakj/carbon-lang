@@ -47,7 +47,7 @@ fn F(generic Form: Core.Form) ->? Form;
 // CHECK:STDOUT:   generics:
 // CHECK:STDOUT:     generic70000000: {decl: inst70000030, bindings: inst_block7000000C, self_specific_id: specific70000000, decl_block_id: inst_block7000000E, definition_block_id: inst_block<none>}
 // CHECK:STDOUT:   specifics:
-// CHECK:STDOUT:     specific70000000: {generic: generic70000000, args: inst_block7000000D, identified: 0, decl_block_id: inst_block7000000F, decl_has_error: 0, definition_block_id: inst_block<none>, definition_has_error: 0}
+// CHECK:STDOUT:     specific70000000: {generic: generic70000000, args: inst_block7000000D, flags: {identified: 0}, decl_block_id: inst_block7000000F, decl_has_error: 0, definition_block_id: inst_block<none>, definition_has_error: 0}
 // CHECK:STDOUT:   specific_interfaces: {}
 // CHECK:STDOUT:   struct_type_fields:
 // CHECK:STDOUT:     struct_type_fields_empty: {}

@@ -718,8 +718,8 @@ auto ResolveSpecificDecl(Context& context, SemIR::LocId loc_id,
 auto MakeSpecific(Context& context, SemIR::LocId loc_id,
                   SemIR::GenericId generic_id, SemIR::InstBlockId args_id)
     -> SemIR::SpecificId {
-  auto specific_id = context.specifics().GetOrAdd(
-      generic_id, args_id, context.eval_impl_lookup_to_identified_witness());
+  auto specific_id = context.specifics().GetOrAdd(generic_id, args_id,
+                                                  GetSpecificKeyFlags(context));
   ResolveSpecificDecl(context, loc_id, specific_id);
   return specific_id;
 }
@@ -749,7 +749,8 @@ static auto MakeSelfSpecificId(Context& context, SemIR::GenericId generic_id)
   auto args_id = context.inst_blocks().AddCanonical(arg_ids);
   // Self specifics are not created as part of identifying a facet type.
   CARBON_CHECK(!context.eval_impl_lookup_to_identified_witness());
-  return context.specifics().GetOrAdd(generic_id, args_id, false);
+  return context.specifics().GetOrAdd(generic_id, args_id,
+                                      GetSpecificKeyFlags(context));
 }
 
 auto MakeSelfSpecific(Context& context, SemIR::LocId loc_id,
@@ -953,6 +954,80 @@ auto GetScrutineeTypeInSpecific(const Context& context,
   const auto& sem_ir = context.sem_ir();
   return ExtractScrutineeType(
       sem_ir, SemIR::GetTypeOfInstInSpecific(sem_ir, specific_id, pattern_id));
+}
+
+struct SpecificKeyFlagsMeaning {
+  bool identified;
+
+  static auto FromFlags(SemIR::SpecificKeyFlags flags)
+      -> SpecificKeyFlagsMeaning {
+    return {.identified = !!flags.value1};
+  }
+  auto ToFlags() -> SemIR::SpecificKeyFlags { return {.value1 = identified}; }
+};
+
+auto GetSpecificKeyFlags(Context& context) -> SemIR::SpecificKeyFlags {
+  auto meaning = SpecificKeyFlagsMeaning{
+      .identified = !!context.eval_impl_lookup_to_identified_witness()};
+  return meaning.ToFlags();
+}
+
+auto GetSpecificKeyFlagsFromSpecific(Context& context,
+                                     SemIR::SpecificKeyFlags flags)
+    -> SemIR::SpecificKeyFlags {
+  auto current =
+      SpecificKeyFlagsMeaning::FromFlags(GetSpecificKeyFlags(context));
+  auto specific = SpecificKeyFlagsMeaning::FromFlags(flags);
+
+  // A specific derived from an `identified` one preserves its flag, and a new
+  // specific always inherits any of current conditions which would affect
+  // evaluation.
+  current.identified |= specific.identified;
+
+  return current.ToFlags();
+}
+
+auto DropSpecificKeyFlags(SemIR::SpecificKeyFlags flags,
+                          SpecificKeyFlagsState drop)
+    -> SemIR::SpecificKeyFlags {
+  auto meaning = SpecificKeyFlagsMeaning::FromFlags(flags);
+  switch (drop) {
+    case SpecificKeyFlagsState::Identified:
+      meaning.identified = false;
+  }
+  return meaning.ToFlags();
+}
+
+RestoreGlobalEvalState::RestoreGlobalEvalState(RestoreGlobalEvalState&& rhs)
+    : context(std::exchange(rhs.context, nullptr)),
+      eval_impl_lookup_to_identified_witness(
+          (rhs.eval_impl_lookup_to_identified_witness)) {}
+
+RestoreGlobalEvalState::~RestoreGlobalEvalState() {
+  if (!context) {
+    return;
+  }
+  if (eval_impl_lookup_to_identified_witness.has_value()) {
+    context->eval_impl_lookup_to_identified_witness() =
+        eval_impl_lookup_to_identified_witness.value();
+  }
+}
+
+auto SaveAndRemoveGlobalEvalStateNotInSpecificKey(Context& context,
+                                                  SemIR::SpecificKeyFlags flags)
+    -> RestoreGlobalEvalState {
+  RestoreGlobalEvalState restore(&context);
+
+  auto specific = SpecificKeyFlagsMeaning::FromFlags(flags);
+  if (!specific.identified &&
+      context.eval_impl_lookup_to_identified_witness()) {
+    // The specific is not from identifying. Drop the "we are identifying"
+    // condition for its evaluation.
+    restore.eval_impl_lookup_to_identified_witness =
+        std::exchange(context.eval_impl_lookup_to_identified_witness(), false);
+  }
+
+  return restore;
 }
 
 }  // namespace Carbon::Check

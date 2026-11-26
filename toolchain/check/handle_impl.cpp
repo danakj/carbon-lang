@@ -114,7 +114,8 @@ auto HandleParseNode(Context& context, Parse::ImplTypeAsId node_id) -> bool {
   // The specific interface in here, if any, is populated by the `where`
   // expression that introduces a `.Self` in the impl's constraint facet type.
   context.declaring_impl_decls().Push(
-      {.self_id = self_type.type_id.AsConstantId(),
+      {.impl_decl_node_id = node_id,
+       .self_id = self_type.type_id.AsConstantId(),
        .specific_interface = SemIR::SpecificInterface::None});
   return true;
 }
@@ -152,7 +153,8 @@ auto HandleParseNode(Context& context, Parse::ImplDefaultSelfAsId node_id)
   // The specific interface in here, if any, is populated by the `where`
   // expression that introduces a `.Self` in the impl's constraint facet type.
   context.declaring_impl_decls().Push(
-      {.self_id = context.constant_values().Get(self_inst_id),
+      {.impl_decl_node_id = node_id,
+       .self_id = context.constant_values().Get(self_inst_id),
        .specific_interface = SemIR::SpecificInterface::None});
   return true;
 }

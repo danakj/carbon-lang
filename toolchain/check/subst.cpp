@@ -32,14 +32,9 @@ auto SubstInstCallbacks::RebuildSpecific(SemIR::SpecificId orig_specific_id,
     // even during identify.
     return orig_specific_id;
   }
-  // When modifying a non-`identified` specific during identify, mark the new
-  // specific as `identified` too. If modifying an `identified` specific outside
-  // of identify, it may contain `IdentifiedWitness` insts so the new specific
-  // must keep the `identified` marker.
-  bool identified = context().eval_impl_lookup_to_identified_witness() ||
-                    orig_specific.identified;
-  return context().specifics().GetOrAdd(orig_specific.generic_id, args_id,
-                                        identified);
+  return context().specifics().GetOrAdd(
+      orig_specific.generic_id, args_id,
+      GetSpecificKeyFlagsFromSpecific(context(), orig_specific.flags));
 }
 
 auto SubstInstCallbacks::RebuildNewInst(SemIR::LocId loc_id,

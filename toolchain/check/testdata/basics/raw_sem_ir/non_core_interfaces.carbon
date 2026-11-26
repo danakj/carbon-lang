@@ -67,7 +67,7 @@ fn HasRewrites[T: Copy where .Self impls NonCore.SubobjectDestroy and .T1 = ()](
 // CHECK:STDOUT:     generic60000000: {decl: inst<none>, bindings: inst_block<none>, self_specific_id: specific<none>, decl_block_id: inst_block<none>, definition_block_id: inst_block<none>}
 // CHECK:STDOUT:     generic60000001: {decl: inst60000014, bindings: inst_block60000006, self_specific_id: specific60000000, decl_block_id: inst_block_empty, definition_block_id: inst_block_empty}
 // CHECK:STDOUT:   specifics:
-// CHECK:STDOUT:     specific60000000: {generic: generic60000001, args: inst_block60000007, identified: 0, decl_block_id: inst_block_empty, decl_has_error: 0, definition_block_id: inst_block<none>, definition_has_error: 0}
+// CHECK:STDOUT:     specific60000000: {generic: generic60000001, args: inst_block60000007, flags: {identified: 0}, decl_block_id: inst_block_empty, decl_has_error: 0, definition_block_id: inst_block<none>, definition_has_error: 0}
 // CHECK:STDOUT:   specific_interfaces: {}
 // CHECK:STDOUT:   struct_type_fields:
 // CHECK:STDOUT:     struct_type_fields_empty: {}
@@ -260,16 +260,16 @@ fn HasRewrites[T: Copy where .Self impls NonCore.SubobjectDestroy and .T1 = ()](
 // CHECK:STDOUT:     generic50000004: {decl: inst500000A7, bindings: inst_block5000002D, self_specific_id: specific50000005, decl_block_id: inst_block5000002E, definition_block_id: inst_block50000031}
 // CHECK:STDOUT:     generic50000005: {decl: inst5000010C, bindings: inst_block50000043, self_specific_id: specific50000009, decl_block_id: inst_block50000044, definition_block_id: inst_block50000047}
 // CHECK:STDOUT:   specifics:
-// CHECK:STDOUT:     specific50000000: {generic: generic50000001, args: inst_block50000007, identified: 0, decl_block_id: inst_block_empty, decl_has_error: 0, definition_block_id: inst_block_empty, definition_has_error: 0}
-// CHECK:STDOUT:     specific50000001: {generic: generic50000002, args: inst_block50000012, identified: 0, decl_block_id: inst_block_empty, decl_has_error: 0, definition_block_id: inst_block_empty, definition_has_error: 0}
-// CHECK:STDOUT:     specific50000002: {generic: generic50000002, args: inst_block50000015, identified: 0, decl_block_id: inst_block_empty, decl_has_error: 0, definition_block_id: inst_block_empty, definition_has_error: 0}
-// CHECK:STDOUT:     specific50000003: {generic: generic50000003, args: inst_block50000015, identified: 0, decl_block_id: inst_block5000001F, decl_has_error: 0, definition_block_id: inst_block<none>, definition_has_error: 0}
-// CHECK:STDOUT:     specific50000004: {generic: generic50000001, args: inst_block50000025, identified: 0, decl_block_id: inst_block_empty, decl_has_error: 0, definition_block_id: inst_block_empty, definition_has_error: 0}
-// CHECK:STDOUT:     specific50000005: {generic: generic50000004, args: inst_block50000025, identified: 0, decl_block_id: inst_block5000002F, decl_has_error: 0, definition_block_id: inst_block<none>, definition_has_error: 0}
-// CHECK:STDOUT:     specific50000006: {generic: generic50000001, args: inst_block50000033, identified: 0, decl_block_id: inst_block_empty, decl_has_error: 0, definition_block_id: inst_block_empty, definition_has_error: 0}
-// CHECK:STDOUT:     specific50000007: {generic: generic50000001, args: inst_block50000039, identified: 0, decl_block_id: inst_block_empty, decl_has_error: 0, definition_block_id: inst_block_empty, definition_has_error: 0}
-// CHECK:STDOUT:     specific50000008: {generic: generic50000001, args: inst_block5000003C, identified: 0, decl_block_id: inst_block_empty, decl_has_error: 0, definition_block_id: inst_block_empty, definition_has_error: 0}
-// CHECK:STDOUT:     specific50000009: {generic: generic50000005, args: inst_block50000039, identified: 0, decl_block_id: inst_block50000045, decl_has_error: 0, definition_block_id: inst_block<none>, definition_has_error: 0}
+// CHECK:STDOUT:     specific50000000: {generic: generic50000001, args: inst_block50000007, flags: {identified: 0}, decl_block_id: inst_block_empty, decl_has_error: 0, definition_block_id: inst_block_empty, definition_has_error: 0}
+// CHECK:STDOUT:     specific50000001: {generic: generic50000002, args: inst_block50000012, flags: {identified: 0}, decl_block_id: inst_block_empty, decl_has_error: 0, definition_block_id: inst_block_empty, definition_has_error: 0}
+// CHECK:STDOUT:     specific50000002: {generic: generic50000002, args: inst_block50000015, flags: {identified: 0}, decl_block_id: inst_block_empty, decl_has_error: 0, definition_block_id: inst_block_empty, definition_has_error: 0}
+// CHECK:STDOUT:     specific50000003: {generic: generic50000003, args: inst_block50000015, flags: {identified: 0}, decl_block_id: inst_block5000001F, decl_has_error: 0, definition_block_id: inst_block<none>, definition_has_error: 0}
+// CHECK:STDOUT:     specific50000004: {generic: generic50000001, args: inst_block50000025, flags: {identified: 0}, decl_block_id: inst_block_empty, decl_has_error: 0, definition_block_id: inst_block_empty, definition_has_error: 0}
+// CHECK:STDOUT:     specific50000005: {generic: generic50000004, args: inst_block50000025, flags: {identified: 0}, decl_block_id: inst_block5000002F, decl_has_error: 0, definition_block_id: inst_block<none>, definition_has_error: 0}
+// CHECK:STDOUT:     specific50000006: {generic: generic50000001, args: inst_block50000033, flags: {identified: 0}, decl_block_id: inst_block_empty, decl_has_error: 0, definition_block_id: inst_block_empty, definition_has_error: 0}
+// CHECK:STDOUT:     specific50000007: {generic: generic50000001, args: inst_block50000039, flags: {identified: 0}, decl_block_id: inst_block_empty, decl_has_error: 0, definition_block_id: inst_block_empty, definition_has_error: 0}
+// CHECK:STDOUT:     specific50000008: {generic: generic50000001, args: inst_block5000003C, flags: {identified: 0}, decl_block_id: inst_block_empty, decl_has_error: 0, definition_block_id: inst_block_empty, definition_has_error: 0}
+// CHECK:STDOUT:     specific50000009: {generic: generic50000005, args: inst_block50000039, flags: {identified: 0}, decl_block_id: inst_block50000045, decl_has_error: 0, definition_block_id: inst_block<none>, definition_has_error: 0}
 // CHECK:STDOUT:   specific_interfaces:
 // CHECK:STDOUT:     specific_interface50000000: {interface_id: interface50000001, specific_id: specific<none>}
 // CHECK:STDOUT:     specific_interface50000001: {interface_id: interface50000000, specific_id: specific<none>}

@@ -8,6 +8,7 @@
 #include "common/enum_mask_base.h"
 #include "toolchain/check/context.h"
 #include "toolchain/sem_ir/entity_with_params_base.h"
+#include "toolchain/sem_ir/generic.h"
 #include "toolchain/sem_ir/ids.h"
 
 namespace Carbon::Check {
@@ -198,6 +199,35 @@ auto DiagnoseImplsOnNonFacetType(Context& context, SemIR::LocId loc_id) -> void;
 auto GetScrutineeTypeInSpecific(const Context& context,
                                 SemIR::InstId pattern_id,
                                 SemIR::SpecificId specific_id) -> SemIR::TypeId;
+
+auto GetSpecificKeyFlags(Context& context) -> SemIR::SpecificKeyFlags;
+auto GetSpecificKeyFlagsFromSpecific(Context& context, SemIR::SpecificKeyFlags flags) -> SemIR::SpecificKeyFlags;
+
+enum class SpecificKeyFlagsState {
+  Identified,
+};
+auto DropSpecificKeyFlags(SemIR::SpecificKeyFlags flags, SpecificKeyFlagsState drop) -> SemIR::SpecificKeyFlags;
+
+struct RestoreGlobalEvalState {
+  explicit RestoreGlobalEvalState(Context* context) : context(context) {}
+  RestoreGlobalEvalState(RestoreGlobalEvalState&&);
+  ~RestoreGlobalEvalState();
+
+  Context* context;
+  std::optional<int32_t> eval_impl_lookup_to_identified_witness;
+};
+
+// Specifics are keyed by the conditions under which they were created, as those
+// conditions affect the behaviour of evaluation. If the same specific is being
+// resolved and the conditions have changed, we must be sure to not introduce
+// new conditions into the specific that are not part of its key.
+//
+// If a specific was created without a current condition being present, we
+// remove that condition so that evaluation is not modified by it. This state
+// is maintained for the duration of the returned object's lifetime.
+auto SaveAndRemoveGlobalEvalStateNotInSpecificKey(Context& context,
+                                                  SemIR::SpecificKeyFlags flags)
+    -> RestoreGlobalEvalState;
 
 }  // namespace Carbon::Check
 

@@ -66,6 +66,23 @@ class GenericStore : public ValueStore<GenericId, Generic, Tag<CheckIRId>> {
   }
 };
 
+// Opaque flags used by check to differentiate specifics created under different
+// conditions, which should have different ids because the evalution of their
+// inst blocks is modified by those conditions.
+struct SpecificKeyFlags : Printable<SpecificKeyFlags> {
+  // NOTE: Add any new fields to the SpecificId fingerprint.
+  int32_t value1 [[clang::require_explicit_initialization]];
+
+  // Hints for formatting about what state check was setting.
+  auto identified() const -> bool { return !!value1; }
+
+  auto Print(llvm::raw_ostream& out) const -> void {
+    out << "{" << "identified: " << identified() << "}";
+  }
+
+  auto operator==(const SpecificKeyFlags& rhs) const -> bool = default;
+};
+
 // A specific, which is the combination of a generic and specified generic
 // arguments. For each construct that depends on a compile-time parameter in the
 // generic entity, this contains the corresponding specific value. This includes
@@ -78,7 +95,7 @@ struct Specific : Printable<Specific> {
           << "_has_error: " << has_error;
     };
     out << "{generic: " << generic_id << ", args: " << args_id
-        << ", identified: " << identified;
+        << ", flags: " << flags;
     print_block("decl", decl_block_id, decl_block_has_error);
     print_block("definition", definition_block_id, definition_block_has_error);
     out << "}";
@@ -128,9 +145,9 @@ struct Specific : Printable<Specific> {
   GenericId generic_id;
   // Argument values, corresponding to the bindings in `Generic::bindings_id`.
   InstBlockId args_id;
-  // A boolean value: whether the specific is formed as part of identifying a
-  // facet type.
-  int32_t identified [[clang::require_explicit_initialization]];
+  // Flags used to differentiate specifics formed under different conditions.
+  // Specifics with different flags should not be deduped together.
+  SpecificKeyFlags flags;
 
   // The following members are set when the corresponding region of the specific
   // is resolved.
@@ -159,8 +176,8 @@ class SpecificStore : public Yaml::Printable<SpecificStore> {
   // and argument list. Returns the ID of the specific. The argument IDs must be
   // for instructions in the constant block, and must be a canonical instruction
   // block ID.
-  auto GetOrAdd(GenericId generic_id, InstBlockId args_id, bool identified)
-      -> SpecificId;
+  auto GetOrAdd(GenericId generic_id, InstBlockId args_id,
+                SpecificKeyFlags flags) -> SpecificId;
 
   // Gets the specific with the given ID.
   auto Get(SpecificId specific_id) const -> const Specific& {

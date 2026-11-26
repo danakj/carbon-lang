@@ -670,15 +670,10 @@ static auto GetConstantValue(EvalContext& eval_context,
   // TODO: consider finding a way to have `Subst` resolve the specifics it
   // creates.
   if (args_id != specific.args_id) {
-    // When modifying a non-`identified` specific during identify, mark the new
-    // specific as `identified` too. If modifying an `identified` specific
-    // outside of identify, it may contain `IdentifiedWitness` insts so the new
-    // specific must keep the `identified` marker.
-    bool identified =
-        eval_context.context().eval_impl_lookup_to_identified_witness() ||
-        specific.identified;
     result_id = eval_context.context().specifics().GetOrAdd(
-        specific.generic_id, args_id, identified);
+        specific.generic_id, args_id,
+        GetSpecificKeyFlagsFromSpecific(eval_context.context(),
+                                        specific.flags));
   }
 
   const auto& generic = eval_context.generics().Get(specific.generic_id);
@@ -3494,17 +3489,8 @@ auto TryEvalBlockForSpecific(Context& context, SemIR::LocId loc_id,
   CheckedSaveAndRestore access_context(context.access_context(),
                                        FindAccessContext(context, generic));
 
-  // The `eval_impl_lookup_to_identified_witness` is a global state that
-  // modifies the evaluation of LookupImplWitness. We don't want to apply that
-  // state to existing instructions in eval blocks, unless we are resolving a
-  // specific that is marked as `identified`. In that case, the specific is
-  // being formed as part of identification and the global state does apply.
-  // Otherwise, it should not affect anything done while resolving a specific.
-  std::optional<CheckedSaveAndRestore<int32_t>> eval_identified;
-  if (!specific.identified) {
-    eval_identified.emplace(context.eval_impl_lookup_to_identified_witness(),
-                            0);
-  }
+  auto saved =
+      SaveAndRemoveGlobalEvalStateNotInSpecificKey(context, specific.flags);
 
   EvalContext eval_context(&context, loc_id, specific_id);
 
