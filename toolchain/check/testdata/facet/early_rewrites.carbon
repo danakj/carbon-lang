@@ -110,12 +110,13 @@ fn G(generic T: J where .J1 = D) {
   F(T);
 }
 
-// --- fail_todo_period_self_used_in_access_in_nested_specific.carbon
+// --- period_self_used_in_access_in_nested_specific.carbon
 library "[[@TEST_NAME]]";
 
 interface Z {
   let Z1: type;
-  let Z2: type;
+  let Z2: ();
+  let Z3: type;
 }
 
 interface Y {}
@@ -130,32 +131,16 @@ class D;
 // (due to .Self) and points to the impl above. But the witness for
 // `Z` is not symbolic and points to the impl being declared here.
 // The use of `T.(Z.Z1)` in the class decl ensures we find the value
-// from this impl's witness table.
-//
-// TODO: Right now the type of `U` ends up with an ImplSelfWitness
-// which does not resolve the access. So () can't convert to it.
-// CHECK:STDERR:        ╭─┤ fail_todo_period_self_used_in_access_in_nested_specific.carbon:[[@LINE+14]]:38
-// CHECK:STDERR:        │ class C(T: Z & Y, U: T.(Z.Z1)) {}
-// CHECK:STDERR:        ·       ┬
-// CHECK:STDERR:        ·       ╰──┤ while deducing parameters of generic declared here
-// CHECK:STDERR:        ·          │ [DeductionGenericHere]
-// CHECK:STDERR:        ┆
-// CHECK:STDERR: ->     │ impl D as Z where .Z1 = () and .Z2 = C(.Self, .Z1) {}
-// CHECK:STDERR:        ·                                      ┳━━━━━━━━━━━━
-// CHECK:STDERR:        ·                                      ┗━━┫ error: cannot implicitly convert
-// CHECK:STDERR:        ·                                         ┃        expression of type `type` to
-// CHECK:STDERR:        ·                                         ┃        `.(Z.Z1)`
-// CHECK:STDERR:        ·                                         ┃        [ConversionFailure]
-// CHECK:STDERR:        ╰────
-// CHECK:STDERR:
-impl D as Z where .Z1 = () and .Z2 = C(.Self, .Z1) {}
+// from this impl declaration.
+impl D as Z where .Z1 = () and .Z2 = () and .Z3 = C(.Self, .Z2) {}
 
-// --- fail_todo_period_self_used_in_access_in_nested_specific_before_rewrite_of_access.carbon
+// --- fail_period_self_used_in_access_in_nested_specific_before_rewrite_of_access.carbon
 library "[[@TEST_NAME]]";
 
 interface Z {
   let Z1: type;
-  let Z2: type;
+  let Z2: ();
+  let Z3: type;
 }
 
 interface Y {}
@@ -164,30 +149,24 @@ impl forall [T: Z] T as Y {}
 class C(T: Z & Y, U: T.(Z.Z1)) {}
 
 class D;
-// This forms the specific `C(.Self)` where `.Self` is of type `Z`
-// but we need type `Z & Y` so a conversion takes place. This forms
-// a FacetValue with two witnesses. The witness for `Y` is symbolic
-// (due to .Self) and points to the impl above. But the witness for
-// `Z` is not symbolic and points to the impl being declared here.
-// The use of `T.(Z.Z1)` in the class decl ensures we find the value
-// from this impl's witness table.
+// We form the RHS of .Z3 before we see a value for .Z1, so the type of `U`
+// in the specific of `C` will be a symbolic type. We can't convert .Z2 to
+// an unknown symbolic type.
 //
-// TODO: Right now the type of `U` ends up with an ImplSelfWitness
-// which does not resolve the access. So `.Z1` can't convert to it.
-// CHECK:STDERR:        ╭─┤ fail_todo_period_self_used_in_access_in_nested_specific_before_rewrite_of_access.carbon:[[@LINE+13]]:25
+// CHECK:STDERR:        ╭─┤ fail_period_self_used_in_access_in_nested_specific_before_rewrite_of_access.carbon:[[@LINE+13]]:25
 // CHECK:STDERR:        │ class C(T: Z & Y, U: T.(Z.Z1)) {}
 // CHECK:STDERR:        ·       ┬
 // CHECK:STDERR:        ·       ╰──┤ while deducing parameters of generic declared here
 // CHECK:STDERR:        ·          │ [DeductionGenericHere]
 // CHECK:STDERR:        ┆
-// CHECK:STDERR: ->     │ impl D as Z where .Z2 = C(.Self, .Z1) and .Z1 = () {}
+// CHECK:STDERR: ->     │ impl D as Z where .Z3 = C(.Self, .Z2) and .Z2 = () and .Z1 = () {}
 // CHECK:STDERR:        ·                         ┳━━━━━━━━━━━━
 // CHECK:STDERR:        ·                         ┗━━┫ error: cannot implicitly convert expression of type
-// CHECK:STDERR:        ·                            ┃        `type` to `.(Z.Z1)`
+// CHECK:STDERR:        ·                            ┃        `()` to `.(Z.Z1)`
 // CHECK:STDERR:        ·                            ┃        [ConversionFailure]
 // CHECK:STDERR:        ╰────
 // CHECK:STDERR:
-impl D as Z where .Z2 = C(.Self, .Z1) and .Z1 = () {}
+impl D as Z where .Z3 = C(.Self, .Z2) and .Z2 = () and .Z1 = () {}
 
 // --- fail_todo_nested_constraint_visible_in_type_parameter.carbon
 library "[[@TEST_NAME]]";

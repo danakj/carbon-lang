@@ -481,6 +481,18 @@ auto EvalConstantInst(Context& context, SemIR::InstId inst_id,
       context.emitter().Emit(inst_id, ImplAccessMemberBeforeSet);
       return ConstantEvalResult::Error;
     }
+    case CARBON_KIND(SemIR::ImplSelfWitness _): {
+      if (!context.where_stack().empty()) {
+        auto witness = context.constant_values().Get(inst.witness_id);
+        auto index = inst.index;
+        if (auto result = context.where_stack().Peek().rewrites.Lookup(
+                Context::WhereStackEntry::Target{witness, index})) {
+          return ConstantEvalResult::Existing(
+              context.constant_values().Get(result.value()));
+        }
+      }
+      break;
+    }
     case CARBON_KIND(SemIR::LookupImplWitness witness): {
       // If the witness is symbolic but has a self type that is a FacetType, it
       // can pull rewrite values from the self's facet type. If the access is

@@ -112,45 +112,41 @@ class C(T: Y(B({}))) {}
 // That matches the type structure of the first impl, so it forms
 // the specific `Y(B(.Self.(Z.Z1)))` which requires the access of `.Z1` to
 // evaluate to `{}` from the facet type being declared.
-//
-// TODO: `ImplWitnessAccess` evaluation (in a specific, through a
-// symbolic witness) doesn't yet look on the `where_stack` for rewrites into
-// `.Self`.
-//
-// CHECK:STDERR:        ╭─┤ fail_todo_early_rewrite_query_indirectly_in_interface_specific.carbon:[[@LINE+14]]:39
-// CHECK:STDERR:        │ class C(T: Y(B({}))) {}
-// CHECK:STDERR:        ·         ─────┬─────
-// CHECK:STDERR:        ·              ╰──┤ initializing generic parameter `T` declared here
-// CHECK:STDERR:        ·                 │ [InitializingGenericParam]
-// CHECK:STDERR:        ┆
-// CHECK:STDERR: ->     │ impl () as Z where .Z1 = {} and .Z2 = C(.Self) {}
-// CHECK:STDERR:        ·                                       ┳━━━━━━━
-// CHECK:STDERR:        ·                                       ┗━━┫ error: cannot convert type `.Self`
-// CHECK:STDERR:        ·                                          ┃        that implements `Z` into type
-// CHECK:STDERR:        ·                                          ┃        implementing `Y(B({}))`
-// CHECK:STDERR:        ·                                          ┃        [ConversionFailureFacetToFacet]
-// CHECK:STDERR:        ╰────
-// CHECK:STDERR:
 impl () as Z where .Z1 = {} and .Z2 = C(.Self) {}
 
 fn F() {
-  // CHECK:STDERR:        ╭─┤ fail_todo_early_rewrite_query_indirectly_in_interface_specific.carbon:[[@LINE+13]]:37
-  // CHECK:STDERR:        │ class C(T: Y(B({}))) {}
-  // CHECK:STDERR:        ·         ─────┬─────
-  // CHECK:STDERR:        ·              ╰──┤ initializing generic parameter `T` declared here
-  // CHECK:STDERR:        ·                 │ [InitializingGenericParam]
-  // CHECK:STDERR:        ┆
+  // TODO: When we identify the facet type of `impl () as Z...` and replace
+  // `.Self` with `()`, we lose the fact that the self type impls `Z`. That
+  // was in the facet type of `.Self` but is not in the type of `()`.
+  // We don't actually even _know_ which interface is being impl'd yet when
+  // we identify (that's what we're trying to find out), so we can't
+  // replace `.Self` with a FacetValue providing a witness for `Z` there.
+  //
+  // The result is the witness table for .Z2 has a facet value with a
+  // LookupImplWitness for `() as Y(B({}))` when it should be an
+  // ImplWitness. The facet type written below gets an ImplWitness for
+  // that, which doesn't match.
+  //
+  // We can:
+  // - Defer substing `.Self` until even later for identified facet types,
+  //   until the point where we replace witnesses. Then we can replace it
+  //   with a facet value that knows `() impls Z`.
+  // - When replacing witnesses to collect rewrites, modify
+  //   LookupImplWitness query self if it's the impls self to be a facet
+  //   value that knows `() impls Z`.
+  //
+  // CHECK:STDERR:        ╭─┤ fail_todo_early_rewrite_query_indirectly_in_interface_specific.carbon:[[@LINE+8]]:3
   // CHECK:STDERR: ->     │   () as (Z where .Z1 = {} and .Z2 = C(()));
-  // CHECK:STDERR:        ·                                     ┳━━━━
-  // CHECK:STDERR:        ·                                     ┗━━┫ error: cannot convert type `()` into
-  // CHECK:STDERR:        ·                                        ┃        type implementing `Y(B({}))`
-  // CHECK:STDERR:        ·                                        ┃        [ConversionFailureTypeToFacet]
+  // CHECK:STDERR:        ·   ┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // CHECK:STDERR:        ·   ┗━━┫ error: cannot convert type `()` into type implementing
+  // CHECK:STDERR:        ·      ┃        `Z where .(Z.Z1) = {} and .(Z.Z2) = C(() as Y(B({})))`
+  // CHECK:STDERR:        ·      ┃        [ConversionFailureTypeToFacet]
   // CHECK:STDERR:        ╰────
   // CHECK:STDERR:
   () as (Z where .Z1 = {} and .Z2 = C(()));
 }
 
-// --- fail_todo_early_rewrite_query_indirectly_in_interface_specific_out_of_order.carbon
+// --- fail_early_rewrite_query_indirectly_in_interface_specific_out_of_order.carbon
 library "[[@TEST_NAME]]";
 
 interface Z {
@@ -165,15 +161,10 @@ class B(U: type) {}
 impl forall [T: Z] T as Y(B(T.Z2)) {}
 
 class C(T: Y(B({}))) {}
-// Forming the specific C(.Self) does a lookup for `.Self as Y(B({}))`.
-// That matches the type structure of the first impl, so it forms
-// the specific `Y(B(.Self.(Z.Z2)))` which does an access to see if
-// `.Z2 == {}`.
-//
-// TODO: The lookup doesn't know `.Z2 == {}` yet, but it should succeed.
-// Maybe through the use of implied constraints? Since the actual use of
-// the witness table can't be performed yet.
-// CHECK:STDERR:        ╭─┤ fail_todo_early_rewrite_query_indirectly_in_interface_specific_out_of_order.carbon:[[@LINE+13]]:26
+// We form the RHS of Z1 before we see the value for Z2. That means that
+// `C` requires `.Z2 == {}` before we know a value for Z2. 
+// 
+// CHECK:STDERR:        ╭─┤ fail_early_rewrite_query_indirectly_in_interface_specific_out_of_order.carbon:[[@LINE+13]]:26
 // CHECK:STDERR:        │ class C(T: Y(B({}))) {}
 // CHECK:STDERR:        ·         ─────┬─────
 // CHECK:STDERR:        ·              ╰──┤ initializing generic parameter `T` declared here
@@ -188,23 +179,6 @@ class C(T: Y(B({}))) {}
 // CHECK:STDERR:
 impl () as Z where .Z1 = C(.Self) and .Z2 = {} {}
 
-fn F() {
-  // CHECK:STDERR:        ╭─┤ fail_todo_early_rewrite_query_indirectly_in_interface_specific_out_of_order.carbon:[[@LINE+13]]:24
-  // CHECK:STDERR:        │ class C(T: Y(B({}))) {}
-  // CHECK:STDERR:        ·         ─────┬─────
-  // CHECK:STDERR:        ·              ╰──┤ initializing generic parameter `T` declared here
-  // CHECK:STDERR:        ·                 │ [InitializingGenericParam]
-  // CHECK:STDERR:        ┆
-  // CHECK:STDERR: ->     │   () as (Z where .Z1 = C(()) and .Z2 = {});
-  // CHECK:STDERR:        ·                        ┳━━━━
-  // CHECK:STDERR:        ·                        ┗━━┫ error: cannot convert type `()` into type
-  // CHECK:STDERR:        ·                           ┃        implementing `Y(B({}))`
-  // CHECK:STDERR:        ·                           ┃        [ConversionFailureTypeToFacet]
-  // CHECK:STDERR:        ╰────
-  // CHECK:STDERR:
-  () as (Z where .Z1 = C(()) and .Z2 = {});
-}
-
 // --- fail_todo_early_rewrite_query_indirectly_in_where.carbon
 library "[[@TEST_NAME]]";
 
@@ -218,6 +192,13 @@ impl forall [T: Z] T as Y where .Y1 = T.Z1 {}
 impl () as Z where .Z1 = {} and .Z2 = .Self.(Y.Y1) {}
 
 fn F() {
+  // Like in fail_todo_early_rewrite_query_indirectly_in_interface_specific.carbon
+  // above, we identify the facet type in `impl () as Z...` before we know
+  // the interface being impl'd. When we replace `.Self` with `()` in a
+  // witness, we lose that self type impls `Z`. So the resulting query
+  // `() as Y` in a LookupImplWitness can not resolve to an ImplWitness.
+  // and the `.Y1` access can't resolve to a concrete value.
+  //
   // CHECK:STDERR:        ╭─┤ fail_todo_early_rewrite_query_indirectly_in_where.carbon:[[@LINE+8]]:3
   // CHECK:STDERR: ->     │   () as (Z where .Z1 = {} and .Z2 = {});
   // CHECK:STDERR:        ·   ┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -299,8 +280,9 @@ interface Z {
 }
 
 interface Y {}
-// TODO: This should be able to see that `.Z1 = {}` from both `C(.Self)`
-// constructions below.
+// TODO: The .Self[frozen] doesn't replace the .Self in the facet type here
+// so we don't convert the witness to an ImplSelfWitness. Then we can't see
+// the value of .Z1 = {} in the impl decl.
 impl forall [T: Z where .Z1 = {}] T as Y {}
 
 class C(T: Y) {}
