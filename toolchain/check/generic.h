@@ -201,12 +201,16 @@ auto GetScrutineeTypeInSpecific(const Context& context,
                                 SemIR::SpecificId specific_id) -> SemIR::TypeId;
 
 auto GetSpecificKeyFlags(Context& context) -> SemIR::SpecificKeyFlags;
-auto GetSpecificKeyFlagsFromSpecific(Context& context, SemIR::SpecificKeyFlags flags) -> SemIR::SpecificKeyFlags;
+auto GetSpecificKeyFlagsFromSpecific(Context& context,
+                                     SemIR::SpecificKeyFlags flags)
+    -> SemIR::SpecificKeyFlags;
 
 enum class SpecificKeyFlagsState {
   Identified,
 };
-auto DropSpecificKeyFlags(SemIR::SpecificKeyFlags flags, SpecificKeyFlagsState drop) -> SemIR::SpecificKeyFlags;
+auto DropSpecificKeyFlags(SemIR::SpecificKeyFlags flags,
+                          SpecificKeyFlagsState drop)
+    -> SemIR::SpecificKeyFlags;
 
 struct RestoreGlobalEvalState {
   explicit RestoreGlobalEvalState(Context* context) : context(context) {}
@@ -215,6 +219,8 @@ struct RestoreGlobalEvalState {
 
   Context* context;
   std::optional<int32_t> eval_impl_lookup_to_identified_witness;
+  std::optional<StableStack<Context::DeclaringImplDecl, 1>>
+      declaring_impl_decls;
 };
 
 // Specifics are keyed by the conditions under which they were created, as those

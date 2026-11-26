@@ -958,17 +958,34 @@ auto GetScrutineeTypeInSpecific(const Context& context,
 
 struct SpecificKeyFlagsMeaning {
   bool identified;
+  Parse::NodeId impl_decl_node_id;
 
   static auto FromFlags(SemIR::SpecificKeyFlags flags)
       -> SpecificKeyFlagsMeaning {
-    return {.identified = !!flags.value1};
+    return {
+        .identified = !!flags.value1,
+        .impl_decl_node_id = flags.value2,
+    };
   }
-  auto ToFlags() -> SemIR::SpecificKeyFlags { return {.value1 = identified}; }
+  auto ToFlags() -> SemIR::SpecificKeyFlags {
+    return {
+        .value1 = identified,
+        .value2 = impl_decl_node_id,
+    };
+  }
 };
+
+static auto CurrentDeclaringImplDecl(Context& context) -> Parse::NodeId {
+  return context.declaring_impl_decls().empty()
+             ? Parse::NodeId::None
+             : context.declaring_impl_decls().Peek().impl_decl_node_id;
+}
 
 auto GetSpecificKeyFlags(Context& context) -> SemIR::SpecificKeyFlags {
   auto meaning = SpecificKeyFlagsMeaning{
-      .identified = !!context.eval_impl_lookup_to_identified_witness()};
+      .identified = !!context.eval_impl_lookup_to_identified_witness(),
+      .impl_decl_node_id = CurrentDeclaringImplDecl(context),
+  };
   return meaning.ToFlags();
 }
 
@@ -979,10 +996,24 @@ auto GetSpecificKeyFlagsFromSpecific(Context& context,
       SpecificKeyFlagsMeaning::FromFlags(GetSpecificKeyFlags(context));
   auto specific = SpecificKeyFlagsMeaning::FromFlags(flags);
 
-  // A specific derived from an `identified` one preserves its flag, and a new
-  // specific always inherits any of current conditions which would affect
-  // evaluation.
-  current.identified |= specific.identified;
+  // A new specific always inherits any of current conditions which would affect
+  // evaluation. Additionally, if the specific has more conditions, we add them.
+  //
+  // This is for constructing a new specific derived from an existing one.
+  if (current.identified != specific.identified && specific.identified) {
+    current.identified = specific.identified;
+  }
+  if (current.impl_decl_node_id != specific.impl_decl_node_id &&
+      specific.impl_decl_node_id.has_value()) {
+    // The specific was from a different impl decl. The new specific is being
+    // constructed in a new impl decl, but may have instructions specific to the
+    // old impl decl, so keep the old one in the key.
+    // FIXME: But this breaks the
+    // period_self_converted_in_specific_in_named_constraint_from_generic_impl.carbon
+    // test. Why???
+    current.impl_decl_node_id = specific.impl_decl_node_id;
+    current.impl_decl_node_id = Parse::NodeId::None;
+  }
 
   return current.ToFlags();
 }
@@ -1001,7 +1032,8 @@ auto DropSpecificKeyFlags(SemIR::SpecificKeyFlags flags,
 RestoreGlobalEvalState::RestoreGlobalEvalState(RestoreGlobalEvalState&& rhs)
     : context(std::exchange(rhs.context, nullptr)),
       eval_impl_lookup_to_identified_witness(
-          (rhs.eval_impl_lookup_to_identified_witness)) {}
+          (rhs.eval_impl_lookup_to_identified_witness)),
+      declaring_impl_decls(std::move(rhs.declaring_impl_decls)) {}
 
 RestoreGlobalEvalState::~RestoreGlobalEvalState() {
   if (!context) {
@@ -1011,6 +1043,9 @@ RestoreGlobalEvalState::~RestoreGlobalEvalState() {
     context->eval_impl_lookup_to_identified_witness() =
         eval_impl_lookup_to_identified_witness.value();
   }
+  if (declaring_impl_decls.has_value()) {
+    context->declaring_impl_decls() = std::move(declaring_impl_decls.value());
+  }
 }
 
 auto SaveAndRemoveGlobalEvalStateNotInSpecificKey(Context& context,
@@ -1019,12 +1054,22 @@ auto SaveAndRemoveGlobalEvalStateNotInSpecificKey(Context& context,
   RestoreGlobalEvalState restore(&context);
 
   auto specific = SpecificKeyFlagsMeaning::FromFlags(flags);
-  if (!specific.identified &&
-      context.eval_impl_lookup_to_identified_witness()) {
+
+  auto current_identified = context.eval_impl_lookup_to_identified_witness();
+  if (specific.identified != current_identified && current_identified) {
     // The specific is not from identifying. Drop the "we are identifying"
     // condition for its evaluation.
     restore.eval_impl_lookup_to_identified_witness =
         std::exchange(context.eval_impl_lookup_to_identified_witness(), false);
+  }
+
+  auto current_impl_decl = CurrentDeclaringImplDecl(context);
+  if (specific.impl_decl_node_id != current_impl_decl &&
+      current_impl_decl.has_value()) {
+    // The specific is not from the current impl decl. Drop the current impl
+    // decl condition for its evaluation.
+    restore.declaring_impl_decls =
+        std::exchange(context.declaring_impl_decls(), {});
   }
 
   return restore;

@@ -590,6 +590,7 @@ struct Worklist {
     Add(specific.generic_id);
     Add(specific.args_id);
     AddInteger(specific.flags.value1);
+    AddInteger(specific.flags.value2.index);
   }
 
   auto Add(SpecificInterface specific_interface) -> void {

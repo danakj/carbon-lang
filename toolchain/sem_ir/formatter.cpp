@@ -1768,6 +1768,9 @@ auto Formatter::FormatName(SpecificId id) -> void {
   if (specific.flags.identified()) {
     out() << ":identified";
   }
+  if (auto id = specific.flags.impl_decl(); id.has_value()) {
+    out() << ":impl(" << id << ")";
+  }
 }
 
 auto Formatter::FormatName(SpecificInterfaceId id) -> void {

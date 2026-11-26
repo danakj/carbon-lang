@@ -72,12 +72,16 @@ class GenericStore : public ValueStore<GenericId, Generic, Tag<CheckIRId>> {
 struct SpecificKeyFlags : Printable<SpecificKeyFlags> {
   // NOTE: Add any new fields to the SpecificId fingerprint.
   int32_t value1 [[clang::require_explicit_initialization]];
+  Parse::NodeId value2 [[clang::require_explicit_initialization]];
 
   // Hints for formatting about what state check was setting.
   auto identified() const -> bool { return !!value1; }
+  auto impl_decl() const -> Parse::NodeId { return value2; }
 
   auto Print(llvm::raw_ostream& out) const -> void {
-    out << "{" << "identified: " << identified() << "}";
+    out << "{";
+    out << "identified: " << identified();
+    out << "impl decl: " << llvm::formatv("{0:x}", impl_decl()) << "}";
   }
 
   auto operator==(const SpecificKeyFlags& rhs) const -> bool = default;
