@@ -192,7 +192,7 @@ impl forall [T: Z] T as Y where .Y1 = T.Z1 {}
 impl () as Z where .Z1 = {} and .Z2 = .Self.(Y.Y1) {}
 
 fn F() {
-  // Like in fail_todo_early_rewrite_query_indirectly_in_interface_specific.carbon
+  // TODO: Like in fail_todo_early_rewrite_query_indirectly_in_interface_specific.carbon
   // above, we identify the facet type in `impl () as Z...` before we know
   // the interface being impl'd. When we replace `.Self` with `()` in a
   // witness, we lose that self type impls `Z`. So the resulting query
@@ -286,24 +286,18 @@ class C(T: Y) {}
 impl () as Z where .Z1 = {} and .Z2 = C(.Self) {}
 
 fn F() {
-  // Like in fail_todo_early_rewrite_query_indirectly_in_interface_specific.carbon
+  // TODO: Like in fail_todo_early_rewrite_query_indirectly_in_interface_specific.carbon
   // above, we identify the facet type in `impl () as Z...` before we know
   // the interface being impl'd. When we replace `.Self` with `()` in a
   // witness, we lose that self type impls `Z`. So the resulting query
   // `() as Y` in a LookupImplWitness can not resolve to an ImplWitness.
   //
-  // CHECK:STDERR:        ╭─┤ fail_todo_early_rewrite_query_in_deduce.carbon:[[@LINE+14]]:37
-  // CHECK:STDERR:        │ class C(T: Y) {}
-  // CHECK:STDERR:        ·         ──┬─
-  // CHECK:STDERR:        ·           ╰──┤ initializing generic parameter `T` declared here
-  // CHECK:STDERR:        ·              │ [InitializingGenericParam]
-  // CHECK:STDERR:        ┆
+  // CHECK:STDERR:        ╭─┤ fail_todo_early_rewrite_query_in_deduce.carbon:[[@LINE+8]]:3
   // CHECK:STDERR: ->     │   () as (Z where .Z1 = {} and .Z2 = C(.Self));
-  // CHECK:STDERR:        ·                                     ┳━━━━━━━
-  // CHECK:STDERR:        ·                                     ┗━━┫ error: cannot convert type `.Self` that
-  // CHECK:STDERR:        ·                                        ┃        implements `Z` into type
-  // CHECK:STDERR:        ·                                        ┃        implementing `Y`
-  // CHECK:STDERR:        ·                                        ┃        [ConversionFailureFacetToFacet]
+  // CHECK:STDERR:        ·   ┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // CHECK:STDERR:        ·   ┗━━┫ error: cannot convert type `()` into type implementing
+  // CHECK:STDERR:        ·      ┃        `Z where .(Z.Z1) = {} and .(Z.Z2) = C(.Self as Y)`
+  // CHECK:STDERR:        ·      ┃        [ConversionFailureTypeToFacet]
   // CHECK:STDERR:        ╰────
   // CHECK:STDERR:
   () as (Z where .Z1 = {} and .Z2 = C(.Self));

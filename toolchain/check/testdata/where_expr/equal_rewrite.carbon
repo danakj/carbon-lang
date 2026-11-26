@@ -497,7 +497,7 @@ let K: (E where .F = .Self.G) = bool;
 // CHECK:STDOUT:       %.Self.as_type.loc11_52: type = facet_access_type %.Self.ref.loc11_52 [symbolic_self = constants.%.Self.frozen.as_type]
 // CHECK:STDOUT:       %.loc11_52: type = converted %.Self.ref.loc11_52, %.Self.as_type.loc11_52 [symbolic_self = constants.%.Self.frozen.as_type]
 // CHECK:STDOUT:       %F.ref.loc11_52: %E.assoc_type = name_ref F, @F.%assoc0 [concrete = constants.%assoc0]
-// CHECK:STDOUT:       %impl.elem0.loc11_52.1: type = impl_witness_access constants.%E.lookup_impl_witness.b1b, element0 [symbolic_self = constants.%impl.elem0.efe]
+// CHECK:STDOUT:       %impl.elem0.loc11_52.1: type = impl_witness_access constants.%E.lookup_impl_witness.b1b, element0 [concrete = constants.%i32]
 // CHECK:STDOUT:       %impl.elem0.subst.loc11_52.1: type = impl_witness_access_substituted %impl.elem0.loc11_52.1, %i32.loc11_44 [concrete = constants.%i32]
 // CHECK:STDOUT:       %i32.loc11_57: type = type_literal constants.%i32 [concrete = constants.%i32]
 // CHECK:STDOUT:       %rewrite.loc11_55.1 = requirement_rewrite %impl.elem0.subst.loc11_52.1, %i32.loc11_57 [concrete]

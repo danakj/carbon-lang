@@ -795,7 +795,7 @@ fn F(unused generic T: I & J where .I1 = .J1.I2) {}
 // CHECK:STDOUT:       %.Self.as_type.loc17_49: type = facet_access_type %.Self.ref.loc17_49 [symbolic_self = constants.%.Self.frozen.as_type]
 // CHECK:STDOUT:       %.loc17_49: type = converted %.Self.ref.loc17_49, %.Self.as_type.loc17_49 [symbolic_self = constants.%.Self.frozen.as_type]
 // CHECK:STDOUT:       %X.ref.loc17_49: %M.assoc_type = name_ref X, @X.%assoc0 [concrete = constants.%assoc0]
-// CHECK:STDOUT:       %impl.elem0.loc17_49.1: type = impl_witness_access constants.%M.lookup_impl_witness.beb, element0 [symbolic_self = constants.%impl.elem0.352]
+// CHECK:STDOUT:       %impl.elem0.loc17_49.1: type = impl_witness_access constants.%M.lookup_impl_witness.beb, element0 [symbolic_self = constants.%impl.elem1.66c]
 // CHECK:STDOUT:       %impl.elem0.subst.loc17_49.1: type = impl_witness_access_substituted %impl.elem0.loc17_49.1, %impl.elem1.loc17_37.1 [symbolic_self = constants.%impl.elem1.66c]
 // CHECK:STDOUT:       %rewrite.loc17_47.1 = requirement_rewrite %impl.elem1.loc17_44.1, %impl.elem0.subst.loc17_49.1 [concrete]
 // CHECK:STDOUT:       %.Self.ref.loc17_56: %M.type = name_ref .Self, %.Self.frozen.loc17_26 [symbolic_self = constants.%.Self.frozen.1cb]

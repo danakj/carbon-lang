@@ -520,6 +520,16 @@ auto EvalConstantInst(Context& context, SemIR::InstId inst_id,
           break;
         }
       }
+
+      if (!context.where_stack().empty()) {
+        auto witness = context.constant_values().Get(inst.witness_id);
+        auto index = inst.index;
+        if (auto result = context.where_stack().Peek().rewrites.Lookup(
+                Context::WhereStackEntry::Target{witness, index})) {
+          return ConstantEvalResult::Existing(
+              context.constant_values().Get(result.value()));
+        }
+      }
       break;
     }
     default:
