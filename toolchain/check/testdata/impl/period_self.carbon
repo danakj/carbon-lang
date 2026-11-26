@@ -388,6 +388,34 @@ impl () as Z where .Z1 = C(.Self).C1 and .Z2 = {} {
   }
 }
 
+// --- fail_todo_impl_self_witness_pollutes_specific.carbon
+library "[[@TEST_NAME]]";
+
+interface X {}
+interface Z { let Z1: type; let Z2: type; }
+impl forall [U: X] U as Z where .Z1 = {} and .Z2 = {} {}
+class C(U: X) { alias C1 = U.(Z.Z1); }
+impl () as X {}
+// Here we're inside an impl decl, so the specific C(()) is formed with
+// an ImplSelfWitness inside it for `() as Z`.
+impl () as Z where .Z1 = () and .Z2 = C(()).C1 {}
+interface Tuple {}
+impl () as Tuple {}
+fn F() {
+  // Here we're outside an impl decl, but if we reuse the same specific for
+  // C(()) then we get an ImplSelfWitness for `() as Z` which won't do an
+  // impl lookup and find the `impl () as Z...` above, so we don't resolve
+  // the access of Z1 (inside of the C1 alias).
+  // CHECK:STDERR:        ╭─┤ fail_todo_impl_self_witness_pollutes_specific.carbon:[[@LINE+7]]:3
+  // CHECK:STDERR: ->     │   C(()).C1 as Tuple;
+  // CHECK:STDERR:        ·   ━━━━━━━━┳━━━━━━━━
+  // CHECK:STDERR:        ·           ┗━━┫ error: cannot convert type `C1` into type implementing `Tuple`
+  // CHECK:STDERR:        ·              ┃        [ConversionFailureTypeToFacet]
+  // CHECK:STDERR:        ╰────
+  // CHECK:STDERR:
+  C(()).C1 as Tuple;
+}
+
 // CHECK:STDOUT: --- period_self_converted_in_impl_as_decl.carbon = $period_self_converted_in_impl_as_decl
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
