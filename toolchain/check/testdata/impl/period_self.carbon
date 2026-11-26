@@ -353,6 +353,76 @@ class C(T: Z & Y) {}
 impl forall [U: X] U as Z where .Z1 = C(.Self) {}
 //@dump-sem-ir-end
 
+// --- class_specific_accesses_impl_witness_table_order_one.carbon
+library "[[@TEST_NAME]]";
+
+interface Z {
+  let Z1: type;
+  let Z2: type;
+  fn F();
+}
+class C(T: Z) { alias C1 = T.Z1; }
+impl () as Z where .Z1 = {} and .Z2 = C(.Self).C1 {
+  fn F() {
+    let _: ().(Z.Z1) = {};
+    let _: ().(Z.Z2) = {};
+  }
+}
+
+// --- class_specific_accesses_impl_witness_table_order_two.carbon
+library "[[@TEST_NAME]]";
+
+interface Z {
+  let Z1: type;
+  let Z2: type;
+  fn F();
+}
+// Change the order of .Z1 and .Z2 constant ids.
+impl {} as Z where .Z2 = () and .Z1 = () { fn F() {} }
+
+class C(T: Z) { alias C1 = T.Z1; }
+impl () as Z where .Z1 = {} and .Z2 = C(.Self).C1 {
+  fn F() {
+    let _: ().(Z.Z1) = {};
+    let _: ().(Z.Z2) = {};
+  }
+}
+
+// --- class_specific_accesses_impl_witness_table_order_three.carbon
+library "[[@TEST_NAME]]";
+
+interface Z {
+  let Z1: type;
+  let Z2: type;
+  fn F();
+}
+class C(T: Z) { alias C1 = T.Z2; }
+impl () as Z where .Z1 = C(.Self).C1 and .Z2 = {} {
+  fn F() {
+    let _: ().(Z.Z1) = {};
+    let _: ().(Z.Z2) = {};
+  }
+}
+
+// --- class_specific_accesses_impl_witness_table_order_four.carbon
+library "[[@TEST_NAME]]";
+
+interface Z {
+  let Z1: type;
+  let Z2: type;
+  fn F();
+}
+// Change the order of .Z1 and .Z2 constant ids.
+impl {} as Z where .Z2 = () and .Z1 = () { fn F() {} }
+
+class C(T: Z) { alias C1 = T.Z2; }
+impl () as Z where .Z1 = C(.Self).C1 and .Z2 = {} {
+  fn F() {
+    let _: ().(Z.Z1) = {};
+    let _: ().(Z.Z2) = {};
+  }
+}
+
 // CHECK:STDOUT: --- period_self_converted_in_impl_as_decl.carbon = $period_self_converted_in_impl_as_decl
 // CHECK:STDOUT:
 // CHECK:STDOUT: constants {
